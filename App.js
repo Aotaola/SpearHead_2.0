@@ -1,8 +1,8 @@
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import { Button, Text, View, Image, StyleSheet, ActivityIndicator, ScrollView, TouchableOpacity, Marker  } from 'react-native';
-import MapView from 'react-native-maps';
-import Geolocation from 'react-native-geolocation-service';
+import { Button, Text, View, Image, StyleSheet, ActivityIndicator, ScrollView, TouchableOpacity  } from 'react-native';
+//import MapView from 'react-native-maps';
+// import Geolocation from 'react-native-geolocation-service';
 import {useEffect, useState} from 'react';
 import afc_logo from './assets/afc_logo.png';
 
@@ -96,14 +96,14 @@ function ContactScreen({navigation}) {
         title = "Home"
         onPress={() => navigation.navigate('Home')}
         />
-      <MapView
+      {/* <MapView
         region={{
           latitude: location.lat,
           longitude: location.lng
         }}>
-        <Marker 
-          coordinate={{latitude: location.lat, longitude: location.lng}}/>
-      </MapView>
+        {/* <Marker 
+          coordinate={{latitude: location.lat, longitude: location.lng}}/> */}
+      {/* </MapView> */} 
     </View>
   );
 }
