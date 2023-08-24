@@ -1,6 +1,8 @@
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import { Button, Text, View, Image, StyleSheet, ActivityIndicator, ScrollView, Link } from 'react-native';
+import { Button, Text, View, Image, StyleSheet, ActivityIndicator, ScrollView, TouchableOpacity, Marker  } from 'react-native';
+import MapView from 'react-native-maps';
+import Geolocation from 'react-native-geolocation-service';
 import {useEffect, useState} from 'react';
 import afc_logo from './assets/afc_logo.png';
 
@@ -37,39 +39,75 @@ useEffect(() => {
         onPress={() => navigation.navigate('Info')}  
       />
       {updates.map((item, index) => (
-        <View>
-         <Text style = {styles.newsTitle} key={index}>{item.title}</Text>
-         
-        </View>
-         
+        <TouchableOpacity 
+        key={index}
+        onPress={() => navigation.navigate('Update', {item})}
+        >
+        <Text style={styles.newsTitle}>{item.title}</Text>
+        </TouchableOpacity>
         ))}
     </ScrollView>
   );
 }
 
-function UpdateScreen({navigation, index}){
-  return(
-    <View>
 
+function UpdateScreen({route}){
+  const {item} = route.params;
+
+  return(
+    <View style={styles.newsContainer}>
+      <Text style={styles.newsTitle}>{item.title}</Text>
+      <Text style={styles.newsBody}>{item.body}</Text> 
+      <Text>{item.date}</Text>
     </View>
   );
 }
 
+
 function ContactScreen({navigation}) {
+  const [location, setLocation] = useState(null)
+
+  useEffect(() => {
+    requestLocationPermission();
+    getCurrentLocation();
+  },[])
+
+  const requestLocationPermission = async() => {
+
+  }
+  
+  const getCurrentLocation = () => {
+    Geolocation.getCurrentPosition(
+      position => {
+        const coords = position.coords
+        const lat = coords.latitude
+        const lon = coords.longitude
+        setLocation({lat, lon})
+      }
+    )
+  }
   return (
     <View>
-      <Text>Contact Screen</Text>
       <Button
         title="Info"
         onPress={() => navigation.navigate('Info')}  
-      />
+        />
       <Button 
         title = "Home"
         onPress={() => navigation.navigate('Home')}
         />
+      <MapView
+        region={{
+          latitude: location.lat,
+          longitude: location.lng
+        }}>
+        <Marker 
+          coordinate={{latitude: location.lat, longitude: location.lng}}/>
+      </MapView>
     </View>
   );
 }
+
 function InfoScreen({navigation}) {
   return (
     <View>
@@ -77,7 +115,7 @@ function InfoScreen({navigation}) {
       <Button
         title="Contact"
         onPress={() => navigation.navigate('Contact')}  
-      />
+        />
       <Button 
         title = "Home"
         onPress={() => navigation.navigate('Home')}
@@ -107,6 +145,7 @@ function App() {
           })}  />
           <Stack.Screen name="Contact" component={ContactScreen} />
           <Stack.Screen name="Info" component={InfoScreen} />
+          <Stack.Screen name="Update" component={UpdateScreen}/>
         </Stack.Navigator>
         <View style={styles.footer}>
           <Text style={styles.footerText}>Built by Alejandro Otaola</Text>
@@ -127,12 +166,19 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
+  newsContainer: {
+
+  },
   newsTitle: {
-    padding: 10,
-    fontSize: 16,
+    padding: 0,
+    fontSize: 0,
     fontFamily: 'Helvetica',
     backgroundColor: 'white',
-  
+  },
+  newsBody: {
+    fontSize: 30,
+    fontFamily: 'Helvetica',
+    backgroundColor: 'white',
   },
   header: {
     fontFamily: 'Helvetica',

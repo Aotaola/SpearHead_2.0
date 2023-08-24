@@ -1,15 +1,17 @@
 {
   "expo": {
-    "name": "afc_mobile_app",
-    "slug": "afc_mobile_app",
+    "name": "MyApp",
+    "slug": "my-app",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
-    "userInterfaceStyle": "light",
     "splash": {
       "image": "./assets/splash.png",
       "resizeMode": "contain",
-      "backgroundColor": "#ffffff"
+      "backgroundColor": "#ffffff" 
+    },
+    "updates": {
+      "fallbackToCacheTimeout": 0
     },
     "assetBundlePatterns": [
       "**/*"
@@ -20,11 +22,19 @@
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
-        "backgroundColor": "#ffffff"
+        "backgroundColor": "#FFFFFF"
       }
     },
     "web": {
       "favicon": "./assets/favicon.png"
+    }
+  },
+
+  "name": "MyApp",
+
+  "ios": {
+    "infoPlist": {
+      "NSLocationWhenInUseUsageDescription": "This app uses your location to show nearby stores."
     }
   }
 }
