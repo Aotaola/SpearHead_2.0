@@ -2,7 +2,8 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { Button, Text, View, Image, StyleSheet, ActivityIndicator, ScrollView, TouchableOpacity  } from 'react-native';
 //import MapView from 'react-native-maps';
-// import Geolocation from 'react-native-geolocation-service';
+//import Geolocation from 'react-native-geolocation-service';
+//import Geolocation from '@react-native-community/geolocation';
 import {useEffect, useState} from 'react';
 import afc_logo from './assets/afc_logo.png';
 
@@ -37,6 +38,10 @@ useEffect(() => {
       <Button
         title="Info"
         onPress={() => navigation.navigate('Info')}  
+      />
+      <Button
+        title="Location"
+        onPress={() => navigation.navigate('Location')}  
       />
       {updates.map((item, index) => (
         <TouchableOpacity 
@@ -77,7 +82,7 @@ function ContactScreen({navigation}) {
   }
   
   const getCurrentLocation = () => {
-    Geolocation.getCurrentPosition(
+    geolocation.getCurrentPosition(
       position => {
         const coords = position.coords
         const lat = coords.latitude
@@ -107,6 +112,35 @@ function ContactScreen({navigation}) {
     </View>
   );
 }
+
+function LocationScreen({navigation}){
+  Geolocation.getCurrentPosition(position => {
+    const lat = position.coords.latitude;
+    const lng = position.coords.longitude;
+  });
+    // Apple Maps
+ // let url = `https://maps.apple.com/?q=afc&near=${lat},${lng}`;
+
+// Google Maps 
+  //let url = `https://www.google.com/maps/search/?api=1&query=afc&query_place_id=${lat},${lng}`;
+  
+    // Use lat/lng  
+
+  
+  return (
+    <View>
+      <Button 
+  title="Find AFC Near You"
+  onPress={() => {
+    getUserLocation();
+    openMapsApp(); 
+  }}
+/>
+
+    </View>
+  )
+}
+
 
 function InfoScreen({navigation}) {
   return (
@@ -146,6 +180,7 @@ function App() {
           <Stack.Screen name="Contact" component={ContactScreen} />
           <Stack.Screen name="Info" component={InfoScreen} />
           <Stack.Screen name="Update" component={UpdateScreen}/>
+          <Stack.Screen name="Location" component={LocationScreen} />
         </Stack.Navigator>
         <View style={styles.footer}>
           <Text style={styles.footerText}>Built by Alejandro Otaola</Text>
@@ -170,13 +205,14 @@ const styles = StyleSheet.create({
 
   },
   newsTitle: {
-    padding: 0,
-    fontSize: 0,
+    padding: 10,
+    fontSize: 30,
     fontFamily: 'Helvetica',
     backgroundColor: 'white',
   },
   newsBody: {
-    fontSize: 30,
+    paddingTop: 10,
+    fontSize: 15,
     fontFamily: 'Helvetica',
     backgroundColor: 'white',
   },
