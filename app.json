@@ -36,5 +36,13 @@
     "infoPlist": {
       "NSLocationWhenInUseUsageDescription": "This app uses your location to show nearby stores."
     }
-  }
+  },
+  "plugins": [
+    [
+      "expo-location",
+      {
+        "locationAlwaysAndWhenInUsePermission": "Allow $(PRODUCT_NAME) to use your location."
+      }
+      ]
+    ]
 }

@@ -1,11 +1,9 @@
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { Button, Text, View, Image, StyleSheet, ActivityIndicator, ScrollView, TouchableOpacity  } from 'react-native';
-//import MapView from 'react-native-maps';
-//import Geolocation from 'react-native-geolocation-service';
-//import Geolocation from '@react-native-community/geolocation';
 import {useEffect, useState} from 'react';
 import afc_logo from './assets/afc_logo.png';
+import * as Location from 'expo-location';
 
 function HomeScreen({navigation}) {
 const [updates, setUpdates] = useState([])
@@ -39,10 +37,6 @@ useEffect(() => {
         title="Info"
         onPress={() => navigation.navigate('Info')}  
       />
-      <Button
-        title="Location"
-        onPress={() => navigation.navigate('Location')}  
-      />
       {updates.map((item, index) => (
         <TouchableOpacity 
         key={index}
@@ -70,27 +64,30 @@ function UpdateScreen({route}){
 
 
 function ContactScreen({navigation}) {
-  const [location, setLocation] = useState(null)
+  const [location, setLocation] = useState(null);
+  const [errorMsg, setErrorMsg] = useState(null);
 
   useEffect(() => {
-    requestLocationPermission();
-    getCurrentLocation();
-  },[])
-
-  const requestLocationPermission = async() => {
-
-  }
-  
-  const getCurrentLocation = () => {
-    geolocation.getCurrentPosition(
-      position => {
-        const coords = position.coords
-        const lat = coords.latitude
-        const lon = coords.longitude
-        setLocation({lat, lon})
+    (async () => {
+      
+      let { status } = await Location.requestForegroundPermissionsAsync();
+      if (status !== 'granted') {
+        setErrorMsg('Permission to access location was denied');
+        return;
       }
-    )
+
+      let location = await Location.getCurrentPositionAsync({});
+      setLocation(location);
+    })();
+  }, []);
+
+  let text = 'Waiting..';
+  if (errorMsg) {
+    text = errorMsg;
+  } else if (location) {
+    text = JSON.stringify(location);
   }
+
   return (
     <View>
       <Button
@@ -101,46 +98,12 @@ function ContactScreen({navigation}) {
         title = "Home"
         onPress={() => navigation.navigate('Home')}
         />
-      {/* <MapView
-        region={{
-          latitude: location.lat,
-          longitude: location.lng
-        }}>
-        {/* <Marker 
-          coordinate={{latitude: location.lat, longitude: location.lng}}/> */}
-      {/* </MapView> */} 
+      <View style={styles.container}>
+        <Text style={styles.paragraph}>{text}</Text>
+      </View>
     </View>
   );
 }
-
-function LocationScreen({navigation}){
-  Geolocation.getCurrentPosition(position => {
-    const lat = position.coords.latitude;
-    const lng = position.coords.longitude;
-  });
-    // Apple Maps
- // let url = `https://maps.apple.com/?q=afc&near=${lat},${lng}`;
-
-// Google Maps 
-  //let url = `https://www.google.com/maps/search/?api=1&query=afc&query_place_id=${lat},${lng}`;
-  
-    // Use lat/lng  
-
-  
-  return (
-    <View>
-      <Button 
-  title="Find AFC Near You"
-  onPress={() => {
-    getUserLocation();
-    openMapsApp(); 
-  }}
-/>
-
-    </View>
-  )
-}
-
 
 function InfoScreen({navigation}) {
   return (
@@ -180,7 +143,6 @@ function App() {
           <Stack.Screen name="Contact" component={ContactScreen} />
           <Stack.Screen name="Info" component={InfoScreen} />
           <Stack.Screen name="Update" component={UpdateScreen}/>
-          <Stack.Screen name="Location" component={LocationScreen} />
         </Stack.Navigator>
         <View style={styles.footer}>
           <Text style={styles.footerText}>Built by Alejandro Otaola</Text>
