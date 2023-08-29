@@ -34,7 +34,7 @@
 
   "ios": {
     "infoPlist": {
-      "NSLocationWhenInUseUsageDescription": "This app uses your location to show nearby stores."
+      "NSLocationWhenInUseUsageDescription": "Allow Afc Mobile access to your location to find your nearest urgent care."
     }
   },
   "plugins": [

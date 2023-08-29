@@ -1,13 +1,28 @@
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import { Button, Text, View, Image, StyleSheet, ActivityIndicator, ScrollView, TouchableOpacity  } from 'react-native';
+import { Button, Text, View, Image, StyleSheet, ActivityIndicator, ScrollView, TouchableOpacity} from 'react-native';
 import {useEffect, useState} from 'react';
 import afc_logo from './assets/afc_logo.png';
 import * as Location from 'expo-location';
+import MapView, { Marker } from 'react-native-maps';
+
+const GOOGLE_API_KEY = 'YOUR_GOOGLE_API_KEY';
+
+async function getCoordinatesFromAddress(address) {
+  const response = await fetch(`https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(address)}&key=${GOOGLE_API_KEY}`);
+  const data = await response.json();
+  if (data.results && data.results.length > 0) {
+    const location = data.results[0].geometry.location;
+    return { latitude: location.lat, longitude: location.lng };
+  }
+  return null; // handle error or no results scenario
+}
+
 
 function HomeScreen({navigation}) {
 const [updates, setUpdates] = useState([])
 const [loading, setLoading] = useState(true);
+
 
 useEffect(() => {
   fetch('https://jsonplaceholder.typicode.com/posts')
@@ -66,6 +81,7 @@ function UpdateScreen({route}){
 function ContactScreen({navigation}) {
   const [location, setLocation] = useState(null);
   const [errorMsg, setErrorMsg] = useState(null);
+  
 
   useEffect(() => {
     (async () => {
@@ -98,9 +114,29 @@ function ContactScreen({navigation}) {
         title = "Home"
         onPress={() => navigation.navigate('Home')}
         />
-      <View style={styles.container}>
-        <Text style={styles.paragraph}>{text}</Text>
-      </View>
+              {
+        location ? (
+          <MapView 
+            style={{  width: '100%', height: '70%'}} // Estyle={{ width: '100%', height: '100%' }} nsure the map fills the space
+            region={{
+              latitude: location.coords.latitude,
+              longitude: location.coords.longitude,
+              latitudeDelta: 0.0922,
+              longitudeDelta: 0.0421
+            }}
+          >
+            <Marker 
+              coordinate={{
+                latitude: location.coords.latitude,
+                longitude: location.coords.longitude
+              }}
+              title="Your Location"
+            />
+          </MapView>
+          //<Text style={styles.paragraph}>{text}</Text>
+        ) : ( <Text style={styles.paragraph}> no location found </Text>
+      )
+    }
     </View>
   );
 }
@@ -163,8 +199,10 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
-  newsContainer: {
-
+  paragraph: {
+    padding: 16,
+    fontSize: 18,
+    textAlign: 'center',
   },
   newsTitle: {
     padding: 10,
