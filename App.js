@@ -1,6 +1,7 @@
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { Button, Text, View, Image, StyleSheet, ActivityIndicator, ScrollView, TouchableOpacity} from 'react-native';
+import { WebView } from 'react-native-webview';
 import {useEffect, useState} from 'react';
 import afc_logo from './assets/afc_logo.png';
 import * as Location from 'expo-location';
@@ -137,14 +138,17 @@ function ContactScreen({navigation}) {
         ) : ( <Text style={styles.paragraph}> no location found </Text>
       )
     }
+    <View style={styles.container}>
+  
+    </View>
     </View>
   );
 }
 
 function InfoScreen({navigation}) {
+  const [showWebview, setShowWebview] = useState(false);
   return (
-    <View>
-      <Text >Info Screen</Text>
+    <View style={styles.infoscontainer}>
       <Button
         title="Contact"
         onPress={() => navigation.navigate('Contact')}  
@@ -153,6 +157,20 @@ function InfoScreen({navigation}) {
         title = "Home"
         onPress={() => navigation.navigate('Home')}
         />
+      <View style={styles.container}>
+        <Text style={styles.newsBody}>
+          5812 Hollywood Blvd, Hollywood, FL 33021 {'\n'}
+          Contact information: +19548667435{'\n'} 
+          {/* add call access to the phone number */}
+        </Text>
+        {showWebview ? (
+        <WebView source={{ uri: 'https://www.afcurgentcare.com/hollywood/' }} />
+      ) : (
+      <View style={styles.buttonContainer}>
+        <Button title="Open Link" onPress={() => setShowWebview(true)}  color="darkgrey" />
+      </View> 
+      )}
+      </View>
     </View>
   );
 }
@@ -198,6 +216,32 @@ const styles = StyleSheet.create({
     backgroundColor: 'lightgrey',
     justifyContent: 'center',
     alignItems: 'center',
+  },
+  infoscontainer: {
+    flex:1,
+    alignItems: 'center'
+    
+
+  },
+  primaryButton: {
+    backgroundColor: '#D32F2F', // A shade of red
+    padding: 10,
+    borderRadius: 8,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  primaryButtonText: {
+    color: 'white',
+    fontWeight: 'bold',
+  },
+  buttonContainer: {
+    width: 80,
+    height: 50,
+    borderRadius: 8,
+    borderWidth: 2,
+    borderColor: '#9E9E9E', // A shade of grey for the border
+    alignItems: 'center',
+    justifyContent: 'center'
   },
   paragraph: {
     padding: 16,
