@@ -1,5 +1,5 @@
 import { NavigationContainer } from '@react-navigation/native';
-import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import { createMaterialBottomTabNavigator } from '@react-navigation/material-bottom-tabs';
 import { Button, Text, View, Image, StyleSheet, ActivityIndicator, ScrollView, TouchableOpacity} from 'react-native';
 import { WebView } from 'react-native-webview';
 import {useEffect, useState} from 'react';
@@ -45,14 +45,6 @@ useEffect(() => {
   
   return (
     <ScrollView >
-      <Button 
-          title="Contact"
-          onPress={() => navigation.navigate('Contact')}
-        />
-      <Button
-        title="Info"
-        onPress={() => navigation.navigate('Info')}  
-      />
       {updates.map((item, index) => (
         <TouchableOpacity 
         key={index}
@@ -107,14 +99,6 @@ function ContactScreen({navigation}) {
 
   return (
     <View>
-      <Button
-        title="Info"
-        onPress={() => navigation.navigate('Info')}  
-        />
-      <Button 
-        title = "Home"
-        onPress={() => navigation.navigate('Home')}
-        />
               {
         location ? (
           <MapView 
@@ -149,14 +133,6 @@ function InfoScreen({navigation}) {
   const [showWebview, setShowWebview] = useState(false);
   return (
     <View style={styles.infoscontainer}>
-      <Button
-        title="Contact"
-        onPress={() => navigation.navigate('Contact')}  
-        />
-      <Button 
-        title = "Home"
-        onPress={() => navigation.navigate('Home')}
-        />
       <View style={styles.container}>
         <Text style={styles.newsBody}>
           5812 Hollywood Blvd, Hollywood, FL 33021 {'\n'}
@@ -175,42 +151,36 @@ function InfoScreen({navigation}) {
   );
 }
 
-const Stack = createNativeStackNavigator();
+const Tab = createMaterialBottomTabNavigator();
 
 function App() {
   return (
     <View style={styles.container}>
       <View style={styles.logoContainer}>
        <Image source={afc_logo} style={styles.logo} />
-       <Text>American Family Care</Text>
+       <Text style={styles.mainHeading}>American Family Care</Text>
       </View>
 
       <NavigationContainer>
-        <Stack.Navigator
-          screenOptions={{
-            headerStyle: styles.header,
-            headerTitleStyle: styles.headerTitle,
-            headerMode: 'screen',
-            headerLayoutPreset: 'left'
-          }}
-        >
-          <Stack.Screen
-            name="Home"
-            component={HomeScreen}
-            options={({ navigation }) => ({
-              headerMode: 'screen',
-              headerLayoutPreset: 'left'
-            })}
-          />
-          <Stack.Screen name="Contact" component={ContactScreen} />
-          <Stack.Screen name="Info" component={InfoScreen} />
-          <Stack.Screen name="Update" component={UpdateScreen} />
-        </Stack.Navigator>
+        <Tab.Navigator tabBarPosition="top" screenOptions={{
+          "tabBarStyle": [
+          {
+          "display": "flex"
+          },
+          null
+          ]
+        }}>
+          <Tab.Screen name="Home" component={HomeScreen} />
+          <Tab.Screen name="Contact" component={ContactScreen} />
+          <Tab.Screen name="Info" component={InfoScreen} />
+          <Tab.Screen name="Update" component={UpdateScreen} />
+        </Tab.Navigator>
       </NavigationContainer>
 
-    <View style={styles.footer}>
-      <Text style={styles.footerText}>Built by Alejandro Otaola</Text>
-    </View>
+
+    {/* <View style={styles.footer}> */}
+      {/* <Text style={styles.footerText}>Built by Alejandro Otaola</Text> */}
+    {/* </View> */}
   </View>
     
   );
@@ -223,7 +193,22 @@ const styles = StyleSheet.create({
     paddingTop: 20
   },
   logoContainer: {
-    paddingStart: 10, 
+    flexDirection: 'row', 
+    paddingStart: 10,
+    paddingEnd: 10,
+    paddingBottom: 5,
+    justifyContent: 'flex-start'
+  },
+  mainHeading: {
+    marginLeft: 20,
+    fontFamily: 'Helvetica',
+    fontSize: 18,                
+    fontWeight: '200',           
+    color: '#333',               
+    letterSpacing: 0.7,          
+    position: 'absolute', 
+    bottom: 10,
+    left: 70
   },
   infoscontainer: {
     flex:1,
