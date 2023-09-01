@@ -179,30 +179,39 @@ const Stack = createNativeStackNavigator();
 
 function App() {
   return (
-    
-     <NavigationContainer style={styles.container}>
-        <Image source = {afc_logo}  style={styles.logo} />
-        <Text>American Family Care</Text> 
-        <Stack.Navigator screenOptions={{
-          headerStyle: styles.header,
-          headerTitleStyle: styles.headerTitle,
-          headerMode: 'screen',
-          headerLayoutPreset: 'left'}}
-          >
-          <Stack.Screen name="Home" component={HomeScreen} 
-          options={({ navigation }) => ({
+    <View style={styles.container}>
+      <View style={styles.logoContainer}>
+       <Image source={afc_logo} style={styles.logo} />
+       <Text>American Family Care</Text>
+      </View>
+
+      <NavigationContainer>
+        <Stack.Navigator
+          screenOptions={{
+            headerStyle: styles.header,
+            headerTitleStyle: styles.headerTitle,
             headerMode: 'screen',
             headerLayoutPreset: 'left'
-          })}  />
+          }}
+        >
+          <Stack.Screen
+            name="Home"
+            component={HomeScreen}
+            options={({ navigation }) => ({
+              headerMode: 'screen',
+              headerLayoutPreset: 'left'
+            })}
+          />
           <Stack.Screen name="Contact" component={ContactScreen} />
           <Stack.Screen name="Info" component={InfoScreen} />
-          <Stack.Screen name="Update" component={UpdateScreen}/>
+          <Stack.Screen name="Update" component={UpdateScreen} />
         </Stack.Navigator>
-        <View style={styles.footer}>
-          <Text style={styles.footerText}>Built by Alejandro Otaola</Text>
-        </View>
       </NavigationContainer>
-     
+
+    <View style={styles.footer}>
+      <Text style={styles.footerText}>Built by Alejandro Otaola</Text>
+    </View>
+  </View>
     
   );
 }
@@ -210,18 +219,15 @@ function App() {
 const styles = StyleSheet.create({
  
   container: {
-    paddingTop: 10,
-    fontFamily: 'Helvetica',
     flex: 1,
-    backgroundColor: 'lightgrey',
-    justifyContent: 'center',
-    alignItems: 'center',
+    paddingTop: 20
+  },
+  logoContainer: {
+    paddingStart: 10, 
   },
   infoscontainer: {
     flex:1,
     alignItems: 'center'
-    
-
   },
   primaryButton: {
     backgroundColor: '#D32F2F', // A shade of red
