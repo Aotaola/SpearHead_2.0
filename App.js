@@ -59,10 +59,17 @@ useEffect(() => {
 
 
 function UpdateScreen({route}){
+
+  if (!route.params) {
+    
+    return <Text style={styles.newsError}>Error loading data, please select an article from the homepage</Text> 
+  }
   const {item} = route.params;
 
   return(
+    
     <View style={styles.newsContainer}>
+      
       <Text style={styles.newsTitle}>{item.title}</Text>
       <Text style={styles.newsBody}>{item.body}</Text> 
       <Text>{item.date}</Text>
@@ -162,25 +169,29 @@ function App() {
       </View>
 
       <NavigationContainer>
-        <Tab.Navigator tabBarPosition="top" screenOptions={{
-          "tabBarStyle": [
-          {
-          "display": "flex"
-          },
-          null
-          ]
-        }}>
+        <Tab.Navigator tabBarPosition="top"  
+          initialRouteName="Home"
+          activeColor="red"
+          inactiveColor="grey"
+          fontFamily="Helvetica"
+          barStyle={{ backgroundColor: 'lightgrey', 
+          display: 'flex', 
+          height: 90, 
+          borderTop: '1px red'
+          }}>
           <Tab.Screen name="Home" component={HomeScreen} />
           <Tab.Screen name="Contact" component={ContactScreen} />
           <Tab.Screen name="Info" component={InfoScreen} />
-          <Tab.Screen name="Update" component={UpdateScreen} />
+          <Tab.Screen name="Update" component={UpdateScreen} options={{
+            tabBarVisible: false
+          }}/>
         </Tab.Navigator>
       </NavigationContainer>
 
 
-    {/* <View style={styles.footer}> */}
-      {/* <Text style={styles.footerText}>Built by Alejandro Otaola</Text> */}
-    {/* </View> */}
+    <View style={styles.footer}> 
+      <Text style={styles.footerText}>Built by Alejandro Otaola</Text>
+     </View>
   </View>
     
   );
@@ -190,25 +201,28 @@ const styles = StyleSheet.create({
  
   container: {
     flex: 1,
-    paddingTop: 20
+    paddingTop: 50,
+    paddingBottom: 10,
+    backgroundColor: 'lightgrey'
   },
   logoContainer: {
     flexDirection: 'row', 
-    paddingStart: 10,
+    paddingStart: 30,
     paddingEnd: 10,
-    paddingBottom: 5,
-    justifyContent: 'flex-start'
+    paddingBottom: 10,
+    justifyContent: 'flex-start',
+    borderBottomWidth: 1,
+    borderBottomColor: 'red',
   },
   mainHeading: {
-    marginLeft: 20,
     fontFamily: 'Helvetica',
-    fontSize: 18,                
+    fontSize: 20,                
     fontWeight: '200',           
     color: '#333',               
     letterSpacing: 0.7,          
     position: 'absolute', 
     bottom: 10,
-    left: 70
+    left: 100
   },
   infoscontainer: {
     flex:1,
@@ -225,15 +239,6 @@ const styles = StyleSheet.create({
     color: 'white',
     fontWeight: 'bold',
   },
-  buttonContainer: {
-    width: 80,
-    height: 50,
-    borderRadius: 8,
-    borderWidth: 2,
-    borderColor: '#9E9E9E', // A shade of grey for the border
-    alignItems: 'center',
-    justifyContent: 'center'
-  },
   paragraph: {
     padding: 16,
     fontSize: 18,
@@ -248,6 +253,12 @@ const styles = StyleSheet.create({
   newsBody: {
     paddingTop: 10,
     fontSize: 15,
+    fontFamily: 'Helvetica',
+    backgroundColor: 'white',
+  },
+  newsError: {
+    padding: 10,
+    fontSize: 20,
     fontFamily: 'Helvetica',
     backgroundColor: 'white',
   },
@@ -275,15 +286,18 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     bottom: 0,
-    height: 50,
+    height: 30,
     backgroundColor: 'lightgrey',
     alignItems: 'center',
     justifyContent: 'center',
   },
   footerText: {
     fontFamily: 'Helvetica',
-    color: 'red',
-    fontSize: 15,
+    color: 'black',
+    letterSpacing: 0.7,  
+    fontSize: 10,
+    position: 'absolute',
+    top:5
   },
 });
 
