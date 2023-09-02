@@ -49,8 +49,8 @@ useEffect(() => {
         <TouchableOpacity 
         key={index}
         onPress={() => navigation.navigate('Update', {item})}
-        >
-        <Text style={styles.newsTitle}>{item.title}</Text>
+        > 
+        <Text style={styles.newsTitle}> * {item.title}</Text>
         </TouchableOpacity>
         ))}
     </ScrollView>
@@ -169,29 +169,35 @@ function App() {
       </View>
 
       <NavigationContainer>
-        <Tab.Navigator tabBarPosition="top"  
+        <Tab.Navigator tabBarPosition="bottom" 
           initialRouteName="Home"
-          activeColor="red"
-          inactiveColor="grey"
+          activeColor="black"
+          inactiveColor="whitesmoke"
+          iconActiveColor="red"
           fontFamily="Helvetica"
-          barStyle={{ backgroundColor: 'lightgrey', 
-          display: 'flex', 
-          height: 90, 
-          borderTop: '1px red'
+          barStyle={{ backgroundColor: 'crimson',
+          height: 80,
+          position: 'absolute',
+          left: 10,
+          right: 10,
+          bottom: 20,
+          borderRadius: 20,
+          overflow: 'hidden'
           }}>
-          <Tab.Screen name="Home" component={HomeScreen} />
-          <Tab.Screen name="Contact" component={ContactScreen} />
-          <Tab.Screen name="Info" component={InfoScreen} />
-          <Tab.Screen name="Update" component={UpdateScreen} options={{
-            tabBarVisible: false
+          <Tab.Screen name="Home" component={HomeScreen} style={styles.navButton} options={{
+            tabBarIcon: 'home-circle-outline', 
+            tabBarIconColor: 'red'
+          }}/>
+          <Tab.Screen name="Contact" component={ContactScreen} style={styles.navButton} options={{
+            tabBarIcon: 'map-marker-plus-outline'}}/>
+          <Tab.Screen name="Info" component={InfoScreen} style={styles.navButton} options={{
+            tabBarIcon: 'information-outline'}}/>
+          <Tab.Screen name="Update" component={UpdateScreen} style={styles.navButton} options={{
+            tabBarVisible: false,
+            tabBarIcon: 'update',
           }}/>
         </Tab.Navigator>
       </NavigationContainer>
-
-
-    <View style={styles.footer}> 
-      <Text style={styles.footerText}>Built by Alejandro Otaola</Text>
-     </View>
   </View>
     
   );
@@ -201,15 +207,15 @@ const styles = StyleSheet.create({
  
   container: {
     flex: 1,
-    paddingTop: 50,
-    paddingBottom: 10,
-    backgroundColor: 'lightgrey'
+    backgroundColor: 'crimson',
   },
   logoContainer: {
+    backgroundColor: 'lightgrey',
     flexDirection: 'row', 
     paddingStart: 30,
     paddingEnd: 10,
     paddingBottom: 10,
+    paddingTop: 40,
     justifyContent: 'flex-start',
     borderBottomWidth: 1,
     borderBottomColor: 'red',
@@ -246,12 +252,15 @@ const styles = StyleSheet.create({
   },
   newsTitle: {
     padding: 10,
-    fontSize: 30,
+    fontSize: 20,
     fontFamily: 'Helvetica',
     backgroundColor: 'white',
   },
   newsBody: {
     paddingTop: 10,
+    paddingBottom: 10,
+    paddingLeft: 40,
+    paddingRight: 40,
     fontSize: 15,
     fontFamily: 'Helvetica',
     backgroundColor: 'white',
