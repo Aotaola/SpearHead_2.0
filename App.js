@@ -7,16 +7,18 @@ import afc_logo from './assets/afc_logo.png';
 import * as Location from 'expo-location';
 import MapView, { Marker } from 'react-native-maps';
 
-const GOOGLE_API_KEY = 'YOUR_GOOGLE_API_KEY';
+const GOOGLE_API_KEY = 'AIzaSyBGAPK3-L4ipbDv7LZN6VmK1TqalvOGfmg';
 
-async function getCoordinatesFromAddress(address) {
+async function getBusinessCoordinates() {
+  const address = "5812 Hollywood Blvd, Hollywood, FL 33021";
   const response = await fetch(`https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(address)}&key=${GOOGLE_API_KEY}`);
   const data = await response.json();
   if (data.results && data.results.length > 0) {
     const location = data.results[0].geometry.location;
     return { latitude: location.lat, longitude: location.lng };
   }
-  return null; // handle error or no results scenario
+  console.log('Geocode API response:', data);
+  return null; 
 }
 
 
@@ -44,7 +46,7 @@ useEffect(() => {
   }
   
   return (
-    <ScrollView >
+    <ScrollView>
       {updates.map((item, index) => (
         <TouchableOpacity 
         key={index}
@@ -79,7 +81,8 @@ function UpdateScreen({route}){
 
 
 function ContactScreen({navigation}) {
-  const [location, setLocation] = useState(null);
+  const [userLocation, setUserLocation] = useState(null);
+  const [businessLocation, setBusinessLocation] = useState(null);
   const [errorMsg, setErrorMsg] = useState(null);
   
 
@@ -92,40 +95,60 @@ function ContactScreen({navigation}) {
         return;
       }
 
-      let location = await Location.getCurrentPositionAsync({});
-      setLocation(location);
+      // fetching user location
+      let userLoc = await Location.getCurrentPositionAsync({});
+      setUserLocation(userLoc);
+      console.log('Fetched user location:', userLoc);
+
+      //
+      //fetching business location
+      let businessLoc = await getBusinessCoordinates({});
+      setBusinessLocation(businessLoc);
+      console.log('Fetched business location:', businessLoc);
+
     })();
   }, []);
 
   let text = 'Waiting..';
   if (errorMsg) {
     text = errorMsg;
-  } else if (location) {
-    text = JSON.stringify(location);
+  } else if (userLocation) {
+    text = JSON.stringify(userLocation);
   }
+
+
+  console.log("Business Location:", businessLocation);
+  console.log("User Location:", userLocation);
+  
+
 
   return (
     <View>
               {
-        location ? (
+        userLocation && businessLocation ? (
           <MapView 
             style={{  width: '100%', height: '70%'}} // Estyle={{ width: '100%', height: '100%' }} nsure the map fills the space
             region={{
-              latitude: location.coords.latitude,
-              longitude: location.coords.longitude,
+              latitude: Location.coords.latitude,
+              longitude: Location.coords.longitude,
               latitudeDelta: 0.0922,
               longitudeDelta: 0.0421
             }}
           >
             <Marker 
               coordinate={{
-                latitude: location.coords.latitude,
-                longitude: location.coords.longitude
+                latitude: userLocation.coords.latitude,
+                longitude: userLocation.coords.longitude
               }}
-              title="Your Location"
+              title="your location"
             />
+            <Marker 
+             coordinates={{
+              latitude: businessLocation.coords.latitude,
+              longitude: businessLocation.coords.longitude
+             }}
+             title="American Family Care, Hollywood, Fl."/>
           </MapView>
-          //<Text style={styles.paragraph}>{text}</Text>
         ) : ( <Text style={styles.paragraph}> no location found </Text>
       )
     }
@@ -171,16 +194,16 @@ function App() {
       <NavigationContainer>
         <Tab.Navigator tabBarPosition="bottom" 
           initialRouteName="Home"
-          activeColor="black"
-          inactiveColor="whitesmoke"
+          activeColor="midnightblue"
+          inactiveColor="lightsteelblue"
           iconActiveColor="red"
           fontFamily="Helvetica"
           barStyle={{ backgroundColor: 'crimson',
           height: 80,
           position: 'absolute',
-          left: 10,
-          right: 10,
-          bottom: 20,
+          left: 7,
+          right: 7,
+          bottom: 30,
           borderRadius: 20,
           overflow: 'hidden'
           }}>
@@ -207,10 +230,10 @@ const styles = StyleSheet.create({
  
   container: {
     flex: 1,
-    backgroundColor: 'crimson',
+    backgroundColor: 'lightsteelblue',
   },
   logoContainer: {
-    backgroundColor: 'lightgrey',
+    backgroundColor: 'crimson',
     flexDirection: 'row', 
     paddingStart: 30,
     paddingEnd: 10,
@@ -220,18 +243,20 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: 'red',
   },
+
   mainHeading: {
     fontFamily: 'Helvetica',
     fontSize: 20,                
     fontWeight: '200',           
-    color: '#333',               
+    color: 'aliceblue',               
     letterSpacing: 0.7,          
     position: 'absolute', 
     bottom: 10,
     left: 100
   },
   infoscontainer: {
-    flex:1,
+    flex: 1,
+    
     alignItems: 'center'
   },
   primaryButton: {
@@ -241,20 +266,18 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  primaryButtonText: {
-    color: 'white',
-    fontWeight: 'bold',
-  },
   paragraph: {
     padding: 16,
     fontSize: 18,
     textAlign: 'center',
   },
   newsTitle: {
-    padding: 10,
-    fontSize: 20,
+    paddingTop: 18,
+    paddingHorizontal: 30,
+    fontSize: 18,
     fontFamily: 'Helvetica',
-    backgroundColor: 'white',
+    color: 'midnightblue',
+    backgroundColor: 'whitesmoke',
   },
   newsBody: {
     paddingTop: 10,
@@ -270,6 +293,9 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontFamily: 'Helvetica',
     backgroundColor: 'white',
+  },
+  newsContainer: {
+
   },
   header: {
     fontFamily: 'Helvetica',
