@@ -1,11 +1,13 @@
 import { NavigationContainer } from '@react-navigation/native';
 import { createMaterialBottomTabNavigator } from '@react-navigation/material-bottom-tabs';
-import { Button, Text, View, Image, StyleSheet, ActivityIndicator, ScrollView, TouchableOpacity} from 'react-native';
+import { Button, Text, View, Image, StyleSheet, ActivityIndicator, ScrollView, TouchableOpacity, Linking} from 'react-native';
 import { WebView } from 'react-native-webview';
 import {useEffect, useState} from 'react';
 import afc_logo from './assets/afc_logo.png';
 import * as Location from 'expo-location';
 import MapView, { Marker } from 'react-native-maps';
+import * as FileSystem from 'expo-file-system';
+import Afc_NPP_2022 from './Afc_NPP_2022.pdf'
 
 const GOOGLE_API_KEY = 'AIzaSyBGAPK3-L4ipbDv7LZN6VmK1TqalvOGfmg';
 
@@ -160,23 +162,41 @@ function ContactScreen({navigation}) {
 }
 
 function InfoScreen({navigation}) {
+
+  const openAfcNPP = () => {
+
+    const fileUri = FileSystem.documentDirectory + Afc_NPP_2022;
+
+    Linking.openURL(fileUri);
+    console.log('fileURI:' + fileUri)
+  }
+
   const [showWebview, setShowWebview] = useState(false);
   return (
     <View style={styles.infoscontainer}>
-      <View style={styles.container}>
-        <Text style={styles.newsBody}>
-          5812 Hollywood Blvd, Hollywood, FL 33021 {'\n'}
-          Contact information: +19548667435{'\n'} 
-          {/* add call access to the phone number */}
+        <Text style={styles.infoMainText}>
+        Urgent Care Center in Hollywood {'\n'}
+        We Can Help Your Family Live Life, Uninterrupted. 
         </Text>
-        {showWebview ? (
-        <WebView source={{ uri: 'https://www.afcurgentcare.com/hollywood/' }} />
-      ) : (
-      <View style={styles.buttonContainer}>
-        <Button title="Open Link" onPress={() => setShowWebview(true)}  color="darkgrey" />
-      </View> 
-      )}
-      </View>
+        <Text style={styles.infoBody}>
+        If you’re in need of medical care for an illness or injury that’s not life-threatening, 
+        look no further than American Family Care®. We offer urgent care in the Hollywood area for patients of all ages. 
+        Our medical team is staffed with medical professionals that are dedicated to ensuring your health and overall well-being.
+        </Text>
+        <Text style={styles.infoMainText}>
+          Our Mission
+        </Text>
+        <Text style={styles.infoBody}>
+        Our mission is to provide the best healthcare possible in a kind and caring environment, 
+          in an economical manner,
+           while respecting the rights of all of our patients,
+            at times and locations convenient to the patient.
+        </Text>
+        <View  style={styles.buttonContainer}>
+        <Button title="Privacy Policy" onPress={openAfcNPP} color='steelblue'/>
+  
+        </View>
+
     </View>
   );
 }
@@ -195,8 +215,8 @@ function App() {
         <Tab.Navigator tabBarPosition="bottom" 
           initialRouteName="Home"
           activeColor="midnightblue"
-          inactiveColor="lightsteelblue"
-          iconActiveColor="red"
+          inactiveColor="aliceblue"
+          
           fontFamily="Helvetica"
           barStyle={{ backgroundColor: 'crimson',
           height: 80,
@@ -209,7 +229,7 @@ function App() {
           }}>
           <Tab.Screen name="Home" component={HomeScreen} style={styles.navButton} options={{
             tabBarIcon: 'home-circle-outline', 
-            tabBarIconColor: 'red'
+            
           }}/>
           <Tab.Screen name="Contact" component={ContactScreen} style={styles.navButton} options={{
             tabBarIcon: 'map-marker-plus-outline'}}/>
@@ -243,7 +263,6 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: 'red',
   },
-
   mainHeading: {
     fontFamily: 'Helvetica',
     fontSize: 20,                
@@ -256,11 +275,42 @@ const styles = StyleSheet.create({
   },
   infoscontainer: {
     flex: 1,
-    
-    alignItems: 'center'
+    paddingTop: 50,
+    alignItems: 'center',
+    backgroundColor: 'aliceblue',
+  },
+  infoMainText: {
+    width: '100%',
+    backgroundColor: 'aliceblue',
+    paddingTop: 20,
+    paddingHorizontal: 10,
+    fontFamily: 'Helvetica',
+    letterSpacing: 0.7,  
+    fontSize: 20, 
+    textAlign: 'center'
+  },
+  infoBody: {
+    backgroundColor: 'aliceblue',
+    paddingTop: 20,
+    paddingBottom: 20,
+    paddingHorizontal: 10,
+    fontFamily: 'Helvetica',
+    letterSpacing: 0.7,  
+    fontSize: 15, 
+    textAlign: 'center'
+  },
+  buttonContainer: {
+    marginTop: 20,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderRadius: 10,
+    fontFamily: 'Helvetica',
+    fontSize: 10,
+    borderWidth: 1,
+    borderColor: 'crimson'
   },
   primaryButton: {
-    backgroundColor: '#D32F2F', // A shade of red
+    backgroundColor: '#D32F2F', 
     padding: 10,
     borderRadius: 8,
     alignItems: 'center',
@@ -277,7 +327,8 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontFamily: 'Helvetica',
     color: 'midnightblue',
-    backgroundColor: 'whitesmoke',
+    backgroundColor: 'aliceblue',
+
   },
   newsBody: {
     paddingTop: 10,
