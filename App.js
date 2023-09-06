@@ -1,6 +1,6 @@
 import { NavigationContainer } from '@react-navigation/native';
 import { createMaterialBottomTabNavigator } from '@react-navigation/material-bottom-tabs';
-import { Button, Text, View, Image, StyleSheet, ActivityIndicator, ScrollView, TouchableOpacity, Linking} from 'react-native';
+import { Button, Text, View, Image, StyleSheet, ActivityIndicator, ScrollView, TouchableOpacity, Linking, Pressable} from 'react-native';
 import { WebView } from 'react-native-webview';
 import {useEffect, useState} from 'react';
 import afc_logo from './assets/afc_logo.png';
@@ -8,6 +8,9 @@ import * as Location from 'expo-location';
 import MapView, { Marker } from 'react-native-maps';
 import * as FileSystem from 'expo-file-system';
 import Afc_NPP_2022 from './Afc_NPP_2022.pdf'
+import Svg, {Path} from 'react-native-svg';
+
+
 
 const GOOGLE_API_KEY = 'AIzaSyBGAPK3-L4ipbDv7LZN6VmK1TqalvOGfmg';
 
@@ -46,6 +49,14 @@ useEffect(() => {
   if (loading) {
     return <ActivityIndicator size="large" color="#0000ff" />;
   }
+
+  const Hospital = () => {
+    return(
+      <Svg  style={styles.hospitalSvg} viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" >
+      <Path d="M18 14H14V18H10V14H6V10H10V6H14V10H18" />
+    </Svg>
+      )
+  }
   
   return (
     <ScrollView>
@@ -54,7 +65,8 @@ useEffect(() => {
         key={index}
         onPress={() => navigation.navigate('Update', {item})}
         > 
-        <Text style={styles.newsTitle}> * {item.title}</Text>
+         
+        <Text style={styles.newsTitle}><Hospital />{item.title}</Text>
         </TouchableOpacity>
         ))}
     </ScrollView>
@@ -65,15 +77,12 @@ useEffect(() => {
 function UpdateScreen({route}){
 
   if (!route.params) {
-    
     return <Text style={styles.newsError}>Error loading data, please select an article from the homepage</Text> 
   }
   const {item} = route.params;
 
   return(
-    
     <View style={styles.newsContainer}>
-      
       <Text style={styles.newsTitle}>{item.title}</Text>
       <Text style={styles.newsBody}>{item.body}</Text> 
       <Text>{item.date}</Text>
@@ -241,16 +250,14 @@ function App() {
           }}/>
         </Tab.Navigator>
       </NavigationContainer>
-  </View>
-    
+  </View> 
   );
 }
 
 const styles = StyleSheet.create({
  
   container: {
-    flex: 1,
-    backgroundColor: 'lightsteelblue',
+    flex: 1
   },
   logoContainer: {
     backgroundColor: 'crimson',
@@ -262,6 +269,13 @@ const styles = StyleSheet.create({
     justifyContent: 'flex-start',
     borderBottomWidth: 1,
     borderBottomColor: 'red',
+  },
+  hospitalSvg:{
+    marginLeft: 10,
+    height: 20,
+    width: 20,
+    position: 'absolute',
+    
   },
   mainHeading: {
     fontFamily: 'Helvetica',
@@ -309,6 +323,9 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: 'crimson'
   },
+  buttonContainerPressed: {
+    backgroundColor: 'crimson',
+  },
   primaryButton: {
     backgroundColor: '#D32F2F', 
     padding: 10,
@@ -323,30 +340,43 @@ const styles = StyleSheet.create({
   },
   newsTitle: {
     paddingTop: 18,
-    paddingHorizontal: 30,
-    fontSize: 18,
+    paddingHorizontal: 20,
+    fontSize: 25,
     fontFamily: 'Helvetica',
     color: 'midnightblue',
     backgroundColor: 'aliceblue',
-
+    fontWeight: '400', 
+    letterSpacing: 0.7
   },
   newsBody: {
-    paddingTop: 10,
+    paddingTop: 20,
     paddingBottom: 10,
-    paddingLeft: 40,
-    paddingRight: 40,
-    fontSize: 15,
+    paddingLeft: 30,
+    paddingRight: 30,
+    fontSize: 18,
     fontFamily: 'Helvetica',
-    backgroundColor: 'white',
+    backgroundColor: 'aliceblue',
+    fontWeight: '400',
   },
   newsError: {
-    padding: 10,
-    fontSize: 20,
+    flex: 1,
+    paddingTop: 18,
+    paddingHorizontal: 20,
+    fontSize: 25,
     fontFamily: 'Helvetica',
-    backgroundColor: 'white',
+    color: 'midnightblue',
+    backgroundColor: 'aliceblue',
+    lineWeight: 'bold',
+    fontWeight: '400', 
+    letterSpacing: 0.7,
+    textDecoration: 'underline'
   },
   newsContainer: {
-
+    flex: 1,
+    paddingTop: 18,
+    height: '100%',
+    backgroundColor: 'aliceblue',
+    
   },
   header: {
     fontFamily: 'Helvetica',
