@@ -1,7 +1,6 @@
 import { NavigationContainer } from '@react-navigation/native';
 import { createMaterialBottomTabNavigator } from '@react-navigation/material-bottom-tabs';
-import { Button, Text, View, Image, StyleSheet, ActivityIndicator, ScrollView, TouchableOpacity, Linking, Pressable} from 'react-native';
-import { WebView } from 'react-native-webview';
+import { Button, Text, View, Image, StyleSheet, ActivityIndicator, ScrollView, TouchableOpacity, Linking} from 'react-native';
 import {useEffect, useState} from 'react';
 import afc_logo from './assets/afc_logo.png';
 import * as Location from 'expo-location';
@@ -12,7 +11,7 @@ import Svg, {Path} from 'react-native-svg';
 
 
 
-const GOOGLE_API_KEY = 'AIzaSyBGAPK3-L4ipbDv7LZN6VmK1TqalvOGfmg';
+//const GOOGLE_API_KEY = 'AIzaSyBGAPK3-L4ipbDv7LZN6VmK1TqalvOGfmg';
 
 async function getBusinessCoordinates() {
   const address = "5812 Hollywood Blvd, Hollywood, FL 33021";
@@ -33,7 +32,7 @@ const [loading, setLoading] = useState(true);
 
 
 useEffect(() => {
-  fetch('https://jsonplaceholder.typicode.com/posts')
+  fetch('http://localhost:3000/api/v1/articles')
       .then(response => response.json())
       .then(json => {
         setUpdates(json);
@@ -47,7 +46,7 @@ useEffect(() => {
     }, []);
 
   if (loading) {
-    return <ActivityIndicator size="large" color="#0000ff" />;
+    return <ActivityIndicator size="large" color="#0000ff"/>;
   }
 
   const Hospital = () => {
@@ -82,11 +81,12 @@ function UpdateScreen({route}){
   const {item} = route.params;
 
   return(
-    <View style={styles.newsContainer}>
+    <ScrollView style={styles.newsContainer}>
       <Text style={styles.newsTitle}>{item.title}</Text>
       <Text style={styles.newsBody}>{item.body}</Text> 
+    
       <Text>{item.date}</Text>
-    </View>
+    </ScrollView>
   );
 }
 
@@ -349,8 +349,8 @@ const styles = StyleSheet.create({
     letterSpacing: 0.7
   },
   newsBody: {
-    paddingTop: 20,
-    paddingBottom: 10,
+    paddingTop: 10,
+    paddingBottom: 120,
     paddingLeft: 30,
     paddingRight: 30,
     fontSize: 18,
@@ -366,7 +366,6 @@ const styles = StyleSheet.create({
     fontFamily: 'Helvetica',
     color: 'midnightblue',
     backgroundColor: 'aliceblue',
-    lineWeight: 'bold',
     fontWeight: '400', 
     letterSpacing: 0.7,
     textDecoration: 'underline'
