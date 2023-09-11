@@ -11,54 +11,42 @@ import Svg, {Path} from 'react-native-svg';
 
 
 
-//const GOOGLE_API_KEY = 'AIzaSyBGAPK3-L4ipbDv7LZN6VmK1TqalvOGfmg';
 
-async function getBusinessCoordinates() {
-  const address = "5812 Hollywood Blvd, Hollywood, FL 33021";
-  const response = await fetch(`https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(address)}&key=${GOOGLE_API_KEY}`);
-  const data = await response.json();
-  if (data.results && data.results.length > 0) {
-    const location = data.results[0].geometry.location;
-    return { latitude: location.lat, longitude: location.lng };
-  }
-  console.log('Geocode API response:', data);
-  return null; 
-}
 
 
 function HomeScreen({navigation}) {
-const [updates, setUpdates] = useState([])
-const [loading, setLoading] = useState(true);
-
-
-useEffect(() => {
-  fetch('http://localhost:3000/api/v1/articles')
-      .then(response => response.json())
-      .then(json => {
-        setUpdates(json);
-        setLoading(false);
-        console.log(json);
-      })
-        .catch((error) => {
-          console.error("There was an error fetching the data", error);
-          setLoading(false);
-        });
-    }, []);
-
+  const [updates, setUpdates] = useState([])
+  const [loading, setLoading] = useState(true);
+  
+  
+  useEffect(() => {
+    fetch('http://localhost:3000/api/v1/articles')
+    .then(response => response.json())
+    .then(json => {
+      setUpdates(json);
+      setLoading(false);
+      
+    })
+    .catch((error) => {
+      console.error("There was an error fetching the data", error);
+      setLoading(false);
+    });
+  }, []);
+  
   if (loading) {
     return <ActivityIndicator size="large" color="#0000ff"/>;
   }
-
+  
   const Hospital = () => {
     return(
       <Svg  style={styles.hospitalSvg} viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" >
       <Path d="M18 14H14V18H10V14H6V10H10V6H14V10H18" />
     </Svg>
       )
-  }
-  
-  return (
-    <ScrollView>
+    }
+    
+    return (
+      <ScrollView>
       {updates.map((item, index) => (
         <TouchableOpacity 
         key={index}
@@ -66,6 +54,7 @@ useEffect(() => {
         > 
          
         <Text style={styles.newsTitle}><Hospital />{item.title}</Text>
+        
         </TouchableOpacity>
         ))}
     </ScrollView>
@@ -74,29 +63,56 @@ useEffect(() => {
 
 
 function UpdateScreen({route}){
-
+  
   if (!route.params) {
     return <Text style={styles.newsError}>Error loading data, please select an article from the homepage</Text> 
   }
   const {item} = route.params;
-
+  console.log(item.admin)
+  
   return(
     <ScrollView style={styles.newsContainer}>
       <Text style={styles.newsTitle}>{item.title}</Text>
+      <Text style={styles.newsSubTitle}>{item.description}</Text>
       <Text style={styles.newsBody}>{item.body}</Text> 
-    
-      <Text>{item.date}</Text>
+      <Text style={styles.newsBody}>{item.admin}</Text> 
+      <View style={styles.imageContainer}>
+       <Image source={{uri: 'http://content.health.harvard.edu/wp-content/uploads/2023/08/6c4e88b9-3890-4cf8-aab4-cc0eb928d98f.jpg'}} style={styles.image} />
+      </View>
     </ScrollView>
   );
 }
 
 
+
 function ContactScreen({navigation}) {
+  
   const [userLocation, setUserLocation] = useState(null);
   const [businessLocation, setBusinessLocation] = useState(null);
   const [errorMsg, setErrorMsg] = useState(null);
   
+  const GOOGLE_API_KEY = 'AIzaSyBGAPK3-L4ipbDv7LZN6VmK1TqalvOGfmg';
+  
+  async function getBusinessCoordinates() {
+    const address = "5812 Hollywood Blvd, Hollywood, FL 33021";
+    const response = await fetch(`https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(address)}&key=${GOOGLE_API_KEY}`);
+    const data = await response.json();
 
+    
+    if (data.results && data.results.length > 0) {
+      console.log("Inside the IF statement");
+      const location = data.results[0].geometry.location;
+      console.log("Extracted Location:", location);
+      console.log(location.lat, location.lng);
+      return { latitude: location.lat, longitude: location.lng };
+    }
+    console.log('Geocode API response:', location);
+
+    return null; 
+    
+  }
+
+  
   useEffect(() => {
     (async () => {
       
@@ -105,43 +121,37 @@ function ContactScreen({navigation}) {
         setErrorMsg('Permission to access location was denied');
         return;
       }
-
+      
       // fetching user location
       let userLoc = await Location.getCurrentPositionAsync({});
       setUserLocation(userLoc);
       console.log('Fetched user location:', userLoc);
-
-      //
+      
       //fetching business location
       let businessLoc = await getBusinessCoordinates({});
       setBusinessLocation(businessLoc);
       console.log('Fetched business location:', businessLoc);
-
+      
     })();
   }, []);
-
+  
   let text = 'Waiting..';
   if (errorMsg) {
     text = errorMsg;
   } else if (userLocation) {
     text = JSON.stringify(userLocation);
   }
-
-
-  console.log("Business Location:", businessLocation);
-  console.log("User Location:", userLocation);
   
-
-
   return (
     <View>
               {
-        userLocation && businessLocation ? (
+        userLocation  && businessLocation  ? 
+        (
           <MapView 
             style={{  width: '100%', height: '70%'}} // Estyle={{ width: '100%', height: '100%' }} nsure the map fills the space
             region={{
-              latitude: Location.coords.latitude,
-              longitude: Location.coords.longitude,
+              latitude: userLocation.coords.latitude,
+              longitude: userLocation.coords.longitude,
               latitudeDelta: 0.0922,
               longitudeDelta: 0.0421
             }}
@@ -214,6 +224,7 @@ const Tab = createMaterialBottomTabNavigator();
 
 function App() {
   return (
+    
     <View style={styles.container}>
       <View style={styles.logoContainer}>
        <Image source={afc_logo} style={styles.logo} />
@@ -346,13 +357,28 @@ const styles = StyleSheet.create({
     color: 'midnightblue',
     backgroundColor: 'aliceblue',
     fontWeight: '400', 
-    letterSpacing: 0.7
+    letterSpacing: 0.7,
+    textDecorationLine: 'none'
+  },
+  newsSubTitle: {
+    paddingTop: 18,
+    paddingHorizontal: 25,
+    fontSize: 18,
+    fontFamily: 'Helvetica',
+    fontStyle: 'italic',
+    color: 'palevioletred',
+    backgroundColor: 'aliceblue',
+    fontWeight: '400', 
+    letterSpacing: 0.7,
+    textDecorationLine: 'none',
+    textDecorationColor: 'crimson'
+
   },
   newsBody: {
     paddingTop: 10,
-    paddingBottom: 120,
-    paddingLeft: 30,
-    paddingRight: 30,
+    paddingBottom: 20,
+    paddingLeft: 20,
+    paddingRight: 20,
     fontSize: 18,
     fontFamily: 'Helvetica',
     backgroundColor: 'aliceblue',
@@ -370,12 +396,31 @@ const styles = StyleSheet.create({
     letterSpacing: 0.7,
     textDecoration: 'underline'
   },
+  imageContainer: {
+    flex: 1,
+    height: 250,
+    marginBottom: 120,
+    paddingHorizontal: 10,
+    justifyContent: 'center',
+    alignContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'aliceblue'
+
+  },
+  image: { 
+    paddingHorizontal: 20, 
+    marginTop: 20,
+    marginBottom: 20,
+    marginLeft: 20,
+    marginRight: 20,
+    height: '100%',
+    width: '100%',
+  },
   newsContainer: {
     flex: 1,
     paddingTop: 18,
     height: '100%',
-    backgroundColor: 'aliceblue',
-    
+    backgroundColor: 'aliceblue',    
   },
   header: {
     fontFamily: 'Helvetica',
