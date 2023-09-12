@@ -4,14 +4,11 @@ import { Button, Text, View, Image, StyleSheet, ActivityIndicator, ScrollView, T
 import {useEffect, useState} from 'react';
 import afc_logo from './assets/afc_logo.png';
 import * as Location from 'expo-location';
-import MapView, { Marker } from 'react-native-maps';
+import MapView, { Marker, Circle, Polygon, Callout } from 'react-native-maps';
 import * as FileSystem from 'expo-file-system';
 import Afc_NPP_2022 from './Afc_NPP_2022.pdf'
+//import red_location_marker from './assets/red-location-marker.png'
 import Svg, {Path} from 'react-native-svg';
-
-
-
-
 
 
 function HomeScreen({navigation}) {
@@ -88,34 +85,36 @@ function UpdateScreen({route}){
 function ContactScreen({navigation}) {
   
   const [userLocation, setUserLocation] = useState(null);
-  const [businessLocation, setBusinessLocation] = useState(null);
   const [errorMsg, setErrorMsg] = useState(null);
-  
-  const GOOGLE_API_KEY = 'AIzaSyBGAPK3-L4ipbDv7LZN6VmK1TqalvOGfmg';
-  
-  async function getBusinessCoordinates() {
-    const address = "5812 Hollywood Blvd, Hollywood, FL 33021";
-    const response = await fetch(`https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(address)}&key=${GOOGLE_API_KEY}`);
-    const data = await response.json();
 
-    
-    if (data.results && data.results.length > 0) {
-      console.log("Inside the IF statement");
-      const location = data.results[0].geometry.location;
-      console.log("Extracted Location:", location);
-      console.log(location.lat, location.lng);
-      return { latitude: location.lat, longitude: location.lng };
-    }
-    console.log('Geocode API response:', location);
+  // business location is hardcoded. 
+  
+  const businessLocation = {latitude:  26.0089697, longitude: -80.2038731}
+  console.log('business location: ', businessLocation)
 
-    return null; 
+
+  //when multiple locations are required, the below code will help set up business location services
+  //const GOOGLE_API_KEY = 'AIzaSyBGAPK3-L4ipbDv7LZN6VmK1TqalvOGfmg';
+  // async function getBusinessCoordinates() {
+  //   const address = "5812 Hollywood Blvd, Hollywood, FL 33021";
+  //   const response = await fetch(`https://maps.googleapis.com/maps/api/geocode/json?address=5812%20Hollywood%20Blvd%2C%20Hollywood%2C%20FL%2033021&key=AIzaSyBGAPK3-L4ipbDv7LZN6VmK1TqalvOGfmg`);
+  //   const data = await response.json();
+
+  //   if (data.results && data.results.length > 0) {
+  //     const location = data.results[0].geometry.location;
+  //     console.log("Extracted Location:", location);
+  //     console.log(location.lat, location.lng);
+  //     return { latitude: location.lat, longitude: location.lng };
+  //   }
+  //   //console.log('Geocode API response:', location);
+
+  //   print ("no results found"); 
     
-  }
+  // }
 
   
   useEffect(() => {
     (async () => {
-      
       let { status } = await Location.requestForegroundPermissionsAsync();
       if (status !== 'granted') {
         setErrorMsg('Permission to access location was denied');
@@ -127,10 +126,10 @@ function ContactScreen({navigation}) {
       setUserLocation(userLoc);
       console.log('Fetched user location:', userLoc);
       
-      //fetching business location
-      let businessLoc = await getBusinessCoordinates({});
-      setBusinessLocation(businessLoc);
-      console.log('Fetched business location:', businessLoc);
+      //fetching business location when necessary. remember to use a useState set to (null) when creating businessLocaiton variable
+      //let businessLoc = await getBusinessCoordinates({});
+      //setBusinessLocation[businessLoc];
+      //console.log('Fetched business location:', businessLoc);
       
     })();
   }, []);
@@ -144,39 +143,41 @@ function ContactScreen({navigation}) {
   
   return (
     <View>
-              {
-        userLocation  && businessLocation  ? 
+        {userLocation  && businessLocation  ? 
         (
-          <MapView 
-            style={{  width: '100%', height: '70%'}} // Estyle={{ width: '100%', height: '100%' }} nsure the map fills the space
-            region={{
-              latitude: userLocation.coords.latitude,
-              longitude: userLocation.coords.longitude,
-              latitudeDelta: 0.0922,
-              longitudeDelta: 0.0421
-            }}
-          >
+        <MapView 
+          style={{  width: '100%', height: '70%'}} 
+          region={{
+            latitude: businessLocation.latitude,
+            longitude: businessLocation.longitude,
+            latitudeDelta: 0.0922,
+            longitudeDelta: 0.0421
+            }}>
             <Marker 
+             coordinate={{
+              latitude: 26.0089697, 
+              longitude: -80.2038731
+              }}
+             title="American Family Care, Hollywood, Fl."
+            />
+            <Marker  
               coordinate={{
                 latitude: userLocation.coords.latitude,
                 longitude: userLocation.coords.longitude
               }}
               title="your location"
+              pinColor='crimson'
             />
-            <Marker 
-             coordinates={{
-              latitude: businessLocation.coords.latitude,
-              longitude: businessLocation.coords.longitude
-             }}
-             title="American Family Care, Hollywood, Fl."/>
           </MapView>
         ) : ( <Text style={styles.paragraph}> no location found </Text>
       )
     }
     <View style={styles.container}>
-  
+      <Button title='string'/>
+      <Button title='string'/>
+      <Button title='string'/>
     </View>
-    </View>
+  </View>
   );
 }
 
@@ -268,7 +269,9 @@ function App() {
 const styles = StyleSheet.create({
  
   container: {
-    flex: 1
+    flex: 1,
+    
+    backgroundColor: 'aliceblue'
   },
   logoContainer: {
     backgroundColor: 'crimson',
@@ -282,6 +285,7 @@ const styles = StyleSheet.create({
     borderBottomColor: 'red',
   },
   hospitalSvg:{
+
     marginLeft: 10,
     height: 20,
     width: 20,
@@ -361,6 +365,7 @@ const styles = StyleSheet.create({
     textDecorationLine: 'none'
   },
   newsSubTitle: {
+
     paddingTop: 18,
     paddingHorizontal: 25,
     fontSize: 18,
@@ -405,7 +410,6 @@ const styles = StyleSheet.create({
     alignContent: 'center',
     alignItems: 'center',
     backgroundColor: 'aliceblue'
-
   },
   image: { 
     paddingHorizontal: 20, 
@@ -417,10 +421,7 @@ const styles = StyleSheet.create({
     width: '100%',
   },
   newsContainer: {
-    flex: 1,
     paddingTop: 18,
-    height: '100%',
-    backgroundColor: 'aliceblue',    
   },
   header: {
     fontFamily: 'Helvetica',
