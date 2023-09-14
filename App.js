@@ -1,13 +1,13 @@
 import { NavigationContainer } from '@react-navigation/native';
 import { createMaterialBottomTabNavigator } from '@react-navigation/material-bottom-tabs';
-import { Button, Text, View, Image, StyleSheet, ActivityIndicator, ScrollView, TouchableOpacity, Linking} from 'react-native';
+import { Button, Text, View, Image, StyleSheet, ActivityIndicator, ScrollView, TouchableOpacity, Linking, Alert} from 'react-native';
 import {useEffect, useState} from 'react';
 import afc_logo from './assets/afc_logo.png';
 import * as Location from 'expo-location';
-import MapView, { Marker, Circle, Polygon, Callout } from 'react-native-maps';
+import MapView, { Marker } from 'react-native-maps';
 import * as FileSystem from 'expo-file-system';
 import Afc_NPP_2022 from './Afc_NPP_2022.pdf'
-//import red_location_marker from './assets/red-location-marker.png'
+import Clipboard from '@react-native-community/clipboard';
 import Svg, {Path} from 'react-native-svg';
 
 
@@ -49,9 +49,7 @@ function HomeScreen({navigation}) {
         key={index}
         onPress={() => navigation.navigate('Update', {item})}
         > 
-         
         <Text style={styles.newsTitle}><Hospital />{item.title}</Text>
-        
         </TouchableOpacity>
         ))}
     </ScrollView>
@@ -71,11 +69,11 @@ function UpdateScreen({route}){
     <ScrollView style={styles.newsContainer}>
       <Text style={styles.newsTitle}>{item.title}</Text>
       <Text style={styles.newsSubTitle}>{item.description}</Text>
-      <Text style={styles.newsBody}>{item.body}</Text> 
-      <Text style={styles.newsBody}>{item.admin}</Text> 
       <View style={styles.imageContainer}>
        <Image source={{uri: 'http://content.health.harvard.edu/wp-content/uploads/2023/08/6c4e88b9-3890-4cf8-aab4-cc0eb928d98f.jpg'}} style={styles.image} />
       </View>
+      <Text style={styles.newsBody}>{item.body}</Text> 
+      <Text style={styles.newsBody}>{item.admin}</Text> 
     </ScrollView>
   );
 }
@@ -88,7 +86,42 @@ function ContactScreen({navigation}) {
   const [errorMsg, setErrorMsg] = useState(null);
 
   // business location is hardcoded. 
+
+  const businessAddress = '5812 Hollywood Blvd, Hollywood, FL 33021';
   
+  const handleCopyToClipboard = () => {
+    Clipboard.setString(businessAddress);
+    Alert.alert('Success', 'Address copied to clipboard!');
+  };
+
+  const businessPhoneNumber = 'tel: +1(954) 866-7435';
+
+  const handleCallBusiness = () => {
+    Linking.canOpenURL(businessPhoneNumber)
+      .then(supported => {
+        if (!supported) {
+          console.log('Can\'t handle the URL: ' + businessPhoneNumber);
+        } else {
+          return Linking.openURL(businessPhoneNumber);
+        }
+      })
+      .catch(err => console.error('An error occurred', err));
+  };
+
+  const appointmentURL = 'https://www.clockwisemd.com/hospitals/5482/visits/new?utm_source=google&utm_medium=organic&utm_campaign=&utm_content=&utm_keyword=';
+
+  const handleMakeAppointment = () => {
+    Linking.canOpenURL(appointmentURL)
+      .then(supported => {
+        if (!supported) {
+          console.log('Can\'t handle the URL: ' + appointmentURL);
+        } else {
+          return Linking.openURL(appointmentURL);
+        }
+      })
+      .catch(err => console.error('An error occurred', err));
+  };
+
   const businessLocation = {latitude:  26.0089697, longitude: -80.2038731}
   console.log('business location: ', businessLocation)
 
@@ -150,7 +183,7 @@ function ContactScreen({navigation}) {
           region={{
             latitude: businessLocation.latitude,
             longitude: businessLocation.longitude,
-            latitudeDelta: 0.0922,
+            latitudeDelta: 0.0522,
             longitudeDelta: 0.0421
             }}>
             <Marker 
@@ -172,10 +205,10 @@ function ContactScreen({navigation}) {
         ) : ( <Text style={styles.paragraph}> no location found </Text>
       )
     }
-    <View style={styles.container}>
-      <Button title='string'/>
-      <Button title='string'/>
-      <Button title='string'/>
+    <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+      <Button title={businessAddress} onPress={handleCopyToClipboard} />
+      <Button title="Call: +1(954) 866-7435" onPress={handleCallBusiness} />
+      <Button title="Make an Appointment" onPress={handleMakeAppointment} />
     </View>
   </View>
   );
@@ -403,9 +436,9 @@ const styles = StyleSheet.create({
   },
   imageContainer: {
     flex: 1,
-    height: 250,
-    marginBottom: 120,
-    paddingHorizontal: 10,
+    height: 200,
+    paddingHorizontal: 20,
+    paddingVertical: 5,
     justifyContent: 'center',
     alignContent: 'center',
     alignItems: 'center',
@@ -422,6 +455,7 @@ const styles = StyleSheet.create({
   },
   newsContainer: {
     paddingTop: 18,
+    paddingBottom: 100
   },
   header: {
     fontFamily: 'Helvetica',
