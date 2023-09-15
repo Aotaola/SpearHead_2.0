@@ -1,6 +1,6 @@
 import { NavigationContainer } from '@react-navigation/native';
 import { createMaterialBottomTabNavigator } from '@react-navigation/material-bottom-tabs';
-import { Button, Text, View, Image, StyleSheet, ActivityIndicator, ScrollView, TouchableOpacity, Linking, Alert} from 'react-native';
+import { Button, Text, View, Image, StyleSheet, ActivityIndicator, ScrollView, TouchableOpacity, Linking, Alert, FlatList} from 'react-native';
 import {useEffect, useState} from 'react';
 import afc_logo from './assets/afc_logo.png';
 import * as Location from 'expo-location';
@@ -33,6 +33,8 @@ function HomeScreen({navigation}) {
   if (loading) {
     return <ActivityIndicator size="large" color="#0000ff"/>;
   }
+
+  
   
   const Hospital = () => {
     return(
@@ -58,7 +60,7 @@ function HomeScreen({navigation}) {
 
 
 function UpdateScreen({route}){
-  
+
   if (!route.params) {
     return <Text style={styles.newsError}>Error loading data, please select an article from the homepage</Text> 
   }
