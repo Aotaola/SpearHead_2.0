@@ -65,17 +65,40 @@ function UpdateScreen({route}){
     return <Text style={styles.newsError}>Error loading data, please select an article from the homepage</Text> 
   }
   const {item} = route.params;
-  console.log(item.admin)
+  //console.log(item.id)
+
+  const [items, setItems] = useState([])
+  const [load, setLoad] = useState(true);
+  
+  
+  useEffect(() => {
+    fetch(`http://localhost:3000/api/v1/articles/${item.id}`)
+    .then(response => response.json())
+    .then(json => {
+      setItems(json);
+      setLoad(false);
+    })
+    .catch((error) => {
+      console.error("There was an error fetching the data", error);
+      setLoad(false);
+    });
+  }, [item.id]);
+
+  ///console.log("fetching ID of item", items.article.id)
+  
+  if (load) {
+    return <ActivityIndicator size="large" color="#0000ff"/>;
+  }
   
   return(
     <ScrollView style={styles.newsContainer}>
-      <Text style={styles.newsTitle}>{item.title}</Text>
-      <Text style={styles.newsSubTitle}>{item.description}</Text>
+      <Text style={styles.newsTitle}>{items.article.title}</Text>
+      <Text style={styles.newsSubTitle}>{items.article.description}</Text>
       <View style={styles.imageContainer}>
        <Image source={{uri: 'http://content.health.harvard.edu/wp-content/uploads/2023/08/6c4e88b9-3890-4cf8-aab4-cc0eb928d98f.jpg'}} style={styles.image} />
       </View>
-      <Text style={styles.newsBody}>{item.body}</Text> 
-      <Text style={styles.newsBody}>{item.admin}</Text> 
+      <Text style={styles.newsBody}>{items.article.body}</Text> 
+      <Text style={styles.newsBody}>{items.admin.name}</Text> 
     </ScrollView>
   );
 }
@@ -416,7 +439,7 @@ const styles = StyleSheet.create({
   },
   newsBody: {
     paddingTop: 10,
-    paddingBottom: 20,
+    paddingBottom: 120,
     paddingLeft: 20,
     paddingRight: 20,
     fontSize: 18,
