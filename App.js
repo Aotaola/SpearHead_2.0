@@ -9,12 +9,12 @@ import * as FileSystem from 'expo-file-system';
 import Afc_NPP_2022 from './Afc_NPP_2022.pdf'
 import Clipboard from '@react-native-community/clipboard';
 import Svg, {Path} from 'react-native-svg';
+import PagerView from 'react-native-pager-view';
 
 
 function HomeScreen({navigation}) {
   const [updates, setUpdates] = useState([])
   const [loading, setLoading] = useState(true);
-  
   
   useEffect(() => {
     fetch('http://localhost:3000/api/v1/articles')
@@ -22,7 +22,6 @@ function HomeScreen({navigation}) {
     .then(json => {
       setUpdates(json);
       setLoading(false);
-      
     })
     .catch((error) => {
       console.error("There was an error fetching the data", error);
@@ -67,7 +66,8 @@ function UpdateScreen({route}){
   const {item} = route.params;
   //console.log(item.id)
 
-  const [items, setItems] = useState([])
+  const [articles, setArticles] = useState([])
+  const [admin, setAdmin] = useState(null);
   const [load, setLoad] = useState(true);
   
   
@@ -75,7 +75,8 @@ function UpdateScreen({route}){
     fetch(`http://localhost:3000/api/v1/articles/${item.id}`)
     .then(response => response.json())
     .then(json => {
-      setItems(json);
+      setArticles(json.article);
+      setAdmin(json.admin);
       setLoad(false);
     })
     .catch((error) => {
@@ -84,22 +85,26 @@ function UpdateScreen({route}){
     });
   }, [item.id]);
 
-  ///console.log("fetching ID of item", items.article.id)
+  //console.log("fetching ID of item", items.article.id)
   
   if (load) {
     return <ActivityIndicator size="large" color="#0000ff"/>;
   }
   
   return(
-    <ScrollView style={styles.newsContainer}>
-      <Text style={styles.newsTitle}>{items.article.title}</Text>
-      <Text style={styles.newsSubTitle}>{items.article.description}</Text>
-      <View style={styles.imageContainer}>
-       <Image source={{uri: 'http://content.health.harvard.edu/wp-content/uploads/2023/08/6c4e88b9-3890-4cf8-aab4-cc0eb928d98f.jpg'}} style={styles.image} />
-      </View>
-      <Text style={styles.newsBody}>{items.article.body}</Text> 
-      <Text style={styles.newsBody}>{items.admin.name}</Text> 
-    </ScrollView>
+    <PagerView style={styles.pagerView} initialPage={0}>
+      {articles.map((data, index) => (
+      <ScrollView key = {data.id} style={styles.newsContainer}>
+        <Text style={styles.newsTitle}>{data.title}</Text>
+        <Text style={styles.newsSubTitle}>{data.description}</Text>
+        <View style={styles.imageContainer}>
+        <Image source={{uri: 'http://content.health.harvard.edu/wp-content/uploads/2023/08/6c4e88b9-3890-4cf8-aab4-cc0eb928d98f.jpg'}} style={styles.image} />
+        </View>
+        <Text style={styles.newsBody}>{data.body}</Text> 
+        {/* <Text style={styles.newsBody}>{data.admin.name}</Text>  */}
+      </ScrollView>
+     ))}
+    </PagerView>
   );
 }
 
