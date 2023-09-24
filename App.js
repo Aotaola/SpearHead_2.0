@@ -24,13 +24,18 @@ function HomeScreen({navigation}) {
       setLoading(false);
     })
     .catch((error) => {
-      console.error("There was an error fetching the data", error);
+      console.error("There was an error fetching the articles", error);
       setLoading(false);
     });
   }, []);
   
   if (loading) {
     return <ActivityIndicator size="large" color="#0000ff"/>;
+  }
+
+  function truncate(str, maxLength, continuation = "...") {
+    if (str.length <= maxLength) return str;
+    return str.slice(0, maxLength - continuation.length) + continuation;
   }
 
   
@@ -45,12 +50,14 @@ function HomeScreen({navigation}) {
     
     return (
       <ScrollView>
-      {updates.map((item, index) => (
+      {updates
+      .sort((a, b) => b.id - a.id)
+      .map((item, index) => (
         <TouchableOpacity 
-        key={index}
+        key={index.ascending}
         onPress={() => navigation.navigate('Update', {item})}
         > 
-        <Text style={styles.newsTitle}><Hospital />{item.title}</Text>
+        <Text style={styles.newsTitle}><Hospital />{truncate(item.title, 55)}</Text>
         </TouchableOpacity>
         ))}
     </ScrollView>
@@ -60,15 +67,14 @@ function HomeScreen({navigation}) {
 
 function UpdateScreen({route}){
 
-  if (!route.params) {
-    return <Text style={styles.newsError}>Error loading data, please select an article from the homepage</Text> 
-  }
-  const {item} = route.params;
-  //console.log(item.id)
+  
+let {item} = (route.params)? route.params : index.last;
 
+  
   const [articles, setArticles] = useState([])
   const [admin, setAdmin] = useState(null);
   const [load, setLoad] = useState(true);
+  console.log(item)
   
   
   useEffect(() => {
@@ -80,30 +86,30 @@ function UpdateScreen({route}){
       setLoad(false);
     })
     .catch((error) => {
-      console.error("There was an error fetching the data", error);
+      console.error("There was an error fetching the articles", error);
       setLoad(false);
     });
   }, [item.id]);
 
-  //console.log("fetching ID of item", items.article.id)
+  console.log("fetching ID of item", articles.title)
   
   if (load) {
     return <ActivityIndicator size="large" color="#0000ff"/>;
   }
   
   return(
-    <PagerView style={styles.pagerView} initialPage={0}>
-      {articles.map((data, index) => (
-      <ScrollView key = {data.id} style={styles.newsContainer}>
-        <Text style={styles.newsTitle}>{data.title}</Text>
-        <Text style={styles.newsSubTitle}>{data.description}</Text>
+    <PagerView style={styles.pagerView} initialPage={item.id}>
+      {/* {articles.map((articles) => ( */}
+      <ScrollView key = {articles.id} style={styles.newsContainer}>
+        <Text style={styles.newsTitle}>{articles.title}</Text>
+        <Text style={styles.newsSubTitle}>{articles.description}</Text>
         <View style={styles.imageContainer}>
         <Image source={{uri: 'http://content.health.harvard.edu/wp-content/uploads/2023/08/6c4e88b9-3890-4cf8-aab4-cc0eb928d98f.jpg'}} style={styles.image} />
         </View>
-        <Text style={styles.newsBody}>{data.body}</Text> 
-        {/* <Text style={styles.newsBody}>{data.admin.name}</Text>  */}
+        <Text style={styles.newsBody}>{articles.body}</Text> 
+        {/* <Text style={styles.newsBody}>{articles.admin.name}</Text>  */}
       </ScrollView>
-     ))}
+     {/* ))} */}
     </PagerView>
   );
 }
@@ -161,10 +167,10 @@ function ContactScreen({navigation}) {
   // async function getBusinessCoordinates() {
   //   const address = "5812 Hollywood Blvd, Hollywood, FL 33021";
   //   const response = await fetch(`https://maps.googleapis.com/maps/api/geocode/json?address=5812%20Hollywood%20Blvd%2C%20Hollywood%2C%20FL%2033021&key=AIzaSyBGAPK3-L4ipbDv7LZN6VmK1TqalvOGfmg`);
-  //   const data = await response.json();
+  //   const articles = await response.json();
 
-  //   if (data.results && data.results.length > 0) {
-  //     const location = data.results[0].geometry.location;
+  //   if (articles.results && articles.results.length > 0) {
+  //     const location = articles.results[0].geometry.location;
   //     console.log("Extracted Location:", location);
   //     console.log(location.lat, location.lng);
   //     return { latitude: location.lat, longitude: location.lng };
