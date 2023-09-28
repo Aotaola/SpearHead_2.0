@@ -49,15 +49,16 @@ function HomeScreen({navigation}) {
     }
     
     return (
-      <ScrollView>
+      <ScrollView style={styles.newsContainer}>
       {updates
       .sort((a, b) => b.id - a.id)
       .map((item, index) => (
         <TouchableOpacity 
         key={index.ascending}
         onPress={() => navigation.navigate('Update', {item})}
+        style={styles.TouchableOpacityStyleStyle}
         > 
-        <Text style={styles.newsTitle}><Hospital />{truncate(item.title, 55)}</Text>
+        <Text style={styles.newsTitle}><Hospital/>{truncate(item.title, 55)}</Text>
         </TouchableOpacity>
         ))}
     </ScrollView>
@@ -67,15 +68,12 @@ function HomeScreen({navigation}) {
 
 function UpdateScreen({route}){
 
-  
-let {item} = (route.params)? route.params : index.last;
+  let {item} = route.params;
 
-  
   const [articles, setArticles] = useState([])
   const [admin, setAdmin] = useState(null);
   const [load, setLoad] = useState(true);
-  console.log(item)
-  
+  console.log(item.id)
   
   useEffect(() => {
     fetch(`http://localhost:3000/api/v1/articles/${item.id}`)
@@ -91,15 +89,17 @@ let {item} = (route.params)? route.params : index.last;
     });
   }, [item.id]);
 
-  console.log("fetching ID of item", articles.title)
+  console.log("fetching articles", articles)
+  console.log("fetching administratror", admin)
   
   if (load) {
     return <ActivityIndicator size="large" color="#0000ff"/>;
   }
-  
+
+  //const initialPageIndex = articles.findIndex(articles => articles.id === item.id);
+
   return(
-    <PagerView style={styles.pagerView} initialPage={item.id}>
-      {/* {articles.map((articles) => ( */}
+    <PagerView style={styles.pagerView} initialPage={0}>
       <ScrollView key = {articles.id} style={styles.newsContainer}>
         <Text style={styles.newsTitle}>{articles.title}</Text>
         <Text style={styles.newsSubTitle}>{articles.description}</Text>
@@ -107,9 +107,9 @@ let {item} = (route.params)? route.params : index.last;
         <Image source={{uri: 'http://content.health.harvard.edu/wp-content/uploads/2023/08/6c4e88b9-3890-4cf8-aab4-cc0eb928d98f.jpg'}} style={styles.image} />
         </View>
         <Text style={styles.newsBody}>{articles.body}</Text> 
-        {/* <Text style={styles.newsBody}>{articles.admin.name}</Text>  */}
+        <Text style={styles.newsBody}>{admin.name}</Text> 
+        <Text style={styles.newsBody}>{articles.created_at}</Text>
       </ScrollView>
-     {/* ))} */}
     </PagerView>
   );
 }
@@ -252,6 +252,12 @@ function ContactScreen({navigation}) {
 
 function InfoScreen({navigation}) {
 
+  const [isExpanded, setIsExpanded] = useState(false);
+
+  const handleToggleExpand = () => {
+    setIsExpanded(!isExpanded);
+  };
+
   const openAfcNPP = () => {
 
     const fileUri = FileSystem.documentDirectory + Afc_NPP_2022;
@@ -262,33 +268,40 @@ function InfoScreen({navigation}) {
 
   const [showWebview, setShowWebview] = useState(false);
   return (
-    <View style={styles.infoscontainer}>
-        <Text style={styles.infoMainText}>
-        Urgent Care Center in Hollywood {'\n'}
-        We Can Help Your Family Live Life, Uninterrupted. 
-        </Text>
-        <Text style={styles.infoBody}>
-        If you’re in need of medical care for an illness or injury that’s not life-threatening, 
-        look no further than American Family Care®. We offer urgent care in the Hollywood area for patients of all ages. 
-        Our medical team is staffed with medical professionals that are dedicated to ensuring your health and overall well-being.
-        </Text>
-        <Text style={styles.infoMainText}>
-          Our Mission
-        </Text>
-        <Text style={styles.infoBody}>
-        Our mission is to provide the best healthcare possible in a kind and caring environment, 
-          in an economical manner,
-           while respecting the rights of all of our patients,
-            at times and locations convenient to the patient.
-        </Text>
-        <View  style={styles.buttonContainer}>
-        <Button title="Privacy Policy" onPress={openAfcNPP} color='steelblue'/>
-  
-        </View>
+       <View style={styles.infoMainText}>
+        <TouchableOpacity onPress={handleToggleExpand}>
+          <Text style={styles.infoMainText}>
+            Urgent Care Center in Hollywood {'\n'}
+          </Text>
+          <Text style={styles.toggleText}>
+            {isExpanded ? 'Hide Details' : 'Expand Privacy Details'}
+          </Text>
+        </TouchableOpacity>
 
+      {isExpanded && (
+        <>
+          <Text style={styles.infoBody}>
+            If you’re in need of medical care for an illness or injury that’s not life-threatening, 
+            look no further than American Family Care®. We offer urgent care in the Hollywood area for patients of all ages. 
+            Our medical team is staffed with medical professionals that are dedicated to ensuring your health and overall well-being.
+          </Text>
+          <Text style={styles.infoMainText}>
+            Our Mission
+          </Text>
+          <Text style={styles.infoBody}>
+            Our mission is to provide the best healthcare possible in a kind and caring environment, 
+            in an economical manner,
+            while respecting the rights of all of our patients,
+            at times and locations convenient to the patient.
+          </Text>
+          <View style={styles.buttonContainer}>
+            <Button title="Privacy Policy" onPress={openAfcNPP} color='steelblue'/>
+          </View>
+        </>
+      )}
     </View>
   );
-}
+};
 
 const Tab = createMaterialBottomTabNavigator();
 
@@ -300,13 +313,11 @@ function App() {
        <Image source={afc_logo} style={styles.logo} />
        <Text style={styles.mainHeading}>American Family Care</Text>
       </View>
-
       <NavigationContainer>
         <Tab.Navigator tabBarPosition="bottom" 
           initialRouteName="Home"
           activeColor="midnightblue"
           inactiveColor="aliceblue"
-          
           fontFamily="Helvetica"
           barStyle={{ backgroundColor: 'crimson',
           height: 80,
@@ -339,8 +350,9 @@ const styles = StyleSheet.create({
  
   container: {
     flex: 1,
-    
-    backgroundColor: 'aliceblue'
+  },
+  pagerView: {
+    flex: 1,
   },
   logoContainer: {
     backgroundColor: 'crimson',
@@ -354,12 +366,11 @@ const styles = StyleSheet.create({
     borderBottomColor: 'red',
   },
   hospitalSvg:{
-
-    marginLeft: 10,
+    paddingRight: 10,
+    marginLeft: 20,
     height: 20,
     width: 20,
     position: 'absolute',
-    
   },
   mainHeading: {
     fontFamily: 'Helvetica',
@@ -371,6 +382,14 @@ const styles = StyleSheet.create({
     bottom: 10,
     left: 100
   },
+  TouchableOpacityStyleStyle: {
+    paddingHorizontal:10,
+    paddingVertical: 2,
+    borderWidth: .3,
+    borderColor: 'steelblue',
+    backgroundColor: 'whitesmoke',
+    borderRadius: 10
+  },
   infoscontainer: {
     flex: 1,
     paddingTop: 50,
@@ -378,6 +397,9 @@ const styles = StyleSheet.create({
     backgroundColor: 'aliceblue',
   },
   infoMainText: {
+    display: 'flex',
+    alignContent: 'center',
+    alignItems: 'center',
     width: '100%',
     backgroundColor: 'aliceblue',
     paddingTop: 20,
@@ -417,6 +439,17 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
+  toggleText: {
+    borderWidth: 1,
+    paddingVertical: 1,
+    borderColor: 'crimson',
+    paddingLeft: '22%',
+    display: 'flex',
+    flexDirection: 'row', 
+    alignItems: 'center', // Adjust as needed
+    color: 'steelblue', // Add your styling here
+    fontSize: 16, 
+  },
   paragraph: {
     padding: 16,
     fontSize: 18,
@@ -434,7 +467,6 @@ const styles = StyleSheet.create({
     textDecorationLine: 'none'
   },
   newsSubTitle: {
-
     paddingTop: 18,
     paddingHorizontal: 25,
     fontSize: 18,
@@ -490,8 +522,9 @@ const styles = StyleSheet.create({
     width: '100%',
   },
   newsContainer: {
-    paddingTop: 18,
-    paddingBottom: 100
+    backgroundColor: 'aliceblue',
+    paggingHorizontal: 20,
+    paddingTop: 1,
   },
   header: {
     fontFamily: 'Helvetica',
