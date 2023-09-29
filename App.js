@@ -1,6 +1,6 @@
 import { NavigationContainer } from '@react-navigation/native';
 import { createMaterialBottomTabNavigator } from '@react-navigation/material-bottom-tabs';
-import { Button, Text, View, Image, StyleSheet, ActivityIndicator, ScrollView, TouchableOpacity, Linking, Alert, ScrollViewComponent} from 'react-native';
+import { Button, Text, View, Image, StyleSheet, ActivityIndicator, ScrollView, TouchableOpacity, Linking, Alert, FlatList} from 'react-native';
 import {useEffect, useState} from 'react';
 import afc_logo from './assets/afc_logo.png';
 import * as Location from 'expo-location';
@@ -22,44 +22,64 @@ const Hospital = () => {
 
 function HomeScreen({navigation}) {
   const [updates, setUpdates] = useState([])
+  const [page, setPage] = useState(1)
   const [loading, setLoading] = useState(true);
   
   useEffect(() => {
-    fetch('http://localhost:3000/api/v1/articles')
+    fetch(`http://localhost:3000/api/v1/articles?page=${page}`)
     .then(response => response.json())
     .then(json => {
-      setUpdates(json);
+      console.log('updates =>', json)
+      setUpdates(prevUpdates => [prevUpdates, json]);
       setLoading(false);
     })
     .catch((error) => {
       console.error("There was an error fetching the articles", error);
       setLoading(false);
     });
-  }, []);
+  }, [page]);
   
-  if (loading) {
+  if (loading && page === 1) {
     return <ActivityIndicator size="large" color="#0000ff"/>;
+  }
+  const loadMoreItems = () => {
+    setPage(prevPage => prevPage + 1)
+  };
+  const renderUpdate = ({ item }) => {
+    return (
+      <TouchableOpacity
+        onPress={() => navigation.navigate('Update', { item })}
+      >
+        <Text>{item.title}</Text>
+      </TouchableOpacity>
+    )
   }
   function truncate(str, maxLength, continuation = "...") {
     if (str.length <= maxLength) return str;
     return str.slice(0, maxLength - continuation.length) + continuation;
   }
-  
     
     return (
-      <ScrollView style={styles.newsContainer}>
-      {updates
-      .sort((a, b) => b.id - a.id)
-      .map((item, index) => (
-        <TouchableOpacity 
-        key={index.ascending}
-        onPress={() => navigation.navigate('Update', {item})}
-        style={styles.TouchableOpacityStyleStyle}
-        > 
-        <Text style={styles.newsTitle}><Hospital/>{truncate(item.title, 55)}</Text>
-        </TouchableOpacity>
-        ))}
-    </ScrollView>
+    //   <ScrollView key={updates.id} style={styles.newsContainer}>
+    //   {updates
+    //   .sort((a, b) => b.id - a.id)
+    //   .map((item, index) => (
+    //     <TouchableOpacity 
+    //     key={index.ascending}
+    //     onPress={() => navigation.navigate('Update', {item})}
+    //     style={styles.TouchableOpacityStyleStyle}
+    //     > 
+    //     <Text style={styles.newsTitle}><Hospital/>{truncate(item.title, 55)}</Text>
+    //     </TouchableOpacity>
+    //     ))}
+    // </ScrollView>
+    <FlatList
+    data={updates}
+    renderItem={renderUpdate}
+    keyExtractor={(item, index) => index.toString()}
+    onEndReached={loadMoreItems}
+    onEndReachedThreshold={0.5}
+  />
   );
 }
 
@@ -69,35 +89,35 @@ function UpdateScreen({route}){
   let {item} = route.params;
 
   const [articles, setArticles] = useState([])
-  const [admin, setAdmin] = useState(null);
+  // const [admin, setAdmin] = useState(null);
   const [load, setLoad] = useState(true);
-  console.log(item.id)
+   console.log(item.id)
   
   useEffect(() => {
-    fetch(`http://localhost:3000/api/v1/articles/${item.id}`)
+    fetch(`http://localhost:3000/api/v1/articles/`)
     .then(response => response.json())
     .then(json => {
-      setArticles(json.article);
-      setAdmin(json.admin);
+      setArticles(json);
+      // setAdmin(json.admin);
       setLoad(false);
     })
     .catch((error) => {
       console.error("There was an error fetching the articles", error);
       setLoad(false);
     });
-  }, [item.id]);
+  }, []);
 
-  console.log("fetching articles", articles)
-  console.log("fetching administratror", admin)
+  console.log("fetching articles", articles, articles.id)
+ // console.log("fetching administratror", admin)
   
   if (load) {
     return <ActivityIndicator size="large" color="#0000ff"/>;
   }
 
-  //const initialPageIndex = articles.findIndex(articles => articles.id === item.id);
+  const initialPageIndex = articles.findIndex(articles => articles.id === item.id);
 
   return(
-    <PagerView style={styles.pagerView} initialPage={0}>
+    <PagerView style={styles.pagerView} initialPage={initialPageIndex}>
       <ScrollView key = {articles.id} style={styles.newsContainer}>
         <Text style={styles.newsTitle}>{articles.title}</Text>
         <Text style={styles.newsSubTitle}>{articles.description}</Text>
@@ -105,7 +125,7 @@ function UpdateScreen({route}){
         <Image source={{uri: 'http://content.health.harvard.edu/wp-content/uploads/2023/08/6c4e88b9-3890-4cf8-aab4-cc0eb928d98f.jpg'}} style={styles.image} />
         </View>
         <Text style={styles.newsBody}>{articles.body}</Text> 
-        <Text style={styles.newsBody}>{admin.name}</Text> 
+        {/* <Text style={styles.newsBody}>{admin.name}</Text>  */}
         <Text style={styles.newsBody}>{articles.created_at}</Text>
       </ScrollView>
     </PagerView>
@@ -293,48 +313,48 @@ function InfoScreen({navigation}) {
   
   return (
     <ScrollView style={styles.infoContainer}>
-    <View style={styles.serviceContainer}> 
+        <Text style={styles.infoMainText}>
+          Services at AFC Hollywood {'\n'}
+        </Text>
+      <View style={styles.serviceContainer}> 
         {service.sort((a, b) => b.id - a.id)
-      .map((serv, index) => (
+        .map((serv, index) => (
         
         <TouchableOpacity key={serv.id} onPress={() => Linking.openURL(serv.url)} 
         style={styles.serviceBtn}>
           <Text style={styles.serviceText}>
-            <Hospital style={styles.serviceHospital}/>
+           {/* <Hospital style={styles.serviceHospital}/> */}
             {truncate(serv.title, 55)}
           </Text>
         </TouchableOpacity>
         ))}
-        </View> 
+      </View> 
       <TouchableOpacity onPress={handleToggleExpand}>
-        <Text style={styles.infoMainText}>
-          Urgent Care Center in Hollywood {'\n'}
-        </Text>
         <Text style={styles.toggleText}>
           {isExpanded ? 'Hide Details' : 'Expand Privacy Details'}
         </Text>
       </TouchableOpacity>
 
     {isExpanded && (
-      <>
-        <Text style={styles.infoBody}>
-          If you’re in need of medical care for an illness or injury that’s not life-threatening, 
-          look no further than American Family Care®. We offer urgent care in the Hollywood area for patients of all ages. 
-          Our medical team is staffed with medical professionals that are dedicated to ensuring your health and overall well-being.
-        </Text>
-        <Text style={styles.infoMainText}>
-          Our Mission
-        </Text>
-        <Text style={styles.infoBody}>
-          Our mission is to provide the best healthcare possible in a kind and caring environment, 
-          in an economical manner,
-          while respecting the rights of all of our patients,
-          at times and locations convenient to the patient.
-        </Text>
+      
         <View style={styles.buttonContainer}>
-          <Button title="Privacy Policy" onPress={openAfcNPP} color='steelblue'/>
+          <Text style={styles.infoBody}>
+            If you’re in need of medical care for an illness or injury that’s not life-threatening, 
+            look no further than American Family Care®. We offer urgent care in the Hollywood area for patients of all ages. 
+            Our medical team is staffed with medical professionals that are dedicated to ensuring your health and overall well-being.
+          </Text>
+          <Text style={styles.infoMainText}>
+            Our Mission
+          </Text>
+          <Text style={styles.infoBody}>
+            Our mission is to provide the best healthcare possible in a kind and caring environment, 
+            in an economical manner,
+            while respecting the rights of all of our patients,
+            at times and locations convenient to the patient.
+          </Text>
+          <Button title="Privacy Policy" onPress={openAfcNPP} style={styles.privacyBtn}/>
         </View>
-      </>
+      
     )}
     </ScrollView>
   );
@@ -410,31 +430,36 @@ const styles = StyleSheet.create({
     flexWrap: 'wrap',
     justifyContent: 'space-between',
     height: '80%',
-    backgroundColor: 'steelblue',
+    backgroundColor: 'lavender',
     width: '100%',
-    padding: 5,
+    paddingHorizontal: 10,
+    paddingTop: 2
     
   },
   serviceBtn: {
     margin: 4,
     display: 'flex',
     padding: 5,
-    width: '22%',
-    height: 'auto',
-    backgroundColor: 'aliceblue',
+    width: '25%',
+    height: '30%',
+    backgroundColor: 'cornflowerblue',
     borderWidth: 1.3,
     borderColor: 'lavender',
     borderRadius: '7rem',
   },
   serviceHospital: {
-
+    position: 'relative',
   },
   serviceText: {
+    Color: 'white',
     fontFamily: 'Helvetica',
-    //fontSize: '12rem',
+    fontSize: 16,
     fontWeight: 400,
+    margin: 1,
+    marginColor: 'red',
   },
   hospitalSvg:{
+    color: 'red',
     paddingRight: 10,
     marginLeft: 20,
     height: 20,
@@ -462,8 +487,8 @@ const styles = StyleSheet.create({
     difuseColor: 'steelblue',
   },
   infoContainer: {
-    flex: 1,
-    
+    flex: 2,
+    paddingBottom: 100,
   },
   infoMainText: {
     display: 'flex',
@@ -471,11 +496,11 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     width: '100%',
     backgroundColor: 'aliceblue',
-    paddingTop: 10,
-    paddingHorizontal: 10,
+    paddingVertical: 2,
+    paddingHorizontal: 2,
     fontFamily: 'Helvetica',
     letterSpacing: 0.7,  
-    fontSize: 20, 
+    fontSize: 25, 
     textAlign: 'center'
   },
   infoBody: {
@@ -489,14 +514,21 @@ const styles = StyleSheet.create({
     textAlign: 'center'
   },
   buttonContainer: {
-    marginTop: 20,
     alignItems: 'center',
     justifyContent: 'center',
     borderRadius: 10,
     fontFamily: 'Helvetica',
+    width: '100%',
     fontSize: 10,
     borderWidth: 1,
-    borderColor: 'crimson'
+   // borderColor: 'crimson',
+    marginBottom: 120,
+  },
+  privacyBtn:{
+    borderWidth: 1,
+    borderColor: 'crimson',
+    backgroundColor: 'aliceblue',
+    color: 'white',
   },
   buttonContainerPressed: {
     backgroundColor: 'crimson',
