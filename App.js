@@ -1,6 +1,6 @@
 import { NavigationContainer } from '@react-navigation/native';
 import { createMaterialBottomTabNavigator } from '@react-navigation/material-bottom-tabs';
-import { Button, Text, View, Image, StyleSheet, ActivityIndicator, ScrollView, TouchableOpacity, Linking, Alert, FlatList} from 'react-native';
+import { Button, Text, View, Image, StyleSheet, ActivityIndicator, ScrollView, TouchableOpacity, Linking, Alert, ScrollViewComponent} from 'react-native';
 import {useEffect, useState} from 'react';
 import afc_logo from './assets/afc_logo.png';
 import * as Location from 'expo-location';
@@ -11,6 +11,14 @@ import Clipboard from '@react-native-community/clipboard';
 import Svg, {Path} from 'react-native-svg';
 import PagerView from 'react-native-pager-view';
 
+
+const Hospital = () => {
+  return(
+    <Svg  style={styles.hospitalSvg} viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" >
+    <Path d="M18 14H14V18H10V14H6V10H10V6H14V10H18" />
+  </Svg>
+    )
+  }
 
 function HomeScreen({navigation}) {
   const [updates, setUpdates] = useState([])
@@ -32,21 +40,11 @@ function HomeScreen({navigation}) {
   if (loading) {
     return <ActivityIndicator size="large" color="#0000ff"/>;
   }
-
   function truncate(str, maxLength, continuation = "...") {
     if (str.length <= maxLength) return str;
     return str.slice(0, maxLength - continuation.length) + continuation;
   }
-
   
-  
-  const Hospital = () => {
-    return(
-      <Svg  style={styles.hospitalSvg} viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" >
-      <Path d="M18 14H14V18H10V14H6V10H10V6H14V10H18" />
-    </Svg>
-      )
-    }
     
     return (
       <ScrollView style={styles.newsContainer}>
@@ -253,6 +251,24 @@ function ContactScreen({navigation}) {
 function InfoScreen({navigation}) {
 
   const [isExpanded, setIsExpanded] = useState(false);
+  const [showWebview, setShowWebview] = useState(false);
+  const [service, setService] = useState([])
+  const [loading, setLoading] = useState(false)
+
+  useEffect(() => {
+    fetch('http://localhost:3000/api/v1/services')
+    .then(response => response.json())
+    .then(json => {
+      setService(json);
+      setLoading(false);
+    })
+    .catch((error) => {
+      console.error("There was an error fetching the articles", error);
+      setLoading(false);
+    });
+  }, []);
+
+
 
   const handleToggleExpand = () => {
     setIsExpanded(!isExpanded);
@@ -266,46 +282,68 @@ function InfoScreen({navigation}) {
     console.log('fileURI:' + fileUri)
   }
 
-  const [showWebview, setShowWebview] = useState(false);
+  if (loading) {
+    return <ActivityIndicator size="large" color="#0000ff"/>;
+  }
+
+  function truncate(str, maxLength, continuation = "...") {
+    if (str.length <= maxLength) return str;
+    return str.slice(0, maxLength - continuation.length) + continuation;
+  }
+  
   return (
-       <View style={styles.infoMainText}>
-        <TouchableOpacity onPress={handleToggleExpand}>
-          <Text style={styles.infoMainText}>
-            Urgent Care Center in Hollywood {'\n'}
-          </Text>
-          <Text style={styles.toggleText}>
-            {isExpanded ? 'Hide Details' : 'Expand Privacy Details'}
+    <ScrollView style={styles.infoContainer}>
+    <View style={styles.serviceContainer}> 
+        {service.sort((a, b) => b.id - a.id)
+      .map((serv, index) => (
+        
+        <TouchableOpacity key={serv.id} onPress={() => Linking.openURL(serv.url)} 
+        style={styles.serviceBtn}>
+          <Text style={styles.serviceText}>
+            <Hospital style={styles.serviceHospital}/>
+            {truncate(serv.title, 55)}
           </Text>
         </TouchableOpacity>
+        ))}
+        </View> 
+      <TouchableOpacity onPress={handleToggleExpand}>
+        <Text style={styles.infoMainText}>
+          Urgent Care Center in Hollywood {'\n'}
+        </Text>
+        <Text style={styles.toggleText}>
+          {isExpanded ? 'Hide Details' : 'Expand Privacy Details'}
+        </Text>
+      </TouchableOpacity>
 
-      {isExpanded && (
-        <>
-          <Text style={styles.infoBody}>
-            If you’re in need of medical care for an illness or injury that’s not life-threatening, 
-            look no further than American Family Care®. We offer urgent care in the Hollywood area for patients of all ages. 
-            Our medical team is staffed with medical professionals that are dedicated to ensuring your health and overall well-being.
-          </Text>
-          <Text style={styles.infoMainText}>
-            Our Mission
-          </Text>
-          <Text style={styles.infoBody}>
-            Our mission is to provide the best healthcare possible in a kind and caring environment, 
-            in an economical manner,
-            while respecting the rights of all of our patients,
-            at times and locations convenient to the patient.
-          </Text>
-          <View style={styles.buttonContainer}>
-            <Button title="Privacy Policy" onPress={openAfcNPP} color='steelblue'/>
-          </View>
-        </>
-      )}
-    </View>
+    {isExpanded && (
+      <>
+        <Text style={styles.infoBody}>
+          If you’re in need of medical care for an illness or injury that’s not life-threatening, 
+          look no further than American Family Care®. We offer urgent care in the Hollywood area for patients of all ages. 
+          Our medical team is staffed with medical professionals that are dedicated to ensuring your health and overall well-being.
+        </Text>
+        <Text style={styles.infoMainText}>
+          Our Mission
+        </Text>
+        <Text style={styles.infoBody}>
+          Our mission is to provide the best healthcare possible in a kind and caring environment, 
+          in an economical manner,
+          while respecting the rights of all of our patients,
+          at times and locations convenient to the patient.
+        </Text>
+        <View style={styles.buttonContainer}>
+          <Button title="Privacy Policy" onPress={openAfcNPP} color='steelblue'/>
+        </View>
+      </>
+    )}
+    </ScrollView>
   );
 };
 
 const Tab = createMaterialBottomTabNavigator();
 
 function App() {
+
   return (
     
     <View style={styles.container}>
@@ -330,7 +368,7 @@ function App() {
           }}>
           <Tab.Screen name="Home" component={HomeScreen} style={styles.navButton} options={{
             tabBarIcon: 'home-circle-outline', 
-            
+
           }}/>
           <Tab.Screen name="Contact" component={ContactScreen} style={styles.navButton} options={{
             tabBarIcon: 'map-marker-plus-outline'}}/>
@@ -365,6 +403,37 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: 'red',
   },
+  serviceContainer:{
+    display: 'flex',
+    flexDirection: 'row',
+    flex: 1,
+    flexWrap: 'wrap',
+    justifyContent: 'space-between',
+    height: '80%',
+    backgroundColor: 'steelblue',
+    width: '100%',
+    padding: 5,
+    
+  },
+  serviceBtn: {
+    margin: 4,
+    display: 'flex',
+    padding: 5,
+    width: '22%',
+    height: 'auto',
+    backgroundColor: 'aliceblue',
+    borderWidth: 1.3,
+    borderColor: 'lavender',
+    borderRadius: '7rem',
+  },
+  serviceHospital: {
+
+  },
+  serviceText: {
+    fontFamily: 'Helvetica',
+    //fontSize: '12rem',
+    fontWeight: 400,
+  },
   hospitalSvg:{
     paddingRight: 10,
     marginLeft: 20,
@@ -383,18 +452,18 @@ const styles = StyleSheet.create({
     left: 100
   },
   TouchableOpacityStyleStyle: {
-    paddingHorizontal:10,
+    paddingHorizontal: 10,
     paddingVertical: 2,
     borderWidth: .3,
     borderColor: 'steelblue',
-    backgroundColor: 'whitesmoke',
-    borderRadius: 10
-  },
-  infoscontainer: {
-    flex: 1,
-    paddingTop: 50,
-    alignItems: 'center',
     backgroundColor: 'aliceblue',
+    borderRadius: 10,
+    borderBottomColor: 'midnightblue',
+    difuseColor: 'steelblue',
+  },
+  infoContainer: {
+    flex: 1,
+    
   },
   infoMainText: {
     display: 'flex',
@@ -402,7 +471,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     width: '100%',
     backgroundColor: 'aliceblue',
-    paddingTop: 20,
+    paddingTop: 10,
     paddingHorizontal: 10,
     fontFamily: 'Helvetica',
     letterSpacing: 0.7,  
@@ -443,7 +512,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     paddingVertical: 1,
     borderColor: 'crimson',
-    paddingLeft: '22%',
+    paddingLeft: '5%',
     display: 'flex',
     flexDirection: 'row', 
     alignItems: 'center', // Adjust as needed
