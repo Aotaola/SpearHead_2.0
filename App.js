@@ -385,11 +385,11 @@ function ServiceScreen(){
     console.log('item ID', item.id)
     return (
       <TouchableOpacity 
-      style={styles.TouchableOpacityStyleStyle}
+      style={styles.serviceBtn}
       onPress={() => {item.url}}
       >
-        <Text style={styles.newsTitle}>{item.title}</Text>
-        <Text style={styles.newsSubTitle}>{truncate(item.description, 85)}</Text>
+        <Text style={styles.serviceText}>{item.title}</Text>
+        <Text style={styles.serviceTextDescription}>{truncate(item.description, 85)}</Text>
         <Text style={styles.newsBody}>press to view online</Text>
       </TouchableOpacity>
     )
@@ -418,7 +418,7 @@ function ServiceScreen(){
   };
 
   return (
-    <View style={{flex: 1}}>
+    <View style={styles.serviceContainer} >
       <FlatList
       data={services}
       renderItem={renderUpdate}
@@ -500,38 +500,36 @@ const styles = StyleSheet.create({
   },
   serviceContainer:{
     display: 'flex',
-    flexDirection: 'row',
     flex: 1,
-    flexWrap: 'wrap',
+    flexDirection: 'column',
     justifyContent: 'space-between',
-    height: '80%',
+    alignContent: 'space-between',
     backgroundColor: 'lavender',
-    width: '100%',
-    paddingHorizontal: 10,
+    paddingHorizontal: 4,
     paddingTop: 2
-    
   },
   serviceBtn: {
     margin: 4,
-    display: 'flex',
-    padding: 5,
-    width: '25%',
-    height: '30%',
-    backgroundColor: 'cornflowerblue',
-    borderWidth: 1.3,
+    width: '100%',
+    height: 90,
+    backgroundColor: 'royalblue',
     borderColor: 'lavender',
-    borderRadius: '7rem',
-  },
-  serviceHospital: {
-    position: 'relative',
+    borderRadius: 4,
   },
   serviceText: {
-    Color: 'white',
+    
     fontFamily: 'Helvetica',
-    fontSize: 16,
+    fontSize: 22,
     fontWeight: 400,
-    margin: 1,
-    marginColor: 'red',
+    margin: 1
+  },
+  serviceTextDescription:{
+    position: 'absolute',
+    bottom: 1,
+    fontFamily: 'Helvetica',
+    fontSize: 20,
+    fontWeight: 400,
+    margin: 1
   },
   mainHeading: {
     display: 'flex',
