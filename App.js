@@ -9,7 +9,6 @@ import * as FileSystem from 'expo-file-system';
 import Afc_NPP_2022 from './Afc_NPP_2022.pdf'
 import Clipboard from '@react-native-community/clipboard';
 import Svg, {Path} from 'react-native-svg';
-import PagerView from 'react-native-pager-view';
 import { debounce } from 'lodash';
 
   const Hospital = () => {
@@ -19,6 +18,7 @@ import { debounce } from 'lodash';
   </Svg>
     )
   }
+ 
 
 function HomeScreen({navigation}) {
 
@@ -259,6 +259,7 @@ function ContactScreen({navigation}) {
   );
 }
 
+
 function InfoScreen({navigation}) {
 
   const [isExpanded, setIsExpanded] = useState(false);
@@ -351,6 +352,86 @@ function InfoScreen({navigation}) {
   );
 };
 
+function ServiceScreen(){
+  const [hasMoreItems, setHasMoreItems] = useState(true);
+  const [services, setServices] = useState([])
+  const [page, setPage] = useState(1)
+  const [loading, setLoading] = useState(true);
+  const itemsPerPage = 10;
+  
+  useEffect(() => {
+    fetch(`http://localhost:3000/api/v1/services?page=${page}&per_page=${itemsPerPage}`)
+    .then(response => response.json())
+    .then(json => {
+      if (json.length === 0) {  
+        setHasMoreItems(false);
+      } else {
+        setServices(prevServices => [...prevServices, ...json]);
+        console.log('services per page' + page, json)
+      }
+        setLoading(false);
+      })
+    .catch((error) => {
+      console.error("There was an error fetching the articles", error);
+      setLoading(false);
+    });
+  }, [page]);
+
+    if (loading && page === 1) {
+    return <ActivityIndicator size="large" color="#0000ff"/>;
+  }
+
+  const renderUpdate = ({ item }) => {
+    console.log('item ID', item.id)
+    return (
+      <TouchableOpacity 
+      style={styles.TouchableOpacityStyleStyle}
+      onPress={() => {item.url}}
+      >
+        <Text style={styles.newsTitle}>{item.title}</Text>
+        <Text style={styles.newsSubTitle}>{truncate(item.description, 85)}</Text>
+        <Text style={styles.newsBody}>press to view online</Text>
+      </TouchableOpacity>
+    )
+
+    function truncate(str, maxLength, continuation = "...") {
+      if (str.length <= maxLength) return str;
+       return str.slice(0, maxLength - continuation.length) + continuation;
+    }
+  }
+
+  const loadMoreItems = debounce(() => {
+    if (hasMoreItems && !loading) { 
+    setPage(prevPage => prevPage + 1)
+    }
+  },500);
+
+  const renderFooter = () => {
+    if (loading) {
+      return <ActivityIndicator size="large" color="#0000ff" />;
+    }
+  
+    if (!hasMoreItems) {
+      return <Text style={{ textAlign: 'center', padding: 10 }}>No more articles available</Text>;
+    }
+    return null;
+  };
+
+  return (
+    <View style={{flex: 1}}>
+      <FlatList
+      data={services}
+      renderItem={renderUpdate}
+      keyExtractor={(item) => item.id.toString()}
+      onEndReached={loadMoreItems}
+      onEndReachedThreshold={0.5}
+      ListFooterComponent={renderFooter} 
+      />
+    </View>
+
+  );
+}
+
 const Tab = createMaterialBottomTabNavigator();
 
 function App() {
@@ -388,6 +469,9 @@ function App() {
           <Tab.Screen name="Update" component={UpdateScreen} style={styles.navButton} options={{
             tabBarVisible: false,
             tabBarIcon: 'update',
+          }}/>
+          <Tab.Screen name="Services" component={ServiceScreen} style={styles.navButton} options={{
+            tabBarIcon: 'heart'
           }}/>
         </Tab.Navigator>
       </NavigationContainer>
