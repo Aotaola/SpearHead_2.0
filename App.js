@@ -21,6 +21,8 @@ const Hospital = () => {
   }
 
 function HomeScreen({navigation}) {
+
+  const [hasMoreItems, setHasMoreItems] = useState(true);
   const [updates, setUpdates] = useState([])
   const [page, setPage] = useState(1)
   const [loading, setLoading] = useState(true);
@@ -29,57 +31,71 @@ function HomeScreen({navigation}) {
     fetch(`http://localhost:3000/api/v1/articles?page=${page}`)
     .then(response => response.json())
     .then(json => {
-      console.log('updates =>', json)
-      setUpdates(prevUpdates => [prevUpdates, json]);
-      setLoading(false);
-    })
+      if (json.length === 0) {  
+        setHasMoreItems(false);
+      } else {
+        setUpdates(prevUpdates => [...prevUpdates, ...json]);
+        console.log('updates', updates)
+      }
+        setLoading(false);
+      })
     .catch((error) => {
       console.error("There was an error fetching the articles", error);
       setLoading(false);
     });
   }, [page]);
-  
-  if (loading && page === 1) {
+
+    if (loading && page === 1) {
     return <ActivityIndicator size="large" color="#0000ff"/>;
   }
+
   const loadMoreItems = () => {
     setPage(prevPage => prevPage + 1)
   };
+
   const renderUpdate = ({ item }) => {
+    console.log('item ID', item.id)
     return (
-      <TouchableOpacity
-        onPress={() => navigation.navigate('Update', { item })}
+      <TouchableOpacity 
+      style={styles.TouchableOpacityStyleStyle}
+      onPress={() => navigation.navigate('Update', { item })}
       >
-        <Text>{item.title}</Text>
+        <Text style={styles.newsTitle}><Hospital/>{item.title}</Text>
+        <Text style={styles.newsSubTitle}>{truncate(item.description, 85)}</Text>
+        <Text style={styles.newsBody}>{truncate(item.body, 90)}</Text>
       </TouchableOpacity>
     )
+
+    function truncate(str, maxLength, continuation = "...") {
+      if (str.length <= maxLength) return str;
+       return str.slice(0, maxLength - continuation.length) + continuation;
+    }
   }
-  function truncate(str, maxLength, continuation = "...") {
-    if (str.length <= maxLength) return str;
-    return str.slice(0, maxLength - continuation.length) + continuation;
-  }
+
+  const renderFooter = () => {
+    if (loading) {
+      return <ActivityIndicator size="large" color="#0000ff" />;
+    }
+  
+    if (!hasMoreItems) {
+      return <Text style={{ textAlign: 'center', padding: 10 }}>No more articles available</Text>;
+    }
+  
+    return null;
+    };
+  
     
     return (
-    //   <ScrollView key={updates.id} style={styles.newsContainer}>
-    //   {updates
-    //   .sort((a, b) => b.id - a.id)
-    //   .map((item, index) => (
-    //     <TouchableOpacity 
-    //     key={index.ascending}
-    //     onPress={() => navigation.navigate('Update', {item})}
-    //     style={styles.TouchableOpacityStyleStyle}
-    //     > 
-    //     <Text style={styles.newsTitle}><Hospital/>{truncate(item.title, 55)}</Text>
-    //     </TouchableOpacity>
-    //     ))}
-    // </ScrollView>
-    <FlatList
-    data={updates}
-    renderItem={renderUpdate}
-    keyExtractor={(item, index) => index.toString()}
-    onEndReached={loadMoreItems}
-    onEndReachedThreshold={0.5}
-  />
+    <View style={{flex: 1}}>
+      <FlatList
+      data={updates}
+      renderItem={renderUpdate}
+      keyExtractor={(item) => item.id.toString()}
+      onEndReached={loadMoreItems}
+      onEndReachedThreshold={0.5}
+      ListFooterComponent={renderFooter} 
+      />
+    </View>
   );
 }
 
@@ -458,14 +474,6 @@ const styles = StyleSheet.create({
     margin: 1,
     marginColor: 'red',
   },
-  hospitalSvg:{
-    color: 'red',
-    paddingRight: 10,
-    marginLeft: 20,
-    height: 20,
-    width: 20,
-    position: 'absolute',
-  },
   mainHeading: {
     fontFamily: 'Helvetica',
     fontSize: 20,                
@@ -557,9 +565,10 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   newsTitle: {
-    paddingTop: 18,
-    paddingHorizontal: 20,
-    fontSize: 25,
+    paddingTop: 10,
+    paddingLeft: 20,
+    paddingRight: 5,
+    fontSize: 22,
     fontFamily: 'Helvetica',
     color: 'midnightblue',
     backgroundColor: 'aliceblue',
@@ -568,28 +577,28 @@ const styles = StyleSheet.create({
     textDecorationLine: 'none'
   },
   newsSubTitle: {
-    paddingTop: 18,
-    paddingHorizontal: 25,
-    fontSize: 18,
+    paddingTop: 2,
+    paddingLeft: 10,
+    paddingRight: 4,
+    fontSize: 16,
     fontFamily: 'Helvetica',
     fontStyle: 'italic',
-    color: 'palevioletred',
+    color: 'steelblue',
     backgroundColor: 'aliceblue',
-    fontWeight: '400', 
+    fontWeight: '200', 
     letterSpacing: 0.7,
     textDecorationLine: 'none',
     textDecorationColor: 'crimson'
-
   },
   newsBody: {
-    paddingTop: 10,
-    paddingBottom: 120,
-    paddingLeft: 20,
-    paddingRight: 20,
-    fontSize: 18,
+    paddingTop: 2,
+    paddingBottom:0,
+    paddingLeft: 10,
+    paddingRight: 0,
+    fontSize: 15,
     fontFamily: 'Helvetica',
     backgroundColor: 'aliceblue',
-    fontWeight: '400',
+    fontWeight: '200',
   },
   newsError: {
     flex: 1,
