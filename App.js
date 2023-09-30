@@ -10,9 +10,9 @@ import Afc_NPP_2022 from './Afc_NPP_2022.pdf'
 import Clipboard from '@react-native-community/clipboard';
 import Svg, {Path} from 'react-native-svg';
 import PagerView from 'react-native-pager-view';
+import { debounce } from 'lodash';
 
-
-const Hospital = () => {
+  const Hospital = () => {
   return(
     <Svg  style={styles.hospitalSvg} viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" >
     <Path d="M18 14H14V18H10V14H6V10H10V6H14V10H18" />
@@ -26,16 +26,17 @@ function HomeScreen({navigation}) {
   const [updates, setUpdates] = useState([])
   const [page, setPage] = useState(1)
   const [loading, setLoading] = useState(true);
+  const itemsPerPage = 10;
   
   useEffect(() => {
-    fetch(`http://localhost:3000/api/v1/articles?page=${page}`)
+    fetch(`http://localhost:3000/api/v1/articles?page=${page}&per_page=${itemsPerPage}`)
     .then(response => response.json())
     .then(json => {
       if (json.length === 0) {  
         setHasMoreItems(false);
       } else {
         setUpdates(prevUpdates => [...prevUpdates, ...json]);
-        console.log('updates', updates)
+        console.log('updates per page' + page, json)
       }
         setLoading(false);
       })
@@ -49,9 +50,11 @@ function HomeScreen({navigation}) {
     return <ActivityIndicator size="large" color="#0000ff"/>;
   }
 
-  const loadMoreItems = () => {
+  const loadMoreItems = debounce(() => {
+    if (hasMoreItems && !loading) { 
     setPage(prevPage => prevPage + 1)
-  };
+    }
+  },500);
 
   const renderUpdate = ({ item }) => {
     console.log('item ID', item.id)
@@ -60,7 +63,7 @@ function HomeScreen({navigation}) {
       style={styles.TouchableOpacityStyleStyle}
       onPress={() => navigation.navigate('Update', { item })}
       >
-        <Text style={styles.newsTitle}><Hospital/>{item.title}</Text>
+        <Text style={styles.newsTitle}>{item.title}</Text>
         <Text style={styles.newsSubTitle}>{truncate(item.description, 85)}</Text>
         <Text style={styles.newsBody}>{truncate(item.body, 90)}</Text>
       </TouchableOpacity>
@@ -72,16 +75,15 @@ function HomeScreen({navigation}) {
     }
   }
 
-  const renderFooter = () => {
-    if (loading) {
-      return <ActivityIndicator size="large" color="#0000ff" />;
-    }
-  
-    if (!hasMoreItems) {
-      return <Text style={{ textAlign: 'center', padding: 10 }}>No more articles available</Text>;
-    }
-  
-    return null;
+    const renderFooter = () => {
+      if (loading) {
+        return <ActivityIndicator size="large" color="#0000ff" />;
+      }
+    
+      if (!hasMoreItems) {
+        return <Text style={{ textAlign: 'center', padding: 10 }}>No more articles available</Text>;
+      }
+      return null;
     };
   
     
@@ -96,55 +98,43 @@ function HomeScreen({navigation}) {
       ListFooterComponent={renderFooter} 
       />
     </View>
-  );
+    );
 }
 
 
 function UpdateScreen({route}){
 
-  let {item} = route.params;
+  const {item} = route.params;
 
-  const [articles, setArticles] = useState([])
+  
   // const [admin, setAdmin] = useState(null);
   const [load, setLoad] = useState(true);
    console.log(item.id)
   
-  useEffect(() => {
-    fetch(`http://localhost:3000/api/v1/articles/`)
-    .then(response => response.json())
-    .then(json => {
-      setArticles(json);
-      // setAdmin(json.admin);
-      setLoad(false);
-    })
-    .catch((error) => {
-      console.error("There was an error fetching the articles", error);
-      setLoad(false);
-    });
-  }, []);
+  
 
-  console.log("fetching articles", articles, articles.id)
+  console.log("fetching articles", item.id)
  // console.log("fetching administratror", admin)
   
   if (load) {
     return <ActivityIndicator size="large" color="#0000ff"/>;
   }
 
-  const initialPageIndex = articles.findIndex(articles => articles.id === item.id);
+  
 
   return(
-    <PagerView style={styles.pagerView} initialPage={initialPageIndex}>
-      <ScrollView key = {articles.id} style={styles.newsContainer}>
-        <Text style={styles.newsTitle}>{articles.title}</Text>
-        <Text style={styles.newsSubTitle}>{articles.description}</Text>
+    
+      <ScrollView key = {item.id} style={styles.newsContainer}>
+        <Text style={styles.newsTitle}>{item.title}</Text>
+        <Text style={styles.newsSubTitle}>{item.description}</Text>
         <View style={styles.imageContainer}>
         <Image source={{uri: 'http://content.health.harvard.edu/wp-content/uploads/2023/08/6c4e88b9-3890-4cf8-aab4-cc0eb928d98f.jpg'}} style={styles.image} />
         </View>
-        <Text style={styles.newsBody}>{articles.body}</Text> 
+        <Text style={styles.newsBody}>{item.body}</Text> 
         {/* <Text style={styles.newsBody}>{admin.name}</Text>  */}
-        <Text style={styles.newsBody}>{articles.created_at}</Text>
+        <Text style={styles.newsBody}>{item.created_at}</Text>
       </ScrollView>
-    </PagerView>
+   
   );
 }
 
@@ -475,6 +465,10 @@ const styles = StyleSheet.create({
     marginColor: 'red',
   },
   mainHeading: {
+    display: 'flex',
+    alignContent: 'center',
+    alignContenr: 'center',
+    justifyContent: 'center',
     fontFamily: 'Helvetica',
     fontSize: 20,                
     fontWeight: '200',           
@@ -488,9 +482,8 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
     paddingVertical: 2,
     borderWidth: .3,
-    borderColor: 'steelblue',
+    borderColor: 'lavender',
     backgroundColor: 'aliceblue',
-    borderRadius: 10,
     borderBottomColor: 'midnightblue',
     difuseColor: 'steelblue',
   },
@@ -568,6 +561,7 @@ const styles = StyleSheet.create({
     paddingTop: 10,
     paddingLeft: 20,
     paddingRight: 5,
+    
     fontSize: 22,
     fontFamily: 'Helvetica',
     color: 'midnightblue',
