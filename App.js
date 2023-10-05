@@ -105,13 +105,13 @@ function HomeScreen({navigation}) {
     
     return(
       <ScrollView style={styles.newsContainer}>
-      <Text style={styles.newsTitle}>{item.title}</Text>
-      <Text style={styles.newsSubTitle}>{item.description}</Text>
-      <View style={styles.imageContainer}>
-       <Image source={{uri: 'http://content.health.harvard.edu/wp-content/uploads/2023/08/6c4e88b9-3890-4cf8-aab4-cc0eb928d98f.jpg'}} style={styles.image} />
-      </View>
-      <Text style={styles.newsBody}>{item.body}</Text> 
-      <Text style={styles.newsBody}>{item.admin}</Text> 
+        <Text style={styles.newsTitle}>{item.title}</Text>
+        <Text style={styles.newsSubTitle}>{item.description}</Text>
+        <View style={styles.imageContainer}>
+          <Image source={{uri: 'http://content.health.harvard.edu/wp-content/uploads/2023/08/6c4e88b9-3890-4cf8-aab4-cc0eb928d98f.jpg'}} style={styles.image} />
+        </View>
+        <Text style={styles.newsBody}>{item.body}</Text> 
+        <Text style={styles.newsBody}>{item.admin}</Text> 
     </ScrollView>
   );
 }
@@ -568,8 +568,7 @@ const styles = StyleSheet.create({
   newsTitle: {
     paddingTop: 10,
     paddingLeft: 20,
-    paddingRight: 5,
-    
+    paddingRight: 10,
     fontSize: 22,
     fontFamily: 'Helvetica',
     color: 'midnightblue',
@@ -579,7 +578,7 @@ const styles = StyleSheet.create({
     textDecorationLine: 'none'
   },
   newsSubTitle: {
-    paddingTop: 2,
+    paddingVertical: 5,
     paddingLeft: 10,
     paddingRight: 4,
     fontSize: 16,
@@ -593,14 +592,14 @@ const styles = StyleSheet.create({
     textDecorationColor: 'crimson'
   },
   newsBody: {
-    paddingTop: 2,
-    paddingBottom:0,
-    paddingLeft: 10,
-    paddingRight: 0,
+    paddingTop: 10,
+    paddingBottom: 100,
+    paddingLeft: 20,
+    paddingRight: 20,
     fontSize: 15,
     fontFamily: 'Helvetica',
     backgroundColor: 'aliceblue',
-    fontWeight: '200',
+    fontWeight: '400',
   },
   newsError: {
     flex: 1,
@@ -637,6 +636,7 @@ const styles = StyleSheet.create({
     backgroundColor: 'aliceblue',
     paggingHorizontal: 20,
     paddingTop: 1,
+    paddingBottom: 150,
   },
   header: {
     fontFamily: 'Helvetica',
