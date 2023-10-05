@@ -372,7 +372,7 @@ function HomeStack() {
   return (
     <Stack.Navigator>
       <Stack.Screen name = "Home" component={HomeScreen} />
-      <Stack.Screen name="Update" component={UpdateScreen} options={{TransitionPresets: 'SlideFromRightIOS'}}/>
+      <Stack.Screen name="Update" component={UpdateScreen} options={{presentation: 'transparentModal', TransitionPresets: 'ModalSlideFromBottomIOS'}}/>
     </Stack.Navigator>
   );
 }
@@ -444,31 +444,33 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignContent: 'space-between',
     backgroundColor: 'lavender',
-    paddingHorizontal: 4,
-    paddingTop: 2
+    paddingHorizontal: 15,
+    paddingTop: 5
   },
   serviceBtn: {
-    margin: 4,
-    width: '100%',
-    height: 90,
-    backgroundColor: 'royalblue',
-    borderColor: 'lavender',
-    borderRadius: 4,
+    margin: 8,
+    width: '95%',
+    height: 125,
+    padding: 10,
+    backgroundColor: 'darkblue',
+    borderWidth: 2,
+    borderColor: 'cornflowerblue',
+    borderRadius: 15,
   },
   serviceText: {
-    
+    color: 'aliceblue',
     fontFamily: 'Helvetica',
-    fontSize: 22,
+    fontSize: 21,
     fontWeight: 400,
-    margin: 1
+    marginHorizontal: 10,
+    marginVertical: 5
   },
   serviceTextDescription:{
-    position: 'absolute',
-    bottom: 1,
     fontFamily: 'Helvetica',
-    fontSize: 20,
+    color: 'lightsteelblue',
+    fontSize: 18,
     fontWeight: 400,
-    margin: 1
+    marginHorizontal: 10
   },
   mainHeading: {
     display: 'flex',
