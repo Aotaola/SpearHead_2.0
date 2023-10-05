@@ -1,5 +1,7 @@
+import 'react-native-gesture-handler';
 import { NavigationContainer, useNavigation } from '@react-navigation/native';
 import { createMaterialBottomTabNavigator } from '@react-navigation/material-bottom-tabs';
+import { createStackNavigator } from '@react-navigation/stack';
 import { Button, Text, View, Image, StyleSheet, ActivityIndicator, ScrollView, TouchableOpacity, Linking, Alert, FlatList} from 'react-native';
 import {useEffect, useState} from 'react';
 import afc_logo from './assets/afc_logo.png';
@@ -11,9 +13,8 @@ import Clipboard from '@react-native-community/clipboard';
 import { debounce } from 'lodash';
 
 
-
 function HomeScreen({navigation}) {
-
+  
   const [hasMoreItems, setHasMoreItems] = useState(true);
   const [updates, setUpdates] = useState([])
   const [page, setPage] = useState(1)
@@ -31,24 +32,24 @@ function HomeScreen({navigation}) {
         setUpdates(prevUpdates => [...prevUpdates, ...json]);
         console.log('updates per page' + page, json)
       }
-        setLoading(false);
-      })
+      setLoading(false);
+    })
     .catch((error) => {
       console.error("There was an error fetching the articles", error);
       setLoading(false);
     });
   }, [page]);
-
-    if (loading && page === 1) {
+  
+  if (loading && page === 1) {
     return <ActivityIndicator size="large" color="#0000ff"/>;
   }
-
+  
   const loadMoreItems = debounce(() => {
     if (hasMoreItems && !loading) { 
-    setPage(prevPage => prevPage + 1)
+      setPage(prevPage => prevPage + 1)
     }
   },500);
-
+  
   const renderUpdate = ({ item }) => {
     console.log('item ID', item.id)
     return (
@@ -60,26 +61,26 @@ function HomeScreen({navigation}) {
         <Text style={styles.newsSubTitle}>{truncate(item.description, 85)}</Text>
       </TouchableOpacity>
     )
-
+    
     function truncate(str, maxLength, continuation = "...") {
       if (str.length <= maxLength) return str;
-       return str.slice(0, maxLength - continuation.length) + continuation;
+      return str.slice(0, maxLength - continuation.length) + continuation;
     }
   }
-
-    const renderFooter = () => {
-      if (loading) {
-        return <ActivityIndicator size="large" color="#0000ff" />;
-      }
-    
-      if (!hasMoreItems) {
-        return <Text style={{ textAlign: 'center', padding: 10 }}>No more articles available</Text>;
-      }
-      return null;
-    };
   
+  const renderFooter = () => {
+    if (loading) {
+      return <ActivityIndicator size="large" color="#0000ff" />;
+    }
     
-    return (
+    if (!hasMoreItems) {
+      return <Text style={{ textAlign: 'center', padding: 10 }}>No more articles available</Text>;
+    }
+    return null;
+  };
+  
+  
+  return (
     <View style={{flex: 1}}>
       <FlatList
       data={updates}
@@ -91,19 +92,19 @@ function HomeScreen({navigation}) {
       />
     </View>
     );
-}
-
-
-function UpdateScreen({route}){
-
-  if (!route.params) {
-    return <Text style={styles.newsError}>Error loading data, please select an article from the homepage</Text> 
   }
-  const {item} = route.params;
-  console.log(item.admin)
   
-  return(
-    <ScrollView style={styles.newsContainer}>
+  
+  function UpdateScreen({route}){
+    
+    if (!route.params) {
+      return <Text style={styles.newsError}>Error loading data, please select an article from the homepage</Text> 
+    }
+    const {item} = route.params;
+    console.log(item.admin)
+    
+    return(
+      <ScrollView style={styles.newsContainer}>
       <Text style={styles.newsTitle}>{item.title}</Text>
       <Text style={styles.newsSubTitle}>{item.description}</Text>
       <View style={styles.imageContainer}>
@@ -121,115 +122,115 @@ function ContactScreen({navigation}) {
   
   const [userLocation, setUserLocation] = useState(null);
   const [errorMsg, setErrorMsg] = useState(null);
-
+  
   // business location is hardcoded. 
-
+  
   const businessAddress = '5812 Hollywood Blvd, Hollywood, FL 33021';
   
   const handleCopyToClipboard = () => {
     Clipboard.setString(businessAddress);
     Alert.alert('Success', 'Address copied to clipboard!');
   };
-
+  
   const businessPhoneNumber = 'tel: +1(954) 866-7435';
-
+  
   const handleCallBusiness = () => {
     Linking.canOpenURL(businessPhoneNumber)
-      .then(supported => {
-        if (!supported) {
-          console.log('Can\'t handle the URL: ' + businessPhoneNumber);
-        } else {
-          return Linking.openURL(businessPhoneNumber);
-        }
-      })
-      .catch(err => console.error('An error occurred', err));
+    .then(supported => {
+      if (!supported) {
+        console.log('Can\'t handle the URL: ' + businessPhoneNumber);
+      } else {
+        return Linking.openURL(businessPhoneNumber);
+      }
+    })
+    .catch(err => console.error('An error occurred', err));
   };
-
+  
   const appointmentURL = 'https://www.clockwisemd.com/hospitals/5482/visits/new?utm_source=google&utm_medium=organic&utm_campaign=&utm_content=&utm_keyword=';
-
+  
   const handleMakeAppointment = () => {
     Linking.canOpenURL(appointmentURL)
-      .then(supported => {
-        if (!supported) {
-          console.log('Can\'t handle the URL: ' + appointmentURL);
-        } else {
-          return Linking.openURL(appointmentURL);
-        }
-      })
-      .catch(err => console.error('An error occurred', err));
+    .then(supported => {
+      if (!supported) {
+        console.log('Can\'t handle the URL: ' + appointmentURL);
+      } else {
+        return Linking.openURL(appointmentURL);
+      }
+    })
+    .catch(err => console.error('An error occurred', err));
   };
-
+  
   const businessLocation = {latitude:  26.0089697, longitude: -80.2038731}
   console.log('business location: ', businessLocation)
-
-
+  
+  
   //when multiple locations are required, the below code will help set up business location services
   //const GOOGLE_API_KEY = 'AIzaSyBGAPK3-L4ipbDv7LZN6VmK1TqalvOGfmg';
   // async function getBusinessCoordinates() {
-  //   const address = "5812 Hollywood Blvd, Hollywood, FL 33021";
-  //   const response = await fetch(`https://maps.googleapis.com/maps/api/geocode/json?address=5812%20Hollywood%20Blvd%2C%20Hollywood%2C%20FL%2033021&key=AIzaSyBGAPK3-L4ipbDv7LZN6VmK1TqalvOGfmg`);
-  //   const articles = await response.json();
-
-  //   if (articles.results && articles.results.length > 0) {
-  //     const location = articles.results[0].geometry.location;
-  //     console.log("Extracted Location:", location);
-  //     console.log(location.lat, location.lng);
-  //     return { latitude: location.lat, longitude: location.lng };
-  //   }
-  //   //console.log('Geocode API response:', location);
-
-  //   print ("no results found"); 
+    //   const address = "5812 Hollywood Blvd, Hollywood, FL 33021";
+    //   const response = await fetch(`https://maps.googleapis.com/maps/api/geocode/json?address=5812%20Hollywood%20Blvd%2C%20Hollywood%2C%20FL%2033021&key=AIzaSyBGAPK3-L4ipbDv7LZN6VmK1TqalvOGfmg`);
+    //   const articles = await response.json();
     
-  // }
-
-  
-  useEffect(() => {
-    (async () => {
-      let { status } = await Location.requestForegroundPermissionsAsync();
-      if (status !== 'granted') {
-        setErrorMsg('Permission to access location was denied');
-        return;
+    //   if (articles.results && articles.results.length > 0) {
+      //     const location = articles.results[0].geometry.location;
+      //     console.log("Extracted Location:", location);
+      //     console.log(location.lat, location.lng);
+      //     return { latitude: location.lat, longitude: location.lng };
+      //   }
+      //   //console.log('Geocode API response:', location);
+      
+      //   print ("no results found"); 
+      
+      // }
+      
+      
+      useEffect(() => {
+        (async () => {
+          let { status } = await Location.requestForegroundPermissionsAsync();
+          if (status !== 'granted') {
+            setErrorMsg('Permission to access location was denied');
+            return;
+          }
+          
+          // fetching user location
+          let userLoc = await Location.getCurrentPositionAsync({});
+          setUserLocation(userLoc);
+          console.log('Fetched user location:', userLoc);
+          
+          //fetching business location when necessary. remember to use a useState set to (null) when creating businessLocaiton variable
+          //let businessLoc = await getBusinessCoordinates({});
+          //setBusinessLocation[businessLoc];
+          //console.log('Fetched business location:', businessLoc);
+          
+        })();
+      }, []);
+      
+      let text = 'Waiting..';
+      if (errorMsg) {
+        text = errorMsg;
+      } else if (userLocation) {
+        text = JSON.stringify(userLocation);
       }
       
-      // fetching user location
-      let userLoc = await Location.getCurrentPositionAsync({});
-      setUserLocation(userLoc);
-      console.log('Fetched user location:', userLoc);
-      
-      //fetching business location when necessary. remember to use a useState set to (null) when creating businessLocaiton variable
-      //let businessLoc = await getBusinessCoordinates({});
-      //setBusinessLocation[businessLoc];
-      //console.log('Fetched business location:', businessLoc);
-      
-    })();
-  }, []);
-  
-  let text = 'Waiting..';
-  if (errorMsg) {
-    text = errorMsg;
-  } else if (userLocation) {
-    text = JSON.stringify(userLocation);
-  }
-  
-  return (
-    <View>
+      return (
+        <View>
         {userLocation  && businessLocation  ? 
         (
-        <MapView 
+          <MapView 
           style={{  width: '100%', height: '70%'}} 
           region={{
             latitude: businessLocation.latitude,
             longitude: businessLocation.longitude,
             latitudeDelta: 0.0522,
             longitudeDelta: 0.0421
-            }}>
+          }}>
             <Marker 
              coordinate={{
-              latitude: 26.0089697, 
-              longitude: -80.2038731
+               latitude: 26.0089697, 
+               longitude: -80.2038731
               }}
-             title="American Family Care, Hollywood, Fl."
-            />
+              title="American Family Care, Hollywood, Fl."
+              />
             <Marker  
               coordinate={{
                 latitude: userLocation.coords.latitude,
@@ -237,11 +238,11 @@ function ContactScreen({navigation}) {
               }}
               title="your location"
               pinColor='crimson'
-            />
+              />
           </MapView>
         ) : ( <Text style={styles.paragraph}> no location found </Text>
-      )
-    }
+        )
+      }
     <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
       <Button title={businessAddress} onPress={handleCopyToClipboard} />
       <Button title="Call: +1(954) 866-7435" onPress={handleCallBusiness} />
@@ -253,12 +254,12 @@ function ContactScreen({navigation}) {
 
 
 function InfoScreen({navigation}) {
-
+  
   const [isExpanded, setIsExpanded] = useState(false);
   const [showWebview, setShowWebview] = useState(false);
   const [service, setService] = useState([])
   const [loading, setLoading] = useState(false)
-
+  
   useEffect(() => {
     fetch('http://localhost:3000/api/v1/services')
     .then(response => response.json())
@@ -271,25 +272,25 @@ function InfoScreen({navigation}) {
       setLoading(false);
     });
   }, []);
-
-
-
+  
+  
+  
   const handleToggleExpand = () => {
     setIsExpanded(!isExpanded);
   };
-
+  
   const openAfcNPP = () => {
-
+    
     const fileUri = FileSystem.documentDirectory + Afc_NPP_2022;
-
+    
     Linking.openURL(fileUri);
     console.log('fileURI:' + fileUri)
   }
-
+  
   if (loading) {
     return <ActivityIndicator size="large" color="#0000ff"/>;
   }
-
+  
   function truncate(str, maxLength, continuation = "...") {
     if (str.length <= maxLength) return str;
     return str.slice(0, maxLength - continuation.length) + continuation;
@@ -337,18 +338,18 @@ function ServiceScreen(){
         setServices(prevServices => [...prevServices, ...json]);
         console.log('services per page' + page, json)
       }
-        setLoading(false);
-      })
+      setLoading(false);
+    })
     .catch((error) => {
       console.error("There was an error fetching the articles", error);
       setLoading(false);
     });
   }, [page]);
-
-    if (loading && page === 1) {
+  
+  if (loading && page === 1) {
     return <ActivityIndicator size="large" color="#0000ff"/>;
   }
-
+  
   const renderUpdate = ({ item }) => {
     console.log('item ID', item.id)
     return (
@@ -360,30 +361,30 @@ function ServiceScreen(){
         <Text style={styles.serviceTextDescription}>{truncate(item.description, 85)}</Text>
       </TouchableOpacity>
     )
-
+    
     function truncate(str, maxLength, continuation = "...") {
       if (str.length <= maxLength) return str;
-       return str.slice(0, maxLength - continuation.length) + continuation;
+      return str.slice(0, maxLength - continuation.length) + continuation;
     }
   }
-
+  
   const loadMoreItems = debounce(() => {
     if (hasMoreItems && !loading) { 
-    setPage(prevPage => prevPage + 1)
+      setPage(prevPage => prevPage + 1)
     }
   },500);
-
+  
   const renderFooter = () => {
     if (loading) {
       return <ActivityIndicator size="large" color="#0000ff" />;
     }
-  
+    
     if (!hasMoreItems) {
       return <Text style={{ textAlign: 'center', padding: 10 }}>No more articles available</Text>;
     }
     return null;
   };
-
+  
   return (
     <View style={styles.serviceContainer} >
       <FlatList
@@ -396,10 +397,21 @@ function ServiceScreen(){
       />
     </View>
 
-  );
+);
 }
 
 const Tab = createMaterialBottomTabNavigator();
+
+const Stack = createStackNavigator();
+
+function HomeStack() {
+  return (
+    <Stack.Navigator>
+      <Stack.Screen name = "." component={HomeScreen} />
+      <Stack.Screen name="Update" component={UpdateScreen} />
+    </Stack.Navigator>
+  );
+}
 
 function App() {
 
@@ -425,7 +437,7 @@ function App() {
           borderRadius: 20,
           overflow: 'hidden'
           }}>
-          <Tab.Screen name="Home" component={HomeScreen} style={styles.navButton} options={{
+          <Tab.Screen name="Home" component={HomeStack} style={styles.navButton} options={{
             tabBarIcon: 'home-circle-outline', 
 
           }}/>
@@ -433,10 +445,6 @@ function App() {
             tabBarIcon: 'map-marker-plus-outline'}}/>
           <Tab.Screen name="Info" component={InfoScreen} style={styles.navButton} options={{
             tabBarIcon: 'information-outline'}}/>
-          <Tab.Screen name="Update" component={UpdateScreen} style={styles.navButton} options={{
-            tabBarVisible: false,
-            tabBarIcon: 'update',
-          }}/>
           <Tab.Screen name="Services" component={ServiceScreen} style={styles.navButton} options={{
             tabBarIcon: 'heart'
           }}/>
