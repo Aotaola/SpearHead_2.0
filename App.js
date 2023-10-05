@@ -1,4 +1,4 @@
-import { NavigationContainer } from '@react-navigation/native';
+import { NavigationContainer, useNavigation } from '@react-navigation/native';
 import { createMaterialBottomTabNavigator } from '@react-navigation/material-bottom-tabs';
 import { Button, Text, View, Image, StyleSheet, ActivityIndicator, ScrollView, TouchableOpacity, Linking, Alert, FlatList} from 'react-native';
 import {useEffect, useState} from 'react';
@@ -8,17 +8,9 @@ import MapView, { Marker } from 'react-native-maps';
 import * as FileSystem from 'expo-file-system';
 import Afc_NPP_2022 from './Afc_NPP_2022.pdf'
 import Clipboard from '@react-native-community/clipboard';
-import Svg, {Path} from 'react-native-svg';
 import { debounce } from 'lodash';
 
-  const Hospital = () => {
-  return(
-    <Svg  style={styles.hospitalSvg} viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" >
-    <Path d="M18 14H14V18H10V14H6V10H10V6H14V10H18" />
-  </Svg>
-    )
-  }
- 
+
 
 function HomeScreen({navigation}) {
 
@@ -27,6 +19,7 @@ function HomeScreen({navigation}) {
   const [page, setPage] = useState(1)
   const [loading, setLoading] = useState(true);
   const itemsPerPage = 10;
+  
   
   useEffect(() => {
     fetch(`http://localhost:3000/api/v1/articles?page=${page}&per_page=${itemsPerPage}`)
@@ -65,7 +58,6 @@ function HomeScreen({navigation}) {
       >
         <Text style={styles.newsTitle}>{item.title}</Text>
         <Text style={styles.newsSubTitle}>{truncate(item.description, 85)}</Text>
-        <Text style={styles.newsBody}>{truncate(item.body, 90)}</Text>
       </TouchableOpacity>
     )
 
@@ -304,32 +296,7 @@ function InfoScreen({navigation}) {
   }
   
   return (
-    <ScrollView style={styles.infoContainer}>
-        <Text style={styles.infoMainText}>
-          Services at AFC Hollywood {'\n'}
-        </Text>
-      <View style={styles.serviceContainer}> 
-        {service.sort((a, b) => b.id - a.id)
-        .map((serv, index) => (
-        
-        <TouchableOpacity key={serv.id} onPress={() => Linking.openURL(serv.url)} 
-        style={styles.serviceBtn}>
-          <Text style={styles.serviceText}>
-           {/* <Hospital style={styles.serviceHospital}/> */}
-            {truncate(serv.title, 55)}
-          </Text>
-        </TouchableOpacity>
-        ))}
-      </View> 
-      <TouchableOpacity onPress={handleToggleExpand}>
-        <Text style={styles.toggleText}>
-          {isExpanded ? 'Hide Details' : 'Expand Privacy Details'}
-        </Text>
-      </TouchableOpacity>
-
-    {isExpanded && (
-      
-        <View style={styles.buttonContainer}>
+    <ScrollView style={styles.infoContainer}> 
           <Text style={styles.infoBody}>
             If you’re in need of medical care for an illness or injury that’s not life-threatening, 
             look no further than American Family Care®. We offer urgent care in the Hollywood area for patients of all ages. 
@@ -344,10 +311,11 @@ function InfoScreen({navigation}) {
             while respecting the rights of all of our patients,
             at times and locations convenient to the patient.
           </Text>
+        <View style={styles.buttonContainer}>
           <Button title="Privacy Policy" onPress={openAfcNPP} style={styles.privacyBtn}/>
         </View>
       
-    )}
+   
     </ScrollView>
   );
 };
@@ -390,7 +358,6 @@ function ServiceScreen(){
       >
         <Text style={styles.serviceText}>{item.title}</Text>
         <Text style={styles.serviceTextDescription}>{truncate(item.description, 85)}</Text>
-        <Text style={styles.newsBody}>press to view online</Text>
       </TouchableOpacity>
     )
 
