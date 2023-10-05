@@ -1,7 +1,7 @@
 import 'react-native-gesture-handler';
 import { NavigationContainer, useNavigation } from '@react-navigation/native';
 import { createMaterialBottomTabNavigator } from '@react-navigation/material-bottom-tabs';
-import { createStackNavigator } from '@react-navigation/stack';
+import { createStackNavigator, TransitionPresets } from '@react-navigation/stack';
 import { Button, Text, View, Image, StyleSheet, ActivityIndicator, ScrollView, TouchableOpacity, Linking, Alert, FlatList} from 'react-native';
 import {useEffect, useState} from 'react';
 import afc_logo from './assets/afc_logo.png';
@@ -254,46 +254,13 @@ function ContactScreen({navigation}) {
 
 
 function InfoScreen({navigation}) {
-  
-  const [isExpanded, setIsExpanded] = useState(false);
-  const [showWebview, setShowWebview] = useState(false);
-  const [service, setService] = useState([])
-  const [loading, setLoading] = useState(false)
-  
-  useEffect(() => {
-    fetch('http://localhost:3000/api/v1/services')
-    .then(response => response.json())
-    .then(json => {
-      setService(json);
-      setLoading(false);
-    })
-    .catch((error) => {
-      console.error("There was an error fetching the articles", error);
-      setLoading(false);
-    });
-  }, []);
-  
-  
-  
-  const handleToggleExpand = () => {
-    setIsExpanded(!isExpanded);
-  };
-  
+    
   const openAfcNPP = () => {
     
     const fileUri = FileSystem.documentDirectory + Afc_NPP_2022;
     
     Linking.openURL(fileUri);
     console.log('fileURI:' + fileUri)
-  }
-  
-  if (loading) {
-    return <ActivityIndicator size="large" color="#0000ff"/>;
-  }
-  
-  function truncate(str, maxLength, continuation = "...") {
-    if (str.length <= maxLength) return str;
-    return str.slice(0, maxLength - continuation.length) + continuation;
   }
   
   return (
@@ -347,7 +314,7 @@ function ServiceScreen(){
   }, [page]);
   
   if (loading && page === 1) {
-    return <ActivityIndicator size="large" color="#0000ff"/>;
+    return <ActivityIndicator size="large" color="crimson" padding="20"/>;
   }
   
   const renderUpdate = ({ item }) => {
@@ -407,8 +374,8 @@ const Stack = createStackNavigator();
 function HomeStack() {
   return (
     <Stack.Navigator>
-      <Stack.Screen name = "." component={HomeScreen} />
-      <Stack.Screen name="Update" component={UpdateScreen} />
+      <Stack.Screen name = "Home" component={HomeScreen} />
+      <Stack.Screen name="Update" component={UpdateScreen} options={{TransitionPresets: 'SlideFromRightIOS'}}/>
     </Stack.Navigator>
   );
 }
