@@ -254,11 +254,8 @@ function ContactScreen({navigation}) {
 
 
 function InfoScreen({navigation}) {
-    
   const openAfcNPP = () => {
-    
     const fileUri = FileSystem.documentDirectory + Afc_NPP_2022;
-    
     Linking.openURL(fileUri);
     console.log('fileURI:' + fileUri)
   }
