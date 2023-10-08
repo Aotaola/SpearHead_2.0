@@ -248,6 +248,7 @@ function ContactScreen({navigation}) {
       <Button title="Call: +1(954) 866-7435" onPress={handleCallBusiness} />
       <Button title="Make an Appointment" onPress={handleMakeAppointment} />
     </View>
+    
   </View>
   );
 }
@@ -279,8 +280,11 @@ function InfoScreen({navigation}) {
         <View style={styles.buttonContainer}>
           <Button title="Privacy Policy" onPress={openAfcNPP} style={styles.privacyBtn}/>
         </View>
-      
-   
+        <Text style={styles.infoMainText}>Hours of Operation</Text>
+        <Text style={styles.infoBody}>
+        Monday - Friday: 8:00 AM - 8:00 PM {`\n`}
+        Saturday - Sunday: 8:00 AM - 5:00 PM
+        </Text>
     </ScrollView>
   );
 };
@@ -422,9 +426,13 @@ const styles = StyleSheet.create({
  
   container: {
     flex: 1,
+    backgroundColor: 'aliceblue',
   },
   pagerView: {
     flex: 1,
+  },
+  scrollView: {
+    backgroundColor: 'aliceblue'
   },
   logoContainer: {
     backgroundColor: 'crimson',
@@ -495,9 +503,31 @@ const styles = StyleSheet.create({
     borderBottomColor: 'midnightblue',
     difuseColor: 'steelblue',
   },
+  contactMainText: {
+    color: 'crimson',
+    width: '100%',
+    paddingVertical: 5,
+    paddingHorizontal: 2,
+    fontFamily: 'Helvetica',
+    letterSpacing: 0.7,  
+    fontSize: 20, 
+    textAlign: 'center',
+    textDecorationLine: 'underline',
+  },
+  contactBody:{
+    paddingTop: 5,
+    paddingBottom: 20,
+    paddingHorizontal: 10,
+    fontFamily: 'Helvetica',
+    letterSpacing: 0.7,  
+    justifyContent: 'space-around',
+    fontSize: 17, 
+    textAlign: 'center'
+  },
   infoContainer: {
-    flex: 2,
-    paddingBottom: 100,
+    flex: 1,
+    height: '100%',
+    backgroundColor: 'aliceblue',
   },
   infoMainText: {
     display: 'flex',
@@ -505,7 +535,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     width: '100%',
     backgroundColor: 'aliceblue',
-    paddingVertical: 2,
+    paddingVertical: 10,
     paddingHorizontal: 2,
     fontFamily: 'Helvetica',
     letterSpacing: 0.7,  
@@ -514,15 +544,17 @@ const styles = StyleSheet.create({
   },
   infoBody: {
     backgroundColor: 'aliceblue',
-    paddingTop: 20,
-    paddingBottom: 20,
+    paddingTop: 10,
+    paddingBottom: 10,
     paddingHorizontal: 10,
     fontFamily: 'Helvetica',
     letterSpacing: 0.7,  
-    fontSize: 15, 
+    fontSize: 16, 
     textAlign: 'center'
   },
   buttonContainer: {
+    backgroundColor: 'whitesmoke',
+    borderColor: 'crimson',
     alignItems: 'center',
     justifyContent: 'center',
     borderRadius: 10,
@@ -530,8 +562,6 @@ const styles = StyleSheet.create({
     width: '100%',
     fontSize: 10,
     borderWidth: 1,
-   // borderColor: 'crimson',
-    marginBottom: 120,
   },
   privacyBtn:{
     borderWidth: 1,
