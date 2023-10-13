@@ -13,6 +13,11 @@ import Clipboard from '@react-native-community/clipboard';
 import { debounce } from 'lodash';
 
 
+function truncate(str, maxLength, continuation = "...") {
+  if (str.length <= maxLength) return str;
+  return str.slice(0, maxLength - continuation.length) + continuation;
+}
+
 function HomeScreen({navigation}) {
   
   const [hasMoreItems, setHasMoreItems] = useState(true);
@@ -61,11 +66,6 @@ function HomeScreen({navigation}) {
         <Text style={styles.newsSubTitle}>{truncate(item.description, 85)}</Text>
       </TouchableOpacity>
     )
-    
-    function truncate(str, maxLength, continuation = "...") {
-      if (str.length <= maxLength) return str;
-      return str.slice(0, maxLength - continuation.length) + continuation;
-    }
   }
   
   const renderFooter = () => {
@@ -317,23 +317,27 @@ function ServiceScreen(){
   if (loading && page === 1) {
     return <ActivityIndicator size="large" color="crimson" padding="20"/>;
   }
+
+  async function openServiceUrl(item){
+    const canOpen = await Linking.canOpenURL(item.url);
+    if (canOpen) {
+       Linking.openURL(item.url);
+    } else {
+       console.error("Can't open URL");
+    }
+ }
   
   const renderUpdate = ({ item }) => {
-    console.log('item ID', item.id)
+    
     return (
       <TouchableOpacity 
       style={styles.serviceBtn}
-      onPress={() => {item.url}}
-      >
+      onPress={() => openServiceUrl(item)}
+      > 
         <Text style={styles.serviceText}>{item.title}</Text>
         <Text style={styles.serviceTextDescription}>{truncate(item.description, 85)}</Text>
       </TouchableOpacity>
     )
-    
-    function truncate(str, maxLength, continuation = "...") {
-      if (str.length <= maxLength) return str;
-      return str.slice(0, maxLength - continuation.length) + continuation;
-    }
   }
   
   const loadMoreItems = debounce(() => {
@@ -358,7 +362,7 @@ function ServiceScreen(){
       <FlatList
       data={services}
       renderItem={renderUpdate}
-      keyExtractor={(item) => item.id.toString()}
+      keyExtractor={(item) => item.id.toString()} // 
       onEndReached={loadMoreItems}
       onEndReachedThreshold={0.5}
       ListFooterComponent={renderFooter} 
@@ -450,7 +454,6 @@ const styles = StyleSheet.create({
     flex: 1,
     flexDirection: 'column',
     justifyContent: 'space-between',
-    alignContent: 'space-between',
     backgroundColor: 'lavender',
     paddingHorizontal: 15,
     paddingTop: 5
