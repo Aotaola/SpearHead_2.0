@@ -4,7 +4,7 @@ import { createMaterialBottomTabNavigator } from '@react-navigation/material-bot
 import { createStackNavigator, TransitionPresets } from '@react-navigation/stack';
 import { Button, Text, View, Image, StyleSheet, ActivityIndicator, ScrollView, TouchableOpacity, Linking, Alert, FlatList} from 'react-native';
 import {useEffect, useState} from 'react';
-import afc_logo from './assets/afc_logo.png';
+import SpearHealthLogo from './assets/SpearHealthLogo.png';
 import * as Location from 'expo-location';
 import MapView, { Marker } from 'react-native-maps';
 import * as FileSystem from 'expo-file-system';
@@ -128,10 +128,15 @@ function ContactScreen({navigation}) {
   const businessAddress = '5812 Hollywood Blvd, Hollywood, FL 33021';
   
   const handleCopyToClipboard = () => {
-    Clipboard.setString(businessAddress);
-    Alert.alert('Success', 'Address copied to clipboard!');
-  };
-  
+    if (Clipboard && Clipboard.setString) {
+        Clipboard.setString(businessAddress);
+        Alert.alert('Success', 'Address copied to clipboard!');
+    } else {
+        console.error('Clipboard is not available');
+        Alert.alert('Error', 'Failed to copy address to clipboard');
+    }
+};
+
   const businessPhoneNumber = 'tel: +1(954) 866-7435';
   
   const handleCallBusiness = () => {
@@ -145,9 +150,7 @@ function ContactScreen({navigation}) {
     })
     .catch(err => console.error('An error occurred', err));
   };
-  
   const appointmentURL = 'https://www.clockwisemd.com/hospitals/5482/visits/new?utm_source=google&utm_medium=organic&utm_campaign=&utm_content=&utm_keyword=';
-  
   const handleMakeAppointment = () => {
     Linking.canOpenURL(appointmentURL)
     .then(supported => {
@@ -391,8 +394,8 @@ function App() {
     
     <View style={styles.container}>
       <View style={styles.logoContainer}>
-       <Image source={afc_logo} style={styles.logo} />
-       <Text style={styles.mainHeading}>American Family Care</Text>
+       <Image source={SpearHealthLogo} style={styles.logo} />
+       <Text style={styles.mainHeading}>Spear Health</Text>
       </View>
       <NavigationContainer>
         <Tab.Navigator tabBarPosition="bottom" 
@@ -400,7 +403,7 @@ function App() {
           activeColor="midnightblue"
           inactiveColor="aliceblue"
           fontFamily="Helvetica"
-          barStyle={{ backgroundColor: 'crimson',
+          barStyle={{ backgroundColor: '#20B2AA',
           height: 80,
           position: 'absolute',
           left: 7,
@@ -439,15 +442,19 @@ const styles = StyleSheet.create({
     backgroundColor: 'aliceblue'
   },
   logoContainer: {
-    backgroundColor: 'crimson',
+    //backgroundColor: 'mediumseagreen',
+    backgroundColor: 'lightseagreen',
+    //backgroundColor: 'seagreen',
+    //backgroundColor: 'darkseagreen',
     flexDirection: 'row', 
     paddingStart: 30,
     paddingEnd: 10,
     paddingBottom: 10,
     paddingTop: 40,
     justifyContent: 'flex-start',
+    alignContent: 'space between',
     borderBottomWidth: 1,
-    borderBottomColor: 'red',
+    borderBottomColor: 'lightsteelblue',
   },
   serviceContainer:{
     display: 'flex',
@@ -463,9 +470,9 @@ const styles = StyleSheet.create({
     width: '95%',
     height: 125,
     padding: 10,
-    backgroundColor: 'darkblue',
+    backgroundColor: 'seagreen',
     borderWidth: 2,
-    borderColor: 'cornflowerblue',
+    borderColor: 'mediumseagreen',
     borderRadius: 15,
   },
   serviceText: {
@@ -489,13 +496,14 @@ const styles = StyleSheet.create({
     alignContenr: 'center',
     justifyContent: 'center',
     fontFamily: 'Helvetica',
-    fontSize: 20,                
-    fontWeight: '200',           
+    fontSize: 25,                
+    fontWeight: '300',           
     color: 'aliceblue',               
-    letterSpacing: 0.7,          
+    letterSpacing: 1.5,          
     position: 'absolute', 
-    bottom: 10,
-    left: 100
+    bottom: 20,
+    left: 110,
+    
   },
   TouchableOpacityStyleStyle: {
     paddingHorizontal: 10,
@@ -686,9 +694,9 @@ const styles = StyleSheet.create({
     color: 'white'
   },
   logo: {
-    padding: 10,
-    width: 50,
-    height: 50,
+    padding: 20,
+    width: 60,
+    height: 60,
   },
   footer: {
     position: 'absolute',
