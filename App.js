@@ -4,7 +4,7 @@ import { createMaterialBottomTabNavigator } from '@react-navigation/material-bot
 import { createStackNavigator, TransitionPresets } from '@react-navigation/stack';
 import { Button, Text, View, Image, StyleSheet, ActivityIndicator, ScrollView, TouchableOpacity, Linking, Alert, FlatList} from 'react-native';
 import {useEffect, useState} from 'react';
-import SpearHealthLogo from './assets/SpearHealthLogo.png';
+import SpearHealthLogoBW from './assets/SpearHealthLogoBW.png';
 import * as Location from 'expo-location';
 import MapView, { Marker } from 'react-native-maps';
 import * as FileSystem from 'expo-file-system';
@@ -394,7 +394,7 @@ function App() {
     
     <View style={styles.container}>
       <View style={styles.logoContainer}>
-       <Image source={SpearHealthLogo} style={styles.logo} />
+       <Image source={SpearHealthLogoBW} style={styles.logo} />
        <Text style={styles.mainHeading}>Spear Health</Text>
       </View>
       <NavigationContainer>
