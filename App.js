@@ -10,6 +10,7 @@ import MapView, { Marker } from 'react-native-maps';
 import * as FileSystem from 'expo-file-system';
 import Afc_NPP_2022 from './Afc_NPP_2022.pdf'
 import Clipboard from '@react-native-community/clipboard';
+
 import { debounce } from 'lodash';
 
 
@@ -91,8 +92,8 @@ function HomeScreen({navigation}) {
       ListFooterComponent={renderFooter} 
       />
     </View>
-    );
-  }
+  );
+}
   
   
   function UpdateScreen({route}){
@@ -215,12 +216,19 @@ function ContactScreen({navigation}) {
         text = JSON.stringify(userLocation);
       }
       
+      {/* bellow is to open the privacy policy for this location */}
+      const openAfcNPP = () => {
+        const fileUri = FileSystem.documentDirectory + Afc_NPP_2022;
+        Linking.openURL(fileUri);
+        console.log('fileURI:' + fileUri)
+      }
+      //  
       return (
-        <View>
+        <ScrollView>
         {userLocation  && businessLocation  ? 
         (
           <MapView 
-          style={{  width: '100%', height: '70%'}} 
+          style={{  width: '100%', height: 400}} 
           region={{
             latitude: businessLocation.latitude,
             longitude: businessLocation.longitude,
@@ -246,18 +254,26 @@ function ContactScreen({navigation}) {
         ) : ( <Text style={styles.paragraph}> no location found </Text>
         )
       }
-    <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+
+    <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: 'aliceblue' }}>
       <Button title={businessAddress} onPress={handleCopyToClipboard} />
       <Button title="Call: +1(954) 866-7435" onPress={handleCallBusiness} />
       <Button title="Make an Appointment" onPress={handleMakeAppointment} />
     </View>
+    <View style={styles.informationButton} >
+      <TouchableOpacity 
+      onPress={() => navigation.navigate('Info')} >
+      <Text style={styles.InfobuttonText}>more information +</Text>
+      </TouchableOpacity>
+    </View>
+
     
-  </View>
+  </ScrollView>
   );
 }
 
 
-function InfoScreen({navigation}) {
+function InfoScreen({route}) {
   const openAfcNPP = () => {
     const fileUri = FileSystem.documentDirectory + Afc_NPP_2022;
     Linking.openURL(fileUri);
@@ -375,6 +391,16 @@ function ServiceScreen(){
 );
 }
 
+function ProfileScreen(){
+  return(
+    <View>
+      <Text>
+        this is a profile
+      </Text>
+    </View>
+  )
+}
+
 const Tab = createMaterialBottomTabNavigator();
 
 const Stack = createStackNavigator();
@@ -383,9 +409,18 @@ function HomeStack() {
   return (
     <Stack.Navigator>
       <Stack.Screen name = "Home" component={HomeScreen} />
-      <Stack.Screen name="Update" component={UpdateScreen} options={{presentation: 'transparentModal', TransitionPresets: 'ModalSlideFromBottomIOS'}}/>
+      <Stack.Screen name="Update" component={UpdateScreen} />
     </Stack.Navigator>
   );
+}
+
+function InformationalStack() {
+  return (
+    <Stack.Navigator>
+      <Stack.Screen name = "Contact" component={ContactScreen} />
+      <Stack.Screen name="Info" component={InfoScreen}/>
+    </Stack.Navigator>
+  )
 }
 
 function App() {
@@ -416,13 +451,16 @@ function App() {
             tabBarIcon: 'home-circle-outline', 
 
           }}/>
-          <Tab.Screen name="Contact" component={ContactScreen} style={styles.navButton} options={{
+          <Tab.Screen name="Contact" component={InformationalStack} style={styles.navButton} options={{
             tabBarIcon: 'map-marker-plus-outline'}}/>
-          <Tab.Screen name="Info" component={InfoScreen} style={styles.navButton} options={{
-            tabBarIcon: 'information-outline'}}/>
+          {/* <Tab.Screen name="Info" component={InfoScreen} style={styles.navButton} options={{
+            tabBarIcon: 'information-outline'}}/> */}
           <Tab.Screen name="Services" component={ServiceScreen} style={styles.navButton} options={{
             tabBarIcon: 'heart'
           }}/>
+          <Tab.Screen name="Profile" component={ProfileScreen} style={styles.navButton} options={{
+            tabBarIcon: 'account-heart'
+            }}/>
         </Tab.Navigator>
       </NavigationContainer>
   </View> 
@@ -534,6 +572,22 @@ const styles = StyleSheet.create({
     justifyContent: 'space-around',
     fontSize: 17, 
     textAlign: 'center'
+  },
+  informationButton: {
+    borderWidth: 1,
+    borderColor: 'lavender',
+    borderRadius: 5,
+    backgroundColor: 'aliceblue',
+    justifyContent: 'center',
+    paddingVertical: 10,
+    paddingHorizontal: 30,
+    marginHorizontal: 10
+  },
+  InfobuttonText: {
+    color: 'steelblue',
+    fontFamily: 'Helvetica',
+    fontSize: 20,
+    fontStyle: 'italic',
   },
   infoContainer: {
     flex: 1,
