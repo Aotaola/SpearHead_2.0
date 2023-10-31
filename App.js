@@ -10,6 +10,7 @@ import MapView, { Marker } from 'react-native-maps';
 import * as FileSystem from 'expo-file-system';
 import Afc_NPP_2022 from './Afc_NPP_2022.pdf'
 import Clipboard from '@react-native-community/clipboard';
+import Hospital from './assets/Hospital.svg';
 
 import { debounce } from 'lodash';
 
@@ -36,7 +37,7 @@ function HomeScreen({navigation}) {
         setHasMoreItems(false);
       } else {
         setUpdates(prevUpdates => [...prevUpdates, ...json]);
-        console.log('updates per page' + page, json)
+        //console.log('updates per page' + page, json)
       }
       setLoading(false);
     })
@@ -392,11 +393,43 @@ function ServiceScreen(){
 }
 
 function ProfileScreen(){
+  const [patient, setPatient] = useState([]);
+  const [invoices, setInvoices] = useState([]);
+  useEffect(() => {
+    fetch('http://localhost:3000/api/v1/patients/1')
+      .then(response => {
+        if (response.ok) {
+          return response.json();
+        }
+        throw new Error('Network response was not ok');
+      })
+      .then(data => setPatient(data.patient))
+      .then(data => setInvoices(data.invoices))
+      .catch(error => {
+        console.error('There has been a problem with your fetch operation:', error);
+      });
+      console.log('Patient', patient)
+  }, []);
+
+
+  if (patient === null) {
+    return <div>Loading...</div>;
+  }
+
+
   return(
-    <View>
-      <Text>
-        this is a profile
+    < View style = {styles.profileContainer}>
+      <Text style = {styles.profileText}>
+        Name: {patient.name}
       </Text>
+        <Text style = {styles.profileText}>
+          Email: {patient.email}
+        </Text>
+      <View style = {styles.profileContainer}>
+        <View style = {styles.profileText}>
+          {invoices}
+        </View>
+      </View>
     </View>
   )
 }
@@ -484,6 +517,7 @@ const styles = StyleSheet.create({
     backgroundColor: 'lightseagreen',
     //backgroundColor: 'seagreen',
     //backgroundColor: 'darkseagreen',
+    //backgroundColor: 'cadetblue',
     flexDirection: 'row', 
     paddingStart: 30,
     paddingEnd: 10,
@@ -493,6 +527,19 @@ const styles = StyleSheet.create({
     alignContent: 'space between',
     borderBottomWidth: 1,
     borderBottomColor: 'lightsteelblue',
+  },
+  profileContainer:{
+    display: 'flex',
+    padding: 10,
+    backgroundColor: 'lightsteelblue',
+    borderColor: 'lightsteelblue',
+    borderWidth: 2,
+    borderRadius: 5,
+  },
+  profileText: {
+    fontFamily: 'Helvetica',
+    fontSize: 25,
+    color: 'steelblue',
   },
   serviceContainer:{
     display: 'flex',
@@ -531,7 +578,7 @@ const styles = StyleSheet.create({
   mainHeading: {
     display: 'flex',
     alignContent: 'center',
-    alignContenr: 'center',
+    alignContent: 'center',
     justifyContent: 'center',
     fontFamily: 'Helvetica',
     fontSize: 25,                
