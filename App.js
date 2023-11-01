@@ -225,11 +225,11 @@ function ContactScreen({navigation}) {
       }
       //  
       return (
-        <ScrollView>
+        <ScrollView style = {{backgroundColor: 'aliceblue'}}> 
         {userLocation  && businessLocation  ? 
         (
           <MapView 
-          style={{  width: '100%', height: 400}} 
+          style={{  width: '100%', height: 350}} 
           region={{
             latitude: businessLocation.latitude,
             longitude: businessLocation.longitude,
@@ -256,11 +256,29 @@ function ContactScreen({navigation}) {
         )
       }
 
-    <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: 'aliceblue' }}>
-      <Button title={businessAddress} onPress={handleCopyToClipboard} />
-      <Button title="Call: +1(954) 866-7435" onPress={handleCallBusiness} />
-      <Button title="Make an Appointment" onPress={handleMakeAppointment} />
+    <View style={styles.contactButtonContainer}>
+      <TouchableOpacity onPress={handleCopyToClipboard} style={styles.contactButton}>
+        <Text style={styles.contactButtonText}>
+          {businessAddress}
+        </Text>
+      </TouchableOpacity>
     </View>
+
+    <View style={styles.contactButtonContainer}>
+      <TouchableOpacity onPress={handleCallBusiness} style={styles.contactButton}>
+        <Text style={styles.contactButtonText}>
+          Call: +1(954) 866-7435
+        </Text>
+      </TouchableOpacity>
+    </View>
+    <View  style = {styles.contactButtonContainer}>
+      <TouchableOpacity onPress={handleMakeAppointment} style={styles.contactButton}>
+        <Text style={styles.contactButtonText}>
+          Make an Appointment
+        </Text>
+      </TouchableOpacity>
+    </View>
+
     <View style={styles.informationButton} >
       <TouchableOpacity 
       onPress={() => navigation.navigate('Info')} >
@@ -391,10 +409,55 @@ function ServiceScreen(){
 
 );
 }
+function SignInScreen({ onSignIn }) {
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+
+  const handleSignIn = () => {
+    fetch('http://localhost:3000/api/v1/sessions', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ email, password }),
+    })
+      .then(response => {
+        if (response.ok) {
+          return response.json();
+        }
+        throw new Error('Network response was not ok');
+      })
+      .then(data => {
+        onSignIn(data.patient);
+      })
+      .catch(error => {
+        console.error('There has been a problem with your fetch operation:', error);
+      });
+  };
+
+  return (
+    <View>
+      <TextInput
+        value={email}
+        onChangeText={setEmail}
+        placeholder="Email"
+      />
+      <TextInput
+        value={password}
+        onChangeText={setPassword}
+        placeholder="Password"
+        secureTextEntry
+      />
+      <Button title="Sign In" onPress={handleSignIn} />
+    </View>
+  );
+}
 
 function ProfileScreen(){
+
   const [patient, setPatient] = useState([]);
   const [invoices, setInvoices] = useState([]);
+  
   useEffect(() => {
     fetch('http://localhost:3000/api/v1/patients/1')
       .then(response => {
@@ -403,12 +466,15 @@ function ProfileScreen(){
         }
         throw new Error('Network response was not ok');
       })
-      .then(data => setPatient(data.patient))
-      .then(data => setInvoices(data.invoices))
+      .then(data => {
+        setPatient(data.patient);
+        setInvoices(data.invoices);
+      })
       .catch(error => {
         console.error('There has been a problem with your fetch operation:', error);
       });
       console.log('Patient', patient)
+      console.log('Invoices', invoices)
   }, []);
 
 
@@ -418,19 +484,22 @@ function ProfileScreen(){
 
 
   return(
-    < View style = {styles.profileContainer}>
-      <Text style = {styles.profileText}>
-        Name: {patient.name}
+    < ScrollView style = {styles.profileContainer}>
+      <Text style = {styles.profileMainText}>
+        Welcome, {patient.first_name}!
       </Text>
         <Text style = {styles.profileText}>
-          Email: {patient.email}
+          here are your receipts from your most recent visits:
         </Text>
       <View style = {styles.profileContainer}>
-        <View style = {styles.profileText}>
-          {invoices}
+        {invoices.map(invoice => (
+        <View key = {invoice.id} style = {styles.invoiceContainer}>
+          <Text style={styles.invoiceText}> {invoice.description} </Text>
+          <Text style={styles.invoiceText}> {invoice.created_at} </Text>
         </View>
+        ))}
       </View>
-    </View>
+    </ScrollView>
   )
 }
 
@@ -528,18 +597,33 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: 'lightsteelblue',
   },
-  profileContainer:{
-    display: 'flex',
-    padding: 10,
-    backgroundColor: 'lightsteelblue',
-    borderColor: 'lightsteelblue',
-    borderWidth: 2,
-    borderRadius: 5,
+  profileContainer: {
+    flex: 1,
+    backgroundColor: 'aliceblue',
+    padding: 20,
+  },
+  profileMainText: {
+    fontSize: 25,
+    color: 'lightseagreen',
+    marginBottom: 10,
+
   },
   profileText: {
-    fontFamily: 'Helvetica',
-    fontSize: 25,
-    color: 'steelblue',
+    fontSize: 20,
+    color: 'lightseagreen',
+    marginBottom: 10,
+  },
+  invoiceContainer: {
+    backgroundColor: 'aliceblue', // Aliceblue background for better readability
+    borderRadius: 10, // Medium rounded corners
+    padding: 10,
+    marginBottom: 10,
+    borderWidth: 1,
+    borderColor: 'lightseagreen', // Lightseagreen border for a touch of color
+  },
+  invoiceText: {
+    fontSize: 18, // Slightly larger text for better readability
+    color: 'cornflowerblue', // Cornflowerblue text for readability and color consistency
   },
   serviceContainer:{
     display: 'flex',
@@ -551,29 +635,29 @@ const styles = StyleSheet.create({
     paddingTop: 5
   },
   serviceBtn: {
-    margin: 8,
-    width: '95%',
-    height: 125,
+    marginHorizontal: 10,
+    marginVertical: 5,
+    backgroundColor: 'aliceblue', // Lightseagreen background
+    borderRadius: 10,
     padding: 10,
-    backgroundColor: 'seagreen',
-    borderWidth: 2,
-    borderColor: 'mediumseagreen',
-    borderRadius: 15,
+    marginBottom: 10,
+    borderWidth: 1,
+    borderColor: 'lightseagreen', // Cornflowerblue border for a touch of color
   },
   serviceText: {
-    color: 'aliceblue',
+    color: 'cornflowerblue', // Aliceblue text for readability and color consistency
     fontFamily: 'Helvetica',
     fontSize: 21,
-    fontWeight: 400,
+    fontWeight: '400',
     marginHorizontal: 10,
-    marginVertical: 5
+    marginVertical: 5,
   },
   serviceTextDescription:{
     fontFamily: 'Helvetica',
-    color: 'lightsteelblue',
+    color: 'cadetblue', // Silver text for a subtle contrast
     fontSize: 18,
-    fontWeight: 400,
-    marginHorizontal: 10
+    fontWeight: '400',
+    marginHorizontal: 10,
   },
   mainHeading: {
     display: 'flex',
@@ -588,7 +672,6 @@ const styles = StyleSheet.create({
     position: 'absolute', 
     bottom: 20,
     left: 110,
-    
   },
   TouchableOpacityStyleStyle: {
     paddingHorizontal: 10,
@@ -620,15 +703,35 @@ const styles = StyleSheet.create({
     fontSize: 17, 
     textAlign: 'center'
   },
-  informationButton: {
+  contactButtonContainer: {
+    marginHorizontal: 10,
+    marginTop: 5,
+  },
+  contactButton: {
+    backgroundColor: 'gainsboro', // Lightseagreen background
+    borderRadius: 10,
+    paddingHorizontal: 10,
+    paddingVertical: 10, // Added vertical padding for consistency
     borderWidth: 1,
-    borderColor: 'lavender',
-    borderRadius: 5,
-    backgroundColor: 'aliceblue',
+    borderColor: 'lightseagreen', // Cornflowerblue border for a touch of color
+    alignItems: 'center', // Center content horizontally
+    justifyContent: 'center', // Center content vertically
+  },
+  contactButtonText: {
+    color: 'cornflowerblue', // Aliceblue text for readability and color consistency
+    fontFamily: 'Helvetica',
+    fontSize: 20,
+    fontWeight: '400',
+    textAlign: 'center', // Centered text for a polished look
+  },
+  informationButton: {
     justifyContent: 'center',
-    paddingVertical: 10,
-    paddingHorizontal: 30,
-    marginHorizontal: 10
+    marginHorizontal: 10,
+    marginVertical: 5,
+    backgroundColor: 'silver',
+    borderRadius: 10,
+    padding: 10,
+    marginBottom: 10,
   },
   InfobuttonText: {
     color: 'steelblue',
