@@ -708,7 +708,7 @@ const styles = StyleSheet.create({
     marginTop: 5,
   },
   contactButton: {
-    backgroundColor: 'gainsboro', // Lightseagreen background
+    backgroundColor: 'aliceblue', // Lightseagreen background
     borderRadius: 10,
     paddingHorizontal: 10,
     paddingVertical: 10, // Added vertical padding for consistency
@@ -725,10 +725,12 @@ const styles = StyleSheet.create({
     textAlign: 'center', // Centered text for a polished look
   },
   informationButton: {
-    justifyContent: 'center',
+    alignItems: 'center',
     marginHorizontal: 10,
     marginVertical: 5,
-    backgroundColor: 'silver',
+    backgroundColor: 'gainsboro',
+    borderWidth: 1,
+    borderColor: 'cornflowerblue',
     borderRadius: 10,
     padding: 10,
     marginBottom: 10,
