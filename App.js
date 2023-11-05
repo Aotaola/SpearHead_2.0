@@ -10,8 +10,6 @@ import MapView, { Marker } from 'react-native-maps';
 import * as FileSystem from 'expo-file-system';
 import Afc_NPP_2022 from './Afc_NPP_2022.pdf'
 import Clipboard from '@react-native-community/clipboard';
-import Hospital from './assets/Hospital.svg';
-
 import { debounce } from 'lodash';
 
 
@@ -409,17 +407,22 @@ function ServiceScreen(){
 
 );
 }
-function SignInScreen({ onSignIn }) {
+function SignUpScreen({ onSignUp }) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
-  const handleSignIn = () => {
-    fetch('http://localhost:3000/api/v1/sessions', {
+  const handleSignUp = () => {
+    fetch('http://localhost:3000/patients', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ email, password }),
+      body: JSON.stringify({
+        patient: {
+          email: email,
+          password: password,
+        },
+      }),
     })
       .then(response => {
         if (response.ok) {
@@ -428,7 +431,32 @@ function SignInScreen({ onSignIn }) {
         throw new Error('Network response was not ok');
       })
       .then(data => {
-        onSignIn(data.patient);
+        onSignUp(data.patient);
+      })
+      .catch(error => {
+        console.error('There has been a problem with your fetch operation:', error);
+      });
+  };
+
+  const handleLogin = () => {
+    fetch('http://localhost:3000/sessions', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        email: email,
+        password: password,
+      }),
+    })
+      .then(response => {
+        if (response.ok) {
+          return response.json();
+        }
+        throw new Error('Network response was not ok');
+      })
+      .then(data => {
+        onSignUp(data.patient);
       })
       .catch(error => {
         console.error('There has been a problem with your fetch operation:', error);
@@ -448,7 +476,8 @@ function SignInScreen({ onSignIn }) {
         placeholder="Password"
         secureTextEntry
       />
-      <Button title="Sign In" onPress={handleSignIn} />
+      <Button title="Sign Up" onPress={handleSignUp} />
+      <Button title="Log In" onPress={handleLogin} />
     </View>
   );
 }
