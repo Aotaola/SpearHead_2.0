@@ -419,6 +419,10 @@ function SignUpScreen({ onSignUp }) {
       },
       body: JSON.stringify({
         patient: {
+          first_name: first_name,
+          last_name: last_name,
+          insurance: insurance,
+          phone_number: phone_number,
           email: email,
           password: password,
         },
@@ -439,7 +443,7 @@ function SignUpScreen({ onSignUp }) {
   };
 
   const handleLogin = () => {
-    fetch('http://localhost:3000/sessions', {
+    fetch('http://localhost:3000/patient_login', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -476,7 +480,8 @@ function SignUpScreen({ onSignUp }) {
         placeholder="Password"
         secureTextEntry
       />
-      <Button title="Sign Up" onPress={handleSignUp} />
+      <Button title="Create an Account" onPress={handleSignUp} />
+      <Text> or </Text>
       <Button title="Log In" onPress={handleLogin} />
     </View>
   );
