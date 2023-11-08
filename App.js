@@ -2,7 +2,7 @@ import 'react-native-gesture-handler';
 import { NavigationContainer, useNavigation } from '@react-navigation/native';
 import { createMaterialBottomTabNavigator } from '@react-navigation/material-bottom-tabs';
 import { createStackNavigator, TransitionPresets } from '@react-navigation/stack';
-import { Button, Text, View, Image, StyleSheet, ActivityIndicator, ScrollView, TouchableOpacity, Linking, Alert, FlatList} from 'react-native';
+import { Button, Text, View, Image, StyleSheet, ActivityIndicator, ScrollView, TouchableOpacity, Linking, Alert, FlatList, TextInput} from 'react-native';
 import {useEffect, useState} from 'react';
 import SpearHealthLogoBW from './assets/SpearHealthLogoBW.png';
 import * as Location from 'expo-location';
@@ -410,19 +410,23 @@ function ServiceScreen(){
 function SignUpScreen({ onSignUp }) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [firstName, setFirstName] = useState('');
+  const [lastName, setLastName] = useState('');
+  const [phoneNumber, setPhoneNumber] = useState('');
+  const [insurance, setInsurance] = useState('');
 
   const handleSignUp = () => {
-    fetch('http://localhost:3000/patients', {
+    fetch('http://localhost:3000/api/v1/patients', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
         patient: {
-          first_name: first_name,
-          last_name: last_name,
+          first_name: firstName,
+          last_name: lastName,
           insurance: insurance,
-          phone_number: phone_number,
+          phone_number: phoneNumber,
           email: email,
           password: password,
         },
@@ -442,37 +446,63 @@ function SignUpScreen({ onSignUp }) {
       });
   };
 
-  const handleLogin = () => {
-    fetch('http://localhost:3000/patient_login', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        email: email,
-        password: password,
-      }),
-    })
-      .then(response => {
-        if (response.ok) {
-          return response.json();
-        }
-        throw new Error('Network response was not ok');
-      })
-      .then(data => {
-        onSignUp(data.patient);
-      })
-      .catch(error => {
-        console.error('There has been a problem with your fetch operation:', error);
-      });
-  };
+  // const handleLogin = () => {
+
+  //   fetch('http://localhost:3000/patient_login', {
+  //     method: 'POST',
+  //     headers: {
+  //       'Content-Type': 'application/json',
+  //     },
+  //     body: JSON.stringify({
+  //       email: email,
+  //       password: password,
+  //     }),
+  //   })
+  //     .then(response => {
+  //       if (response.ok) {
+  //         return response.json();
+  //       }
+  //       throw new Error('Network response was not ok');
+  //     })
+  //     .then(data => {
+  //       onSignUp(data.patient);
+  //     })
+  //     .catch(error => {
+  //       console.error('There has been a problem with your fetch operation:', error);
+  //     });
+  
+  // };
 
   return (
     <View>
       <TextInput
+        value={firstName}
+        onChangeText={setFirstName}
+        placeholder="First Name"
+        
+      />
+      <TextInput
+        value={lastName}
+        onChangeText={setLastName}
+        placeholder="Last Name"
+        
+      />
+      <TextInput
+        value={insurance}
+        onChangeText={setInsurance}
+        placeholder="Insurance"
+        
+      />
+      <TextInput
         value={email}
         onChangeText={setEmail}
         placeholder="Email"
+      />
+      <TextInput
+        value={phoneNumber}
+        onChangeText={setPhoneNumber}
+        placeholder="Phone Number"
+        
       />
       <TextInput
         value={password}
@@ -482,7 +512,18 @@ function SignUpScreen({ onSignUp }) {
       />
       <Button title="Create an Account" onPress={handleSignUp} />
       <Text> or </Text>
-      <Button title="Log In" onPress={handleLogin} />
+      {/* <Button title="Log In" onPress={handleLogin} /> */}
+      <TextInput
+        value={email}
+        onChangeText={setEmail}
+        placeholder="Email"
+      />
+       <TextInput
+        value={password}
+        onChangeText={setPassword}
+        placeholder="Password"
+        secureTextEntry
+      />
     </View>
   );
 }
@@ -541,6 +582,15 @@ const Tab = createMaterialBottomTabNavigator();
 
 const Stack = createStackNavigator();
 
+function ProfileStack(){
+  return(
+    <Stack.Navigator>
+      <Stack.Screen name="Signup" component={SignUpScreen} />
+      <Stack.Screen name="Profile" component={ProfileScreen} />
+    </Stack.Navigator>
+  )
+}
+
 function HomeStack() {
   return (
     <Stack.Navigator>
@@ -594,7 +644,7 @@ function App() {
           <Tab.Screen name="Services" component={ServiceScreen} style={styles.navButton} options={{
             tabBarIcon: 'heart'
           }}/>
-          <Tab.Screen name="Profile" component={ProfileScreen} style={styles.navButton} options={{
+          <Tab.Screen name="Profile" component={ProfileStack} style={styles.navButton} options={{
             tabBarIcon: 'account-heart'
             }}/>
         </Tab.Navigator>
