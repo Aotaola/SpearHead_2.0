@@ -11,7 +11,6 @@ import * as FileSystem from 'expo-file-system';
 import Afc_NPP_2022 from './Afc_NPP_2022.pdf'
 import Clipboard from '@react-native-community/clipboard';
 import { debounce } from 'lodash';
-//import auth from '@react-native-firebase/auth';
 
 function truncate(str, maxLength, continuation = "...") {
   if (str.length <= maxLength) return str;
@@ -405,90 +404,87 @@ function ServiceScreen(){
 }
 function SignUpScreen({ navigation }) {
 
-  const [isCreatingAccount, setIsCreatingAccount] = useState(true)
+  // const [isCreatingAccount, setIsCreatingAccount] = useState(true)
 
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [firstName, setFirstName] = useState('');
-  const [lastName, setLastName] = useState('');
-  const [phoneNumber, setPhoneNumber] = useState('');
-  const [insurance, setInsurance] = useState('');
+  // const [email, setEmail] = useState('');
+  // const [password, setPassword] = useState('');
+  // const [firstName, setFirstName] = useState('');
+  // const [lastName, setLastName] = useState('');
+  // const [phoneNumber, setPhoneNumber] = useState('');
+  // const [insurance, setInsurance] = useState('');
 
-  const [loginEmail, setLoginEmail] = useState('');
-  const [loginPassword, setLoginPassword] = useState('');
+  // const [loginEmail, setLoginEmail] = useState('');
+  // const [loginPassword, setLoginPassword] = useState('');
 
   
-  const handleSignUp = () => {
-    fetch('http://localhost:3000/api/v1/patients', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        patient: {
-          first_name: firstName,
-          last_name: lastName,
-          insurance: insurance,
-          phone_number: phoneNumber,
-          email: email,
-          password: password,
-        },
-      }),
-    })
-      .then(response => {
-        if (response.ok) {
-          return response.json();
-        }
-        throw new Error('Network response was not ok');
-      })
-      .then(data => {
-        console.log(data);
-        console.log(data.id)
-        //const patientId = data.id;
-
-       //navigation.navigate('Profile', { patientId: data.id });
-      })
-      .catch(error => {
-        console.error('There has been a problem with your fetch operation:', error);
-      });
-  };
+  // const handleSignUp = () => {
+  //   fetch('http://localhost:3000/api/v1/patients', {
+  //     method: 'POST',
+  //     headers: {
+  //       'Content-Type': 'application/json',
+  //     },
+  //     body: JSON.stringify({
+  //       patient: {
+  //         first_name: firstName,
+  //         last_name: lastName,
+  //         insurance: insurance,
+  //         phone_number: phoneNumber,
+  //         email: email,
+  //         password: password,
+  //       },
+  //     }),
+  //   })
+  //     .then(response => {
+  //       if (response.ok) {
+  //         return response.json();
+  //       }
+  //       throw new Error('Network response was not ok');
+  //     })
+  //     .then(data => {
+  //       console.log(data);
+  //       console.log(data.id)
+  //     })
+  //     .catch(error => {
+  //       console.error('There has been a problem with your fetch operation:', error);
+  //     });
+  // };
     
 
-  const handleLogin = () => {
-    fetch('http://localhost:3000/api/v1/patient_login', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        email: loginEmail,
-        password: loginPassword,
-      }),
-    })
-      .then(response => {
-        if (response.ok) {
-          return response.json();
-          console.log(session.id)
-        }
-        throw new Error('Network response was not ok');
-      })
-      .then(data => {
+  // const handleLogin = () => {
+  //   fetch('http://localhost:3000/api/v1/patient_login', {
+  //     method: 'POST',
+  //     headers: {
+  //       'Content-Type': 'application/json',
+  //     },
+  //     body: JSON.stringify({
+  //       email: loginEmail,
+  //       password: loginPassword,
+  //     }),
+  //   })
+  //     .then(response => {
+  //       if (response.ok) {
+  //         return response.json();
+  //         console.log(session.id)
+  //       }
+  //       throw new Error('Network response was not ok');
+  //     })
+  //     .then(data => {
 
-        console.log(data, data.id);
+  //       console.log(data, data.id);
 
-        const patientId = data.id;
+  //       const patientId = data.id;
 
-        navigation.navigate('Profile', { patientId: data.patient_id });
-      })
-      .catch(error => {
-        console.error('There has been a problem with your fetch operation:', error);
+  //       navigation.navigate('Profile', { patientId: data.patient_id });
+  //     })
+  //     .catch(error => {
+  //       console.error('There has been a problem with your fetch operation:', error);
         
-      });
-  };
+  //     });
+  // };
   
-  const toggleForm = () => {
-    setIsCreatingAccount(!isCreatingAccount); // Toggle the boolean state
-  };
+  // const toggleForm = () => {
+  //   setIsCreatingAccount(!isCreatingAccount); // Toggle the boolean state
+  // };
 
   return (
     <View>
@@ -557,6 +553,19 @@ function SignUpScreen({ navigation }) {
 
 function ProfileScreen({route}){
 
+  const [isCreatingAccount, setIsCreatingAccount] = useState(true)
+  const [user, setUser] = useState(null); 
+
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [firstName, setFirstName] = useState('');
+  const [lastName, setLastName] = useState('');
+  const [phoneNumber, setPhoneNumber] = useState('');
+  const [insurance, setInsurance] = useState('');
+
+  const [loginEmail, setLoginEmail] = useState('');
+  const [loginPassword, setLoginPassword] = useState('');
+
   const [patient, setPatient] = useState(null);
   const [invoices, setInvoices] = useState([]);
 
@@ -564,6 +573,46 @@ function ProfileScreen({route}){
 
   console.log( 'this is the route params log', route.params);
   console.log( ' this is the patient_id log' );
+
+  useEffect(() => {
+    // Check if there's a patientId in route.params
+    const patientId = route.params?.patientId;
+    if (patientId) {
+      fetchUserData(patientId);
+    }
+  }, [route.params]);
+
+  const handleSignUp = () => {
+    fetch('http://localhost:3000/api/v1/patients', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        patient: {
+          first_name: firstName,
+          last_name: lastName,
+          insurance: insurance,
+          phone_number: phoneNumber,
+          email: email,
+          password: password,
+        },
+      }),
+    })
+      .then(response => {
+        if (response.ok) {
+          return response.json();
+        }
+        throw new Error('Network response was not ok');
+      })
+      .then(data => {
+        console.log(data);
+        console.log(data.id)
+      })
+      .catch(error => {
+        console.error('There has been a problem with your fetch operation:', error);
+      });
+  };
 
   useEffect(() => {
     const patientId = route.params?.patientId;
@@ -583,7 +632,6 @@ function ProfileScreen({route}){
         console.error('There has been a problem with your fetch operation:', error);
       });
   }, [route.params?.patientId]); 
-
 
   const handleLogout = () => {
     fetch('http://localhost:3000/api/v1/patient_logout', {
@@ -606,39 +654,125 @@ function ProfileScreen({route}){
       // Optionally inform the user that the logout failed
     });
   };
+
+  const handleLogin = () => {
+    fetch('http://localhost:3000/api/v1/patient_login', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        email: loginEmail,
+        password: loginPassword,
+      }),
+    })
+      .then(response => {
+        if (response.ok) {
+          return response.json();
+          console.log(session.id)
+        }
+        throw new Error('Network response was not ok');
+      })
+      .then(data => {
+
+        console.log(data, data.id);
+
+        const patientId = data.id;
+
+        navigation.navigate('Profile', { patientId: data.patient_id });
+      })
+      .catch(error => {
+        console.error('There has been a problem with your fetch operation:', error);
+        
+      });
+  };
   
-
-
-
-  if (patient === null) {
+  const toggleForm = () => {
+    setIsCreatingAccount(!isCreatingAccount); // Toggle the boolean state
+  };
+  
+  if (user) {
     return(
-      <View>
-        <Text>Loading...</Text>
-      </View>
-    );;
-  }
-
-
-  return(
-    < ScrollView style = {styles.profileContainer}>
-      
-      {/* <Button title = "Edit profile" onPress={handleEdit}/> */}
-      <Button title = "Logout" onPress={handleLogout}/>
-      <Text style = {styles.profileMainText}>
-        Welcome, {patient.first_name}!
-      </Text>
-        <Text style = {styles.profileText}>
-          here are your receipts from your most recent visits:
+      < ScrollView style = {styles.profileContainer}>
+        {/* <Button title = "Edit profile" onPress={handleEdit}/> */}
+        <Button title = "Logout" onPress={handleLogout}/>
+        <Text style = {styles.profileMainText}>
+          Welcome, {patient.first_name}!
         </Text>
-      <View style = {styles.profileContainer}>
-        {invoices.map(invoice => (
-        <View key = {invoice.id} style = {styles.invoiceContainer}>
-          <Text style={styles.invoiceText}> {invoice.description} </Text>
-          <Text style={styles.invoiceText}> {invoice.created_at} </Text>
+          <Text style = {styles.profileText}>
+            here are your receipts from your most recent visits:
+          </Text>
+        <View style = {styles.profileContainer}>
+          {invoices.map(invoice => (
+            <View key = {invoice.id} style = {styles.invoiceContainer}>
+            <Text style={styles.invoiceText}> {invoice.description} </Text>
+            <Text style={styles.invoiceText}> {invoice.created_at} </Text>
+          </View>
+          ))}
         </View>
-        ))}
+      </ScrollView>
+    )
+  } else {
+  return(
+    <View style = {styles.profileContainer}>
+      <View>
+        {isCreatingAccount ? (
+          <View>
+          <TextInput
+            value={firstName}
+            onChangeText={setFirstName}
+            placeholder="First Name"
+            />
+          <TextInput
+            value={lastName}
+            onChangeText={setLastName}
+            placeholder="Last Name"
+            />
+          <TextInput
+            value={insurance}
+            onChangeText={setInsurance}
+            placeholder="Insurance"
+            />
+          <TextInput
+            value={email}
+            onChangeText={setEmail}
+            placeholder="Email"
+            />
+          <TextInput
+            value={phoneNumber}
+            onChangeText={setPhoneNumber}
+            placeholder="Phone Number"
+            />
+          <TextInput
+            value={password}
+            onChangeText={setPassword}
+            placeholder="Password"
+            secureTextEntry
+            />
+          <Button title="Create an Account" onPress={handleSignUp} />
+          <Text> or </Text>
+          <Button title="Go to Log In" onPress={toggleForm} />
+        </View>
+            ):(
+              <View>
+          <TextInput
+            value={loginEmail}
+            onChangeText={setLoginEmail}
+            placeholder="Email"
+            />
+          <TextInput
+            value={loginPassword}
+            onChangeText={setLoginPassword}
+            placeholder="Password"
+            secureTextEntry
+            />
+          <Button title="Log In" onPress={handleLogin} />
+          <Text> or </Text>
+          <Button title="Go to Create Account" onPress={toggleForm} />
+        </View>
+        )}
       </View>
-    </ScrollView>
+    </View>
   )
 }
 
@@ -649,11 +783,11 @@ const Stack = createStackNavigator();
 function AccountStack(){
   return(
        <Stack.Navigator>
-      {isAuthenticated ? (
-        <Stack.Screen name="Profile" component={ProfileScreen} />
-      ) : (
+      
         <Stack.Screen name="Signup" component={SignUpScreen} />
-      )}
+      
+        <Stack.Screen name="Profile" component={ProfileScreen} />
+      
     </Stack.Navigator>
   )
 }
@@ -677,21 +811,6 @@ function InformationalStack() {
 }
 
 function App() {
-  const [currentUser, setCurrentUser] = useState(null);
-
-  useEffect(() => {
-    // Listen for authentication state to change.
-    const unsubscribe = auth().onAuthStateChanged(user => {
-      if (user) {
-        setCurrentUser(user);
-      } else {
-        setCurrentUser(null);
-      }
-    });
-
-    // unsubscribe from the listener when unmounting
-    return () => unsubscribe();
-  }, []);
 
   return (
     
@@ -700,7 +819,7 @@ function App() {
        <Image source={SpearHealthLogoBW} style={styles.logo} />
        <Text style={styles.mainHeading}>Spear Health</Text>
       </View>
-      <AuthContext.Provider value={{ user, setUser }}>
+      {/* <AuthContext.Provider value={{ user, setUser }}> */}
       
         <NavigationContainer>
           <Tab.Navigator tabBarPosition="bottom" 
@@ -727,12 +846,12 @@ function App() {
             <Tab.Screen name="Services" component={ServiceScreen} style={styles.navButton} options={{
               tabBarIcon: 'heart'
             }}/>
-            <Tab.Screen name="Profile" component={AuthScreens} style={styles.navButton} options={{
+            <Tab.Screen name="Profile" component={AccountStack} style={styles.navButton} options={{
               tabBarIcon: 'account-heart'
               }}/>
           </Tab.Navigator>
         </NavigationContainer>
-      </AuthContext.Provider>
+      {/* </AuthContext.Provider> */}
   </View> 
   );
 }
@@ -1092,6 +1211,4 @@ const styles = StyleSheet.create({
   },
 });
 
-
 export default App;
-
