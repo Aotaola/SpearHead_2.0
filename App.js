@@ -682,21 +682,21 @@ function InformationalStack() {
 }
 
 function App() {
-  const [user, setUser] = useState(null);
-
-  const checkAuthState = () => {
-    firebase.auth().onAuthStateChanged((user) => {
-      setUser(user);
-    });
-  };
+  const [currentUser, setCurrentUser] = useState(null);
 
   useEffect(() => {
-    checkAuthState();
-  }, []);
+    // Listen for authentication state to change.
+    const unsubscribe = auth().onAuthStateChanged(user => {
+      if (user) {
+        setCurrentUser(user);
+      } else {
+        setCurrentUser(null);
+      }
+    });
 
-  const AuthScreens = () => {
-    return user ? <ProfileScreen /> : <SignUpScreen />;
-  };
+    // unsubscribe from the listener when unmounting
+    return () => unsubscribe();
+  }, []);
 
   return (
     
