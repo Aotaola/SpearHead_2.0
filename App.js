@@ -3,7 +3,7 @@ import { NavigationContainer, useNavigation } from '@react-navigation/native';
 import { createMaterialBottomTabNavigator } from '@react-navigation/material-bottom-tabs';
 import { createStackNavigator, TransitionPresets } from '@react-navigation/stack';
 import { Button, Text, View, Image, StyleSheet, ActivityIndicator, ScrollView, TouchableOpacity, Linking, Alert, FlatList, TextInput} from 'react-native';
-import {useEffect, useState, useContext, createContext} from 'react';
+import {useEffect, useState} from 'react';
 import SpearHealthLogoBW from './assets/SpearHealthLogoBW.png';
 import * as Location from 'expo-location';
 import MapView, { Marker } from 'react-native-maps';
@@ -11,7 +11,7 @@ import * as FileSystem from 'expo-file-system';
 import Afc_NPP_2022 from './Afc_NPP_2022.pdf'
 import Clipboard from '@react-native-community/clipboard';
 import { debounce } from 'lodash';
-import auth from 'react-native-firebase/auth';
+//import auth from '@react-native-firebase/auth';
 
 function truncate(str, maxLength, continuation = "...") {
   if (str.length <= maxLength) return str;
@@ -621,6 +621,7 @@ function ProfileScreen({route}){
 
   return(
     < ScrollView style = {styles.profileContainer}>
+      
       {/* <Button title = "Edit profile" onPress={handleEdit}/> */}
       <Button title = "Logout" onPress={handleLogout}/>
       <Text style = {styles.profileMainText}>
@@ -646,12 +647,6 @@ const Tab = createMaterialBottomTabNavigator();
 const Stack = createStackNavigator();
 
 function AccountStack(){
-  const { isAuthenticated, checkAuthState } = useContext(AuthContext);
-
-  useEffect(() => {
-    checkAuthState();
-  }, [checkAuthState]);
-
   return(
        <Stack.Navigator>
       {isAuthenticated ? (
