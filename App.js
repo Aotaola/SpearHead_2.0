@@ -3,7 +3,7 @@ import { NavigationContainer, useNavigation } from '@react-navigation/native';
 import { createMaterialBottomTabNavigator } from '@react-navigation/material-bottom-tabs';
 import { createStackNavigator, TransitionPresets } from '@react-navigation/stack';
 import { Button, Text, View, Image, StyleSheet, ActivityIndicator, ScrollView, TouchableOpacity, Linking, Alert, FlatList, TextInput} from 'react-native';
-import {useEffect, useState, useContext} from 'react';
+import {useEffect, useState, useContext, createContext} from 'react';
 import SpearHealthLogoBW from './assets/SpearHealthLogoBW.png';
 import * as Location from 'expo-location';
 import MapView, { Marker } from 'react-native-maps';
@@ -11,6 +11,7 @@ import * as FileSystem from 'expo-file-system';
 import Afc_NPP_2022 from './Afc_NPP_2022.pdf'
 import Clipboard from '@react-native-community/clipboard';
 import { debounce } from 'lodash';
+import auth from 'react-native-firebase/auth';
 
 function truncate(str, maxLength, continuation = "...") {
   if (str.length <= maxLength) return str;
@@ -92,8 +93,7 @@ function HomeScreen({navigation}) {
     </View>
   );
 }
-  
-  
+   
   function UpdateScreen({route}){
     
     if (!route.params) {
@@ -114,8 +114,6 @@ function HomeScreen({navigation}) {
     </ScrollView>
   );
 }
-
-
 
 function ContactScreen({navigation}) {
   
@@ -287,7 +285,6 @@ function ContactScreen({navigation}) {
   </ScrollView>
   );
 }
-
 
 function InfoScreen({route}) {
   const openAfcNPP = () => {
@@ -644,12 +641,6 @@ function ProfileScreen({route}){
   )
 }
 
-export const AuthContext = createContext({
-  isAuthenticated: false,
-  checkAuthState: () => {},
-});
-
-
 const Tab = createMaterialBottomTabNavigator();
 
 const Stack = createStackNavigator();
@@ -664,10 +655,8 @@ function AccountStack(){
   return(
        <Stack.Navigator>
       {isAuthenticated ? (
-        // If the user is authenticated, allow access to the Profile screen
         <Stack.Screen name="Profile" component={ProfileScreen} />
       ) : (
-        // If not authenticated, present the Signup screen
         <Stack.Screen name="Signup" component={SignUpScreen} />
       )}
     </Stack.Navigator>
@@ -693,6 +682,21 @@ function InformationalStack() {
 }
 
 function App() {
+  const [user, setUser] = useState(null);
+
+  const checkAuthState = () => {
+    firebase.auth().onAuthStateChanged((user) => {
+      setUser(user);
+    });
+  };
+
+  useEffect(() => {
+    checkAuthState();
+  }, []);
+
+  const AuthScreens = () => {
+    return user ? <ProfileScreen /> : <SignUpScreen />;
+  };
 
   return (
     
@@ -701,37 +705,39 @@ function App() {
        <Image source={SpearHealthLogoBW} style={styles.logo} />
        <Text style={styles.mainHeading}>Spear Health</Text>
       </View>
-      <NavigationContainer>
-        <Tab.Navigator tabBarPosition="bottom" 
-          initialRouteName="Home"
-          activeColor="midnightblue"
-          inactiveColor="aliceblue"
-          fontFamily="Helvetica"
-          barStyle={{ backgroundColor: '#20B2AA',
-          height: 80,
-          position: 'absolute',
-          left: 7,
-          right: 7,
-          bottom: 30,
-          borderRadius: 20,
-          overflow: 'hidden'
-          }}>
-          <Tab.Screen name="Home" component={InitialStack} style={styles.navButton} options={{
-            tabBarIcon: 'home-circle-outline', 
+      <AuthContext.Provider value={{ user, setUser }}>
+      
+        <NavigationContainer>
+          <Tab.Navigator tabBarPosition="bottom" 
+            initialRouteName="Home"
+            activeColor="midnightblue"
+            inactiveColor="aliceblue"
+            fontFamily="Helvetica"
+            barStyle={{ backgroundColor: '#20B2AA',
+            height: 80,
+            position: 'absolute',
+            left: 7,
+            right: 7,
+            bottom: 30,
+            borderRadius: 20,
+            overflow: 'hidden'
+            }}>
+            <Tab.Screen name="Home" component={InitialStack} style={styles.navButton} options={{
+              tabBarIcon: 'home-circle-outline', 
 
-          }}/>
-          <Tab.Screen name="Contact" component={InformationalStack} style={styles.navButton} options={{
-            tabBarIcon: 'map-marker-plus-outline'}}/>
-          {/* <Tab.Screen name="Info" component={InfoScreen} style={styles.navButton} options={{
-            tabBarIcon: 'information-outline'}}/> */}
-          <Tab.Screen name="Services" component={ServiceScreen} style={styles.navButton} options={{
-            tabBarIcon: 'heart'
-          }}/>
-          <Tab.Screen name="Profile" component={AccountStack} style={styles.navButton} options={{
-            tabBarIcon: 'account-heart'
             }}/>
-        </Tab.Navigator>
-      </NavigationContainer>
+            <Tab.Screen name="Contact" component={InformationalStack} style={styles.navButton} options={{
+              tabBarIcon: 'map-marker-plus-outline'}}/>
+      
+            <Tab.Screen name="Services" component={ServiceScreen} style={styles.navButton} options={{
+              tabBarIcon: 'heart'
+            }}/>
+            <Tab.Screen name="Profile" component={AuthScreens} style={styles.navButton} options={{
+              tabBarIcon: 'account-heart'
+              }}/>
+          </Tab.Navigator>
+        </NavigationContainer>
+      </AuthContext.Provider>
   </View> 
   );
 }
