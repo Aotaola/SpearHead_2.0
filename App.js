@@ -3,7 +3,7 @@ import { NavigationContainer, useNavigation } from '@react-navigation/native';
 import { createMaterialBottomTabNavigator } from '@react-navigation/material-bottom-tabs';
 import { createStackNavigator, TransitionPresets } from '@react-navigation/stack';
 import { Button, Text, View, Image, StyleSheet, ActivityIndicator, ScrollView, TouchableOpacity, Linking, Alert, FlatList, TextInput} from 'react-native';
-import {useEffect, useState} from 'react';
+import {useEffect, useState, useContext} from 'react';
 import SpearHealthLogoBW from './assets/SpearHealthLogoBW.png';
 import * as Location from 'expo-location';
 import MapView, { Marker } from 'react-native-maps';
@@ -11,7 +11,6 @@ import * as FileSystem from 'expo-file-system';
 import Afc_NPP_2022 from './Afc_NPP_2022.pdf'
 import Clipboard from '@react-native-community/clipboard';
 import { debounce } from 'lodash';
-
 
 function truncate(str, maxLength, continuation = "...") {
   if (str.length <= maxLength) return str;
@@ -446,7 +445,11 @@ function SignUpScreen({ navigation }) {
         throw new Error('Network response was not ok');
       })
       .then(data => {
-        navigation.navigate('Profile', { patientId: data.patient.id });
+        console.log(data);
+        console.log(data.id)
+        //const patientId = data.id;
+
+       //navigation.navigate('Profile', { patientId: data.id });
       })
       .catch(error => {
         console.error('There has been a problem with your fetch operation:', error);
@@ -468,16 +471,21 @@ function SignUpScreen({ navigation }) {
       .then(response => {
         if (response.ok) {
           return response.json();
+          console.log(session.id)
         }
         throw new Error('Network response was not ok');
       })
       .then(data => {
-        // Replace 'onSignUp' with navigation to the 'Profile' screen
-        // and pass the patient ID to it.
-        navigation.navigate('Profile', { patientId: data.patient.id });
+
+        console.log(data, data.id);
+
+        const patientId = data.id;
+
+        navigation.navigate('Profile', { patientId: data.patient_id });
       })
       .catch(error => {
         console.error('There has been a problem with your fetch operation:', error);
+        
       });
   };
   
@@ -494,7 +502,6 @@ function SignUpScreen({ navigation }) {
           value={firstName}
           onChangeText={setFirstName}
           placeholder="First Name"
-          
           />
         <TextInput
           value={lastName}
@@ -556,6 +563,11 @@ function ProfileScreen({route}){
   const [patient, setPatient] = useState(null);
   const [invoices, setInvoices] = useState([]);
 
+  const navigation = useNavigation(route);
+
+  console.log( 'this is the route params log', route.params);
+  console.log( ' this is the patient_id log' );
+
   useEffect(() => {
     const patientId = route.params?.patientId;
 
@@ -576,13 +588,44 @@ function ProfileScreen({route}){
   }, [route.params?.patientId]); 
 
 
+  const handleLogout = () => {
+    fetch('http://localhost:3000/api/v1/patient_logout', {
+      method: 'DELETE', // Assuming that the logout is a DELETE request, change if needed
+      headers: {
+        'Content-Type': 'application/json',
+        // Add any other headers your API requires for logout, like authentication tokens.
+      },
+    })
+    .then(response => {
+      if (response.ok) {
+        // Assuming the server will clear the session or token and respond with a success status.
+        navigation.navigate('SignUp'); // Replace 'Login' with the actual name of your login screen in the navigator
+      } else {
+        throw new Error('Logout failed');
+      }
+    })
+    .catch(error => {
+      console.error('There has been a problem with your logout operation:', error);
+      // Optionally inform the user that the logout failed
+    });
+  };
+  
+
+
+
   if (patient === null) {
-    return <div>Loading...</div>;
+    return(
+      <View>
+        <Text>Loading...</Text>
+      </View>
+    );;
   }
 
 
   return(
     < ScrollView style = {styles.profileContainer}>
+      {/* <Button title = "Edit profile" onPress={handleEdit}/> */}
+      <Button title = "Logout" onPress={handleLogout}/>
       <Text style = {styles.profileMainText}>
         Welcome, {patient.first_name}!
       </Text>
@@ -601,15 +644,32 @@ function ProfileScreen({route}){
   )
 }
 
+export const AuthContext = createContext({
+  isAuthenticated: false,
+  checkAuthState: () => {},
+});
+
+
 const Tab = createMaterialBottomTabNavigator();
 
 const Stack = createStackNavigator();
 
 function AccountStack(){
+  const { isAuthenticated, checkAuthState } = useContext(AuthContext);
+
+  useEffect(() => {
+    checkAuthState();
+  }, [checkAuthState]);
+
   return(
-    <Stack.Navigator>
-      <Stack.Screen name="Signup" component={SignUpScreen} />
-      <Stack.Screen name="Profile" component={ProfileScreen} />
+       <Stack.Navigator>
+      {isAuthenticated ? (
+        // If the user is authenticated, allow access to the Profile screen
+        <Stack.Screen name="Profile" component={ProfileScreen} />
+      ) : (
+        // If not authenticated, present the Signup screen
+        <Stack.Screen name="Signup" component={SignUpScreen} />
+      )}
     </Stack.Navigator>
   )
 }
