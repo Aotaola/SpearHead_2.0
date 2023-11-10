@@ -527,7 +527,7 @@ function ProfileScreen({route}){
     });
 };
 
-  if (user) {
+  if (user && invoices) {
     return(
       < ScrollView style = {styles.profileContainer}>
         {/* <Button title = "Edit profile" onPress={handleEdit}/> */}
