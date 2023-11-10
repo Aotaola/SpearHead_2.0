@@ -406,7 +406,7 @@ function ServiceScreen(){
 function ProfileScreen({route}){
 
   const [isCreatingAccount, setIsCreatingAccount] = useState(true)
-  const [user, setUser] = useState(null); 
+  let [user, setUser] = useState(null); 
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -420,8 +420,6 @@ function ProfileScreen({route}){
 
   const [invoices, setInvoices] = useState([]);
 
-  console.log('user:', user);
-  console.log('invoice:', invoices);
 
   const handleSignUp = () => {
     fetch('http://localhost:3000/api/v1/patients', {
@@ -449,28 +447,14 @@ function ProfileScreen({route}){
       .then(data => {
         console.log(data);
         console.log(data.id)
+        setUser(data)
+        setInvoices(data.invoices) 
+        
       })
       .catch(error => {
         console.error('There has been a problem with your fetch operation:', error);
       });
   };
-
-  // useEffect(() => {
-  //   fetch(`http://localhost:3000/api/v1/patients/${patientId}`)
-  //     .then(response => {
-  //       if (response.ok) {
-  //         return response.json();
-  //       }
-  //       throw new Error('Network response was not ok');
-  //     })
-  //     .then(data => {
-  //       setUser(data.patient);
-  //       setInvoices(data.invoices);
-  //     })
-  //     .catch(error => {
-  //       console.error('There has been a problem with your fetch operation:', error);
-  //     });
-  // }, [route.params?.patientId]); 
 
   const handleLogin = () => {
     fetch('http://localhost:3000/api/v1/patient_login', {
@@ -494,6 +478,7 @@ function ProfileScreen({route}){
         setUser(data.patient);
         setInvoices(data.invoices);
         console.log(data);
+
       })
       .catch(error => {
         console.error('There has been a problem with your fetch operation:', error);
@@ -501,30 +486,47 @@ function ProfileScreen({route}){
   };
   const handleLogout = () => {
     fetch('http://localhost:3000/api/v1/patient_logout', {
-      method: 'DELETE', // Assuming that the logout is a DELETE request, change if needed
-      headers: {
-        'Content-Type': 'application/json',
-        // Add any other headers your API requires for logout, like authentication tokens.
-      },
+      method: 'DELETE',
     })
     .then(response => {
       if (response.ok) {
-        // Assuming the server will clear the session or token and respond with a success status.
-        navigation.navigate('SignUp'); // Replace 'Login' with the actual name of your login screen in the navigator
+        console.log('Logout successful');
       } else {
         throw new Error('Logout failed');
       }
     })
+    .then(() => {
+      // Clear user and invoices state
+      setUser(null);
+      setInvoices(null);
+    })
     .catch(error => {
-      console.error('There has been a problem with your logout operation:', error);
-      // Optionally inform the user that the logout failed
+      console.error('There has been a problem with the logout operation:', error);
     });
-  };
+  }; 
 
   const toggleForm = () => {
     setIsCreatingAccount(!isCreatingAccount); 
   };
   
+  const forceLogin = () => {
+    fetch('http://localhost:3000/api/v1/patients/1')
+    .then(response => {
+        if (response.ok) {
+            return response.json();
+        }
+        throw new Error('Network response was not ok');
+    })
+    .then(data => {
+        // Assuming the data structure is similar to the one you provided earlier
+        setUser(data.patient);
+        setInvoices(data.invoices);
+    })
+    .catch(error => {
+        console.error('There has been a problem with your fetch operation:', error);
+    });
+};
+
   if (user) {
     return(
       < ScrollView style = {styles.profileContainer}>
@@ -549,6 +551,7 @@ function ProfileScreen({route}){
   } else {
   return(
     <View style = {styles.profileContainer}>
+      <Button title="force Login" onPress={forceLogin}/>
         {isCreatingAccount ? (
           <View>
           <TextInput
