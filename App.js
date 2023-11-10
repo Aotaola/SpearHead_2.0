@@ -11,6 +11,8 @@ import * as FileSystem from 'expo-file-system';
 import Afc_NPP_2022 from './Afc_NPP_2022.pdf'
 import Clipboard from '@react-native-community/clipboard';
 import { debounce } from 'lodash';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
+
 
 
 function truncate(str, maxLength, continuation = "...") {
@@ -461,7 +463,6 @@ function ProfileScreen({navigation}){
       });
   };
 
-
   const handleLogin = () => {
     fetch('http://localhost:3000/api/v1/patient_login', {
       method: 'POST',
@@ -537,20 +538,18 @@ const handleUserChange = (newUser) => {
   setUser(newUser);
 };
 
-
   if (user && invoices) {
     return(
       < ScrollView style = {styles.profileContainer}>
-        {/* <Button title = "Edit profile" onPress={handleEdit}/> */}
-        <View style = {styles.navbarContainer}>
-          <Button title = "Settings" onPress={() => navigation.navigate('Setting', { onUserChange: handleUserChange, user})}/>
-        </View>
         <Text style = {styles.profileMainText}>
           Welcome, {user.first_name}!
         </Text>
-          <Text style = {styles.profileText}>
-            here are your receipts from your most recent visits:
-          </Text>
+        <Text style = {styles.profileText}>
+          here are your receipts from your most recent visits:
+        </Text>
+        <TouchableOpacity  onPress={() => navigation.navigate('Setting', { onUserChange: handleUserChange, user})} style = {styles.settingsButton}>
+        <MaterialCommunityIcons name="cog" size={20} color="black"/>
+        </TouchableOpacity>        
         <View style = {styles.profileContainer}>
           {invoices.map(invoice => (
             <View key = {invoice.id} style = {styles.invoiceContainer}>
@@ -627,17 +626,20 @@ const handleUserChange = (newUser) => {
 function SettingScreen({route, navigation}){
 
   const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
   const [phoneNumber, setPhoneNumber] = useState('');
   const [insurance, setInsurance] = useState(''); 
+  const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+
+  const passwordsMatch = password === confirmPassword;
 
   const onUserChange = route.params?.onUserChange;
+  
+  const patient = route.params.user
 
-  const patient_id = route.params.user.id;
-
-  console.log('patient#', patient_id)
+  console.log('patient#', patient)
 
   const handleLogout = () => {
     fetch('http://localhost:3000/api/v1/patient_logout', {
@@ -660,7 +662,7 @@ function SettingScreen({route, navigation}){
     });
   }; 
 
-  const handleEdit = ({patient_id}) => {
+  const handleEdit = () => {
 
     const updatedPatient = {
       email: email,
@@ -670,8 +672,12 @@ function SettingScreen({route, navigation}){
       phone_number: phoneNumber,
       insurance: insurance
     };
-  
-    fetch(`http://localhost:3000/api/v1/patients/${patient_id}`, {
+    if (!passwordsMatch) {
+      alert("Passwords do not match!");
+      return;
+    }
+
+    fetch(`http://localhost:3000/api/v1/patients/${patient.id}`, {
       method: 'PATCH',
       headers: {
         'Content-Type': 'application/json',
@@ -683,7 +689,7 @@ function SettingScreen({route, navigation}){
         return response.json();
       }
       throw new Error('Network response was not ok.');
-      console.log(patient_id);
+      console.log(patient.id);
     })
     .then(data => {
       console.log('Success:', data);
@@ -697,38 +703,48 @@ function SettingScreen({route, navigation}){
 
 
   return (
-    <View>
+    <View style={styles.profileInfoContainer}>
       <TextInput
             value={firstName}
             onChangeText={setFirstName}
-            placeholder="First Name"
+            placeholder= {patient.first_name}
             />
           <TextInput
             value={lastName}
             onChangeText={setLastName}
-            placeholder="Last Name"
+            placeholder={patient.last_name}
             />
           <TextInput
             value={insurance}
             onChangeText={setInsurance}
-            placeholder="Insurance"
+            placeholder={patient.insurance}
             />
           <TextInput
             value={email}
             onChangeText={setEmail}
-            placeholder="Email"
+            placeholder={patient.email}
             />
           <TextInput
             value={phoneNumber}
             onChangeText={setPhoneNumber}
-            placeholder="Phone Number"
+            placeholder={patient.phone_number}
             />
           <TextInput
             value={password}
             onChangeText={setPassword}
-            placeholder="Password"
+            placeholder="PASSWORD"
             secureTextEntry
             />
+          <TextInput
+            placeholder="Confirm Password"
+            secureTextEntry
+            value={confirmPassword}
+            onChangeText={setConfirmPassword}
+            // ... [Other TextInput properties]
+            />
+            {!passwordsMatch && (
+          <Text style={{ color: 'red' }}> Passwords do not match. </Text>
+            )}
           <Button title="Edit Profile"  onPress={handleEdit}/>
           <Button title="Log Out" onPress={handleLogout}/>
     </View>
@@ -1166,6 +1182,51 @@ const styles = StyleSheet.create({
     position: 'absolute',
     top:5
   },
+  settingsButton: {
+    alignSelf: 'flex-end',
+    flexDirection: 'row',   
+    color: 'red', 
+    alignItems: 'center',   
+    backgroundColor: 'aliceblue', 
+    paddingHorizontal: 15,
+    paddingVertical: 10,
+    borderWidth: 1,
+    borderColor: 'silver',
+    borderRadius: 100,
+    marginTop: 10, 
+    marginRight: 10 
+  },
+  profileInfoContainer: {
+    flex: 1,
+    backgroundColor: 'aliceblue', // Light background color
+    padding: 20,
+  },
+  textInput: {
+    size: 'large',
+    borderColor: 'silver', // Border color for TextInput
+    borderWidth: 1,
+    borderColor: 'midnightblue', 
+    borderRadius: 5,
+    padding: 10,
+    marginBottom: 10,
+    color: 'midnightblue', // Text color
+  },
+  button: {
+    backgroundColor: 'lightseagreen', // Button background color
+    borderRadius: 5,
+    borderWidth: 1,
+    padding: 10,
+    marginVertical: 5,
+  },
+  buttonText: {
+    color: 'red', 
+    textAlign: 'center',
+  },
+  errorText: {
+    color: 'red', 
+    marginBottom: 10,
+  },
+
 });
 
 export default App;
