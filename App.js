@@ -402,154 +402,6 @@ function ServiceScreen(){
 
 );
 }
-function SignUpScreen({ navigation }) {
-
-  // const [isCreatingAccount, setIsCreatingAccount] = useState(true)
-
-  // const [email, setEmail] = useState('');
-  // const [password, setPassword] = useState('');
-  // const [firstName, setFirstName] = useState('');
-  // const [lastName, setLastName] = useState('');
-  // const [phoneNumber, setPhoneNumber] = useState('');
-  // const [insurance, setInsurance] = useState('');
-
-  // const [loginEmail, setLoginEmail] = useState('');
-  // const [loginPassword, setLoginPassword] = useState('');
-
-  
-  // const handleSignUp = () => {
-  //   fetch('http://localhost:3000/api/v1/patients', {
-  //     method: 'POST',
-  //     headers: {
-  //       'Content-Type': 'application/json',
-  //     },
-  //     body: JSON.stringify({
-  //       patient: {
-  //         first_name: firstName,
-  //         last_name: lastName,
-  //         insurance: insurance,
-  //         phone_number: phoneNumber,
-  //         email: email,
-  //         password: password,
-  //       },
-  //     }),
-  //   })
-  //     .then(response => {
-  //       if (response.ok) {
-  //         return response.json();
-  //       }
-  //       throw new Error('Network response was not ok');
-  //     })
-  //     .then(data => {
-  //       console.log(data);
-  //       console.log(data.id)
-  //     })
-  //     .catch(error => {
-  //       console.error('There has been a problem with your fetch operation:', error);
-  //     });
-  // };
-    
-
-  // const handleLogin = () => {
-  //   fetch('http://localhost:3000/api/v1/patient_login', {
-  //     method: 'POST',
-  //     headers: {
-  //       'Content-Type': 'application/json',
-  //     },
-  //     body: JSON.stringify({
-  //       email: loginEmail,
-  //       password: loginPassword,
-  //     }),
-  //   })
-  //     .then(response => {
-  //       if (response.ok) {
-  //         return response.json();
-  //         console.log(session.id)
-  //       }
-  //       throw new Error('Network response was not ok');
-  //     })
-  //     .then(data => {
-
-  //       console.log(data, data.id);
-
-  //       const patientId = data.id;
-
-  //       navigation.navigate('Profile', { patientId: data.patient_id });
-  //     })
-  //     .catch(error => {
-  //       console.error('There has been a problem with your fetch operation:', error);
-        
-  //     });
-  // };
-  
-  // const toggleForm = () => {
-  //   setIsCreatingAccount(!isCreatingAccount); // Toggle the boolean state
-  // };
-
-  return (
-    <View>
-      {isCreatingAccount ? (
-
-      <View>
-        <TextInput
-          value={firstName}
-          onChangeText={setFirstName}
-          placeholder="First Name"
-          />
-        <TextInput
-          value={lastName}
-          onChangeText={setLastName}
-          placeholder="Last Name"
-          
-          />
-        <TextInput
-          value={insurance}
-          onChangeText={setInsurance}
-          placeholder="Insurance"
-          
-          />
-        <TextInput
-          value={email}
-          onChangeText={setEmail}
-          placeholder="Email"
-          />
-        <TextInput
-          value={phoneNumber}
-          onChangeText={setPhoneNumber}
-          placeholder="Phone Number"
-          
-          />
-        <TextInput
-          value={password}
-          onChangeText={setPassword}
-          placeholder="Password"
-          secureTextEntry
-          />
-        <Button title="Create an Account" onPress={handleSignUp} />
-        <Text> or </Text>
-        <Button title="Go to Log In" onPress={toggleForm} />
-      </View>
-          ):(
-      <View>
-        <TextInput
-          value={loginEmail}
-          onChangeText={setLoginEmail}
-          placeholder="Email"
-          />
-        <TextInput
-          value={loginPassword}
-          onChangeText={setLoginPassword}
-          placeholder="Password"
-          secureTextEntry
-          />
-        <Button title="Log In" onPress={handleLogin} />
-        <Text> or </Text>
-        <Button title="Go to Create Account" onPress={toggleForm} />
-      </View>
-      )}
-    </View>
-  );
-}
 
 function ProfileScreen({route}){
 
@@ -715,7 +567,6 @@ function ProfileScreen({route}){
   } else {
   return(
     <View style = {styles.profileContainer}>
-      <View>
         {isCreatingAccount ? (
           <View>
           <TextInput
@@ -754,7 +605,7 @@ function ProfileScreen({route}){
           <Button title="Go to Log In" onPress={toggleForm} />
         </View>
             ):(
-              <View>
+        <View>
           <TextInput
             value={loginEmail}
             onChangeText={setLoginEmail}
@@ -771,26 +622,13 @@ function ProfileScreen({route}){
           <Button title="Go to Create Account" onPress={toggleForm} />
         </View>
         )}
-      </View>
     </View>
-  )
+  )}
 }
 
 const Tab = createMaterialBottomTabNavigator();
 
 const Stack = createStackNavigator();
-
-function AccountStack(){
-  return(
-       <Stack.Navigator>
-      
-        <Stack.Screen name="Signup" component={SignUpScreen} />
-      
-        <Stack.Screen name="Profile" component={ProfileScreen} />
-      
-    </Stack.Navigator>
-  )
-}
 
 function InitialStack() {
   return (
@@ -846,7 +684,7 @@ function App() {
             <Tab.Screen name="Services" component={ServiceScreen} style={styles.navButton} options={{
               tabBarIcon: 'heart'
             }}/>
-            <Tab.Screen name="Profile" component={AccountStack} style={styles.navButton} options={{
+            <Tab.Screen name="Profile" component={ProfileScreen} style={styles.navButton} options={{
               tabBarIcon: 'account-heart'
               }}/>
           </Tab.Navigator>
