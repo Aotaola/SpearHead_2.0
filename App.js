@@ -417,22 +417,9 @@ function ProfileScreen({route}){
 
   const [loginEmail, setLoginEmail] = useState('');
   const [loginPassword, setLoginPassword] = useState('');
-
-  const [patient, setPatient] = useState(null);
+  
   const [invoices, setInvoices] = useState([]);
 
-  const navigation = useNavigation(route);
-
-  console.log( 'this is the route params log', route.params);
-  console.log( ' this is the patient_id log' );
-
-  useEffect(() => {
-    // Check if there's a patientId in route.params
-    const patientId = route.params?.patientId;
-    if (patientId) {
-      fetchUserData(patientId);
-    }
-  }, [route.params]);
 
   const handleSignUp = () => {
     fetch('http://localhost:3000/api/v1/patients', {
@@ -467,8 +454,7 @@ function ProfileScreen({route}){
   };
 
   useEffect(() => {
-    const patientId = route.params?.patientId;
-
+    const patientId = route.params?.patientId
     fetch(`http://localhost:3000/api/v1/patients/${patientId}`)
       .then(response => {
         if (response.ok) {
@@ -477,13 +463,50 @@ function ProfileScreen({route}){
         throw new Error('Network response was not ok');
       })
       .then(data => {
-        setPatient(data.patient);
+        setUser(data.patient);
         setInvoices(data.invoices);
       })
       .catch(error => {
         console.error('There has been a problem with your fetch operation:', error);
       });
   }, [route.params?.patientId]); 
+
+  useEffect(() => {
+    // Check if there's a patientId in route.params
+    const patientId = route.params?.patientId;
+    if (patientId) {
+      fetchUserData(patientId);
+    }
+  }, [route.params]);
+
+  const handleLogin = () => {
+    fetch('http://localhost:3000/api/v1/patient_login', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        email: loginEmail,
+        password: loginPassword,
+      }),
+    })
+      .then(response => {
+        if (response.ok) {
+          return response.json();
+        }
+        throw new Error('Network response was not ok');
+      })
+      .then(data => {
+
+        console.log(data);
+        const patientId = data.id;
+
+      })
+      .catch(error => {
+        console.error('There has been a problem with your fetch operation:', error);
+        
+      });
+  };
 
   const handleLogout = () => {
     fetch('http://localhost:3000/api/v1/patient_logout', {
@@ -507,40 +530,8 @@ function ProfileScreen({route}){
     });
   };
 
-  const handleLogin = () => {
-    fetch('http://localhost:3000/api/v1/patient_login', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        email: loginEmail,
-        password: loginPassword,
-      }),
-    })
-      .then(response => {
-        if (response.ok) {
-          return response.json();
-          console.log(session.id)
-        }
-        throw new Error('Network response was not ok');
-      })
-      .then(data => {
-
-        console.log(data, data.id);
-
-        const patientId = data.id;
-
-        navigation.navigate('Profile', { patientId: data.patient_id });
-      })
-      .catch(error => {
-        console.error('There has been a problem with your fetch operation:', error);
-        
-      });
-  };
-  
   const toggleForm = () => {
-    setIsCreatingAccount(!isCreatingAccount); // Toggle the boolean state
+    setIsCreatingAccount(!isCreatingAccount); 
   };
   
   if (user) {
@@ -549,7 +540,7 @@ function ProfileScreen({route}){
         {/* <Button title = "Edit profile" onPress={handleEdit}/> */}
         <Button title = "Logout" onPress={handleLogout}/>
         <Text style = {styles.profileMainText}>
-          Welcome, {patient.first_name}!
+          Welcome, {user.first_name}!
         </Text>
           <Text style = {styles.profileText}>
             here are your receipts from your most recent visits:
