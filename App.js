@@ -417,9 +417,11 @@ function ProfileScreen({route}){
 
   const [loginEmail, setLoginEmail] = useState('');
   const [loginPassword, setLoginPassword] = useState('');
-  
+
   const [invoices, setInvoices] = useState([]);
 
+  console.log('user:', user);
+  console.log('invoice:', invoices);
 
   const handleSignUp = () => {
     fetch('http://localhost:3000/api/v1/patients', {
@@ -453,31 +455,22 @@ function ProfileScreen({route}){
       });
   };
 
-  useEffect(() => {
-    const patientId = route.params?.patientId
-    fetch(`http://localhost:3000/api/v1/patients/${patientId}`)
-      .then(response => {
-        if (response.ok) {
-          return response.json();
-        }
-        throw new Error('Network response was not ok');
-      })
-      .then(data => {
-        setUser(data.patient);
-        setInvoices(data.invoices);
-      })
-      .catch(error => {
-        console.error('There has been a problem with your fetch operation:', error);
-      });
-  }, [route.params?.patientId]); 
-
-  useEffect(() => {
-    // Check if there's a patientId in route.params
-    const patientId = route.params?.patientId;
-    if (patientId) {
-      fetchUserData(patientId);
-    }
-  }, [route.params]);
+  // useEffect(() => {
+  //   fetch(`http://localhost:3000/api/v1/patients/${patientId}`)
+  //     .then(response => {
+  //       if (response.ok) {
+  //         return response.json();
+  //       }
+  //       throw new Error('Network response was not ok');
+  //     })
+  //     .then(data => {
+  //       setUser(data.patient);
+  //       setInvoices(data.invoices);
+  //     })
+  //     .catch(error => {
+  //       console.error('There has been a problem with your fetch operation:', error);
+  //     });
+  // }, [route.params?.patientId]); 
 
   const handleLogin = () => {
     fetch('http://localhost:3000/api/v1/patient_login', {
@@ -498,16 +491,14 @@ function ProfileScreen({route}){
       })
       .then(data => {
 
+        setUser(data.patient);
+        setInvoices(data.invoices);
         console.log(data);
-        const patientId = data.id;
-
       })
       .catch(error => {
         console.error('There has been a problem with your fetch operation:', error);
-        
       });
   };
-
   const handleLogout = () => {
     fetch('http://localhost:3000/api/v1/patient_logout', {
       method: 'DELETE', // Assuming that the logout is a DELETE request, change if needed
