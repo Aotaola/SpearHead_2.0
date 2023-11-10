@@ -12,6 +12,7 @@ import Afc_NPP_2022 from './Afc_NPP_2022.pdf'
 import Clipboard from '@react-native-community/clipboard';
 import { debounce } from 'lodash';
 
+
 function truncate(str, maxLength, continuation = "...") {
   if (str.length <= maxLength) return str;
   return str.slice(0, maxLength - continuation.length) + continuation;
@@ -403,10 +404,11 @@ function ServiceScreen(){
 );
 }
 
-function ProfileScreen({route}){
+function ProfileScreen({navigation}){
 
   const [isCreatingAccount, setIsCreatingAccount] = useState(true)
   let [user, setUser] = useState(null); 
+  
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -419,6 +421,9 @@ function ProfileScreen({route}){
   const [loginPassword, setLoginPassword] = useState('');
 
   const [invoices, setInvoices] = useState([]);
+
+
+  console.log('user', user)
 
 
   const handleSignUp = () => {
@@ -455,6 +460,7 @@ function ProfileScreen({route}){
         console.error('There has been a problem with your fetch operation:', error);
       });
   };
+
 
   const handleLogin = () => {
     fetch('http://localhost:3000/api/v1/patient_login', {
@@ -527,11 +533,18 @@ function ProfileScreen({route}){
     });
 };
 
+const handleUserChange = (newUser) => {
+  setUser(newUser);
+};
+
+
   if (user && invoices) {
     return(
       < ScrollView style = {styles.profileContainer}>
         {/* <Button title = "Edit profile" onPress={handleEdit}/> */}
-        <Button title = "Logout" onPress={handleLogout}/>
+        <View style = {styles.navbarContainer}>
+          <Button title = "Settings" onPress={() => navigation.navigate('Setting', { onUserChange: handleUserChange, user})}/>
+        </View>
         <Text style = {styles.profileMainText}>
           Welcome, {user.first_name}!
         </Text>
@@ -611,9 +624,130 @@ function ProfileScreen({route}){
   )}
 }
 
+function SettingScreen({route, navigation}){
+
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [firstName, setFirstName] = useState('');
+  const [lastName, setLastName] = useState('');
+  const [phoneNumber, setPhoneNumber] = useState('');
+  const [insurance, setInsurance] = useState(''); 
+
+  const onUserChange = route.params?.onUserChange;
+
+  const patient_id = route.params.user.id;
+
+  console.log('patient#', patient_id)
+
+  const handleLogout = () => {
+    fetch('http://localhost:3000/api/v1/patient_logout', {
+      method: 'DELETE',
+    })
+    .then(response => {
+      if (response.ok) {
+        console.log('Logout successful');
+      } else {
+        throw new Error('Logout failed');
+      }
+    })
+    .then(() => {
+      // Clear user and invoices state
+      onUserChange(null);
+      navigation.navigate('Profile')
+    })
+    .catch(error => {
+      console.error('There has been a problem with the logout operation:', error);
+    });
+  }; 
+
+  const handleEdit = ({patient_id}) => {
+
+    const updatedPatient = {
+      email: email,
+      password: password,
+      first_name: firstName,
+      last_name: lastName,
+      phone_number: phoneNumber,
+      insurance: insurance
+    };
+  
+    fetch(`http://localhost:3000/api/v1/patients/${patient_id}`, {
+      method: 'PATCH',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(updatedPatient)
+    })
+    .then(response => {
+      if (response.ok) {
+        return response.json();
+      }
+      throw new Error('Network response was not ok.');
+      console.log(patient_id);
+    })
+    .then(data => {
+      console.log('Success:', data);
+    })
+    .catch((error) => {
+      console.error('Error:', error);
+
+    });
+  };
+  
+
+
+  return (
+    <View>
+      <TextInput
+            value={firstName}
+            onChangeText={setFirstName}
+            placeholder="First Name"
+            />
+          <TextInput
+            value={lastName}
+            onChangeText={setLastName}
+            placeholder="Last Name"
+            />
+          <TextInput
+            value={insurance}
+            onChangeText={setInsurance}
+            placeholder="Insurance"
+            />
+          <TextInput
+            value={email}
+            onChangeText={setEmail}
+            placeholder="Email"
+            />
+          <TextInput
+            value={phoneNumber}
+            onChangeText={setPhoneNumber}
+            placeholder="Phone Number"
+            />
+          <TextInput
+            value={password}
+            onChangeText={setPassword}
+            placeholder="Password"
+            secureTextEntry
+            />
+          <Button title="Edit Profile"  onPress={handleEdit}/>
+          <Button title="Log Out" onPress={handleLogout}/>
+    </View>
+  )
+}
+
 const Tab = createMaterialBottomTabNavigator();
 
 const Stack = createStackNavigator();
+
+function AccountStack(){
+  return (
+    <Stack.Navigator>
+      <Stack.Screen name = "Profile" component={ProfileScreen} />
+      <Stack.Screen name="Setting" component={SettingScreen} />
+    </Stack.Navigator>
+  );
+
+}
 
 function InitialStack() {
   return (
@@ -669,7 +803,7 @@ function App() {
             <Tab.Screen name="Services" component={ServiceScreen} style={styles.navButton} options={{
               tabBarIcon: 'heart'
             }}/>
-            <Tab.Screen name="Profile" component={ProfileScreen} style={styles.navButton} options={{
+            <Tab.Screen name="Profile" component={AccountStack} style={styles.navButton} options={{
               tabBarIcon: 'account-heart'
               }}/>
           </Tab.Navigator>
