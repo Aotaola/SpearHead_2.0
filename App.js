@@ -409,9 +409,8 @@ function ServiceScreen(){
 function ProfileScreen({navigation}){
 
   const [isCreatingAccount, setIsCreatingAccount] = useState(true)
-  let [user, setUser] = useState(null); 
+  const [user, setUser] = useState(null); 
   
-
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [firstName, setFirstName] = useState('');
@@ -491,26 +490,6 @@ function ProfileScreen({navigation}){
         console.error('There has been a problem with your fetch operation:', error);
       });
   };
-  const handleLogout = () => {
-    fetch('http://localhost:3000/api/v1/patient_logout', {
-      method: 'DELETE',
-    })
-    .then(response => {
-      if (response.ok) {
-        console.log('Logout successful');
-      } else {
-        throw new Error('Logout failed');
-      }
-    })
-    .then(() => {
-      // Clear user and invoices state
-      setUser(null);
-      setInvoices(null);
-    })
-    .catch(error => {
-      console.error('There has been a problem with the logout operation:', error);
-    });
-  }; 
 
   const toggleForm = () => {
     setIsCreatingAccount(!isCreatingAccount); 
@@ -533,7 +512,6 @@ function ProfileScreen({navigation}){
         console.error('There has been a problem with your fetch operation:', error);
     });
 };
-
 const handleUserChange = (newUser) => {
   setUser(newUser);
 };
@@ -541,16 +519,16 @@ const handleUserChange = (newUser) => {
   if (user && invoices) {
     return(
       < ScrollView style = {styles.profileContainer}>
+        <TouchableOpacity  onPress={() => navigation.navigate('Setting', { onUserChange: handleUserChange, user})} style = {styles.settingsButton}>
+        <MaterialCommunityIcons name="cog" size={20} color="black"/>
+        </TouchableOpacity>        
         <Text style = {styles.profileMainText}>
           Welcome, {user.first_name}!
         </Text>
         <Text style = {styles.profileText}>
           here are your receipts from your most recent visits:
         </Text>
-        <TouchableOpacity  onPress={() => navigation.navigate('Setting', { onUserChange: handleUserChange, user})} style = {styles.settingsButton}>
-        <MaterialCommunityIcons name="cog" size={20} color="black"/>
-        </TouchableOpacity>        
-        <View style = {styles.profileContainer}>
+        <View style = {styles.invoicesContainer}>
           {invoices.map(invoice => (
             <View key = {invoice.id} style = {styles.invoiceContainer}>
             <Text style={styles.invoiceText}> {invoice.description} </Text>
@@ -565,7 +543,7 @@ const handleUserChange = (newUser) => {
     <View style = {styles.profileContainer}>
       <Button title="force Login" onPress={forceLogin}/>
         {isCreatingAccount ? (
-          <View>
+          <View style = {styles.profileInfoContainer}>
           <TextInput
             value={firstName}
             onChangeText={setFirstName}
@@ -597,9 +575,15 @@ const handleUserChange = (newUser) => {
             placeholder="Password"
             secureTextEntry
             />
-          <Button title="Create an Account" onPress={handleSignUp} />
-          <Text> or </Text>
-          <Button title="Go to Log In" onPress={toggleForm} />
+          <View style={styles.profileInfoButtons}>
+              <TouchableOpacity style={styles.profileButton} onPress={handleSignUp}>
+                <Text style={styles.buttonText}>Create an Account</Text>
+              </TouchableOpacity>
+              <Text style={styles.orText}> or </Text>
+              <TouchableOpacity style={styles.profileButton} onPress={toggleForm}>
+                <Text style={styles.buttonText}>Go to Log In</Text>
+              </TouchableOpacity>
+            </View>
         </View>
             ):(
         <View>
@@ -625,13 +609,13 @@ const handleUserChange = (newUser) => {
 
 function SettingScreen({route, navigation}){
 
-  const [email, setEmail] = useState('');
-  const [firstName, setFirstName] = useState('');
-  const [lastName, setLastName] = useState('');
-  const [phoneNumber, setPhoneNumber] = useState('');
-  const [insurance, setInsurance] = useState(''); 
-  const [password, setPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
+  const [email, setEmail] = useState(route.params.user.email);
+  const [firstName, setFirstName] = useState(route.params.user.first_name);
+  const [lastName, setLastName] = useState(route.params.user.last_name);
+  const [phoneNumber, setPhoneNumber] = useState(route.params.user.phone_number);
+  const [insurance, setInsurance] = useState(route.params.user.insurance); 
+  const [password, setPassword] = useState(route.params.user.password_digest);
+  const [confirmPassword, setConfirmPassword] = useState(route.params.user.password_digest);
 
   const passwordsMatch = password === confirmPassword;
 
@@ -639,7 +623,7 @@ function SettingScreen({route, navigation}){
   
   const patient = route.params.user
 
-  console.log('patient#', patient)
+  console.log('patient', patient)
 
   const handleLogout = () => {
     fetch('http://localhost:3000/api/v1/patient_logout', {
@@ -693,19 +677,23 @@ function SettingScreen({route, navigation}){
     })
     .then(data => {
       console.log('Success:', data);
+      navigation.navigate('Profile', { onUserChange: handleUserChange, user})
     })
     .catch((error) => {
       console.error('Error:', error);
-
     });
   };
-  
+
+  const handleUserChange = (newUser) => {
+    setUser(newUser);
+  };
 
 
   return (
     <View style={styles.profileInfoContainer}>
       <TextInput
             value={firstName}
+            text={patient.first_name}
             onChangeText={setFirstName}
             placeholder= {patient.first_name}
             />
@@ -740,12 +728,11 @@ function SettingScreen({route, navigation}){
             secureTextEntry
             value={confirmPassword}
             onChangeText={setConfirmPassword}
-            // ... [Other TextInput properties]
             />
             {!passwordsMatch && (
           <Text style={{ color: 'red' }}> Passwords do not match. </Text>
             )}
-          <Button title="Edit Profile"  onPress={handleEdit}/>
+          <Button title="Edit Profile"  onPress={handleEdit} />
           <Button title="Log Out" onPress={handleLogout}/>
     </View>
   )
@@ -860,7 +847,15 @@ const styles = StyleSheet.create({
   profileContainer: {
     flex: 1,
     backgroundColor: 'aliceblue',
+    paddingLeft: 20,
+    paddingRight: 5,
+    paddingVertical: 5,
+  },
+  invoicesContainer: {
+    flex: 1,
+    backgroundColor: 'aliceblue',
     padding: 20,
+    
   },
   profileMainText: {
     fontSize: 25,
@@ -1193,21 +1188,22 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: 'silver',
     borderRadius: 100,
-    marginTop: 10, 
+    marginTop: 0, 
     marginRight: 10 
   },
   profileInfoContainer: {
     flex: 1,
-    backgroundColor: 'aliceblue', // Light background color
+    backgroundColor: 'aliceblue',
     padding: 20,
+    marginTop: 0,
   },
   textInput: {
-    size: 'large',
-    borderColor: 'silver', // Border color for TextInput
+    size: 30,
+    borderColor: 'silver', 
     borderWidth: 1,
     borderColor: 'midnightblue', 
     borderRadius: 5,
-    padding: 10,
+    padding: 20,
     marginBottom: 10,
     color: 'midnightblue', // Text color
   },
@@ -1226,6 +1222,36 @@ const styles = StyleSheet.create({
     color: 'red', 
     marginBottom: 10,
   },
+  profileInfoButtons: {
+    flexDirection: 'column',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginVertical: 20,
+    backgroundColor: 'aliceblue', // Aliceblue background for better readability
+    borderRadius: 10, // Medium rounded corners
+    padding: 10,
+    marginBottom: 10,
+  },
+  profileButton: {
+    backgroundColor: 'aliceblue',
+    borderRadius: 10, 
+    padding: 10,
+    margin: 10,
+    color: 'cornflowerblue',
+    borderWidth: 1,
+    borderColor: 'lightseagreen' 
+  },
+  buttonText: {
+    color: 'cornflowerblue',
+    fontSize: 20,
+  },
+  orText: {
+    color: 'midnightblue',
+    paddingHorizontal: 10,
+    paddingVertical: 10,
+    marginVertical: 10,
+    fontSize: 18,
+  }
 
 });
 
