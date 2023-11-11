@@ -541,35 +541,40 @@ const handleUserChange = (newUser) => {
   } else {
   return(
     <View style = {styles.profileContainer}>
-      <Button title="force Login" onPress={forceLogin}/>
         {isCreatingAccount ? (
-          <View style = {styles.profileInfoContainer}>
+        <View style = {styles.profileInfoContainer}>
           <TextInput
+            style={styles.input}
             value={firstName}
             onChangeText={setFirstName}
             placeholder="First Name"
             />
           <TextInput
+            style={styles.input}
             value={lastName}
             onChangeText={setLastName}
             placeholder="Last Name"
             />
           <TextInput
+            style={styles.input}
             value={insurance}
             onChangeText={setInsurance}
             placeholder="Insurance"
             />
           <TextInput
+            style={styles.input}
             value={email}
             onChangeText={setEmail}
             placeholder="Email"
             />
           <TextInput
+            style={styles.input}
             value={phoneNumber}
             onChangeText={setPhoneNumber}
             placeholder="Phone Number"
             />
           <TextInput
+            style={styles.input}
             value={password}
             onChangeText={setPassword}
             placeholder="Password"
@@ -577,30 +582,38 @@ const handleUserChange = (newUser) => {
             />
           <View style={styles.profileInfoButtons}>
               <TouchableOpacity style={styles.profileButton} onPress={handleSignUp}>
-                <Text style={styles.buttonText}>Create an Account</Text>
+                <Text style={styles.profileButtonText}>Create an Account</Text>
               </TouchableOpacity>
               <Text style={styles.orText}> or </Text>
               <TouchableOpacity style={styles.profileButton} onPress={toggleForm}>
-                <Text style={styles.buttonText}>Go to Log In</Text>
+                <Text style={styles.profileButtonText}>Go Log In</Text>
               </TouchableOpacity>
             </View>
         </View>
             ):(
-        <View>
+        <View style = {styles.profileInfoContainer}>
           <TextInput
+            style={styles.input}
             value={loginEmail}
             onChangeText={setLoginEmail}
             placeholder="Email"
             />
           <TextInput
+            style={styles.secureInput}
             value={loginPassword}
             onChangeText={setLoginPassword}
             placeholder="Password"
             secureTextEntry
             />
-          <Button title="Log In" onPress={handleLogin} />
-          <Text> or </Text>
-          <Button title="Go to Create Account" onPress={toggleForm} />
+          <View style={styles.profileInfoButtons}>
+            <TouchableOpacity onPress={handleLogin} style={styles.profileButton}>
+              <Text style={styles.profileButtonText}>Log In</Text>
+            </TouchableOpacity>
+            <Text style={styles.orText}> or </Text>
+            <TouchableOpacity onPress={toggleForm} style={styles.profileButton} >
+              <Text style={styles.profileButtonText}> Go to Create Account </Text>
+            </TouchableOpacity>
+          </View>
         </View>
         )}
     </View>
@@ -692,48 +705,63 @@ function SettingScreen({route, navigation}){
   return (
     <View style={styles.profileInfoContainer}>
       <TextInput
+            style={styles.input}
             value={firstName}
             text={patient.first_name}
             onChangeText={setFirstName}
             placeholder= {patient.first_name}
             />
           <TextInput
+            style={styles.input}
             value={lastName}
             onChangeText={setLastName}
             placeholder={patient.last_name}
             />
           <TextInput
+            style={styles.input}
             value={insurance}
             onChangeText={setInsurance}
             placeholder={patient.insurance}
             />
           <TextInput
+            style={styles.input}
             value={email}
             onChangeText={setEmail}
             placeholder={patient.email}
             />
           <TextInput
+            style={styles.input}
             value={phoneNumber}
             onChangeText={setPhoneNumber}
             placeholder={patient.phone_number}
             />
           <TextInput
+            style={styles.secureInput}
             value={password}
             onChangeText={setPassword}
             placeholder="PASSWORD"
             secureTextEntry
             />
           <TextInput
+            style={styles.secureInput}
             placeholder="Confirm Password"
-            secureTextEntry
             value={confirmPassword}
             onChangeText={setConfirmPassword}
+            secureTextEntry
             />
             {!passwordsMatch && (
           <Text style={{ color: 'red' }}> Passwords do not match. </Text>
             )}
-          <Button title="Edit Profile"  onPress={handleEdit} />
-          <Button title="Log Out" onPress={handleLogout}/>
+          <View style={styles.profileInfoButtons}>
+            <TouchableOpacity  onPress={handleEdit} style={styles.profileButton}>
+              <Text style={styles.profileButtonText}>Edit Profile</Text>
+            </TouchableOpacity>
+          </View>
+          <View style={styles.profileInfoButtons}>
+            <TouchableOpacity  onPress={handleLogout} style={styles.profileDestroyButton}>
+              <Text style={styles.profileDestroyButtonText}>Log Out</Text>
+            </TouchableOpacity>
+          </View>
     </View>
   )
 }
@@ -1192,10 +1220,9 @@ const styles = StyleSheet.create({
     marginRight: 10 
   },
   profileInfoContainer: {
-    flex: 1,
-    backgroundColor: 'aliceblue',
-    padding: 20,
-    marginTop: 0,
+    flex: 1, 
+    padding: 20, 
+    backgroundColor: 'aliceblue', 
   },
   textInput: {
     size: 30,
@@ -1207,20 +1234,20 @@ const styles = StyleSheet.create({
     marginBottom: 10,
     color: 'midnightblue', // Text color
   },
-  button: {
-    backgroundColor: 'lightseagreen', // Button background color
-    borderRadius: 5,
-    borderWidth: 1,
-    padding: 10,
-    marginVertical: 5,
-  },
-  buttonText: {
-    color: 'red', 
+  profileButtonText: {
+    color: 'cornflowerblue', 
     textAlign: 'center',
+    fontFamily: 'Helvetica',
+    fontSize: 18,
+  },
+  profileDestroyButtonText: {
+   fontFamily: 'Helvetica',
+   fontSize: 15,
+   color: 'crimson',
   },
   errorText: {
     color: 'red', 
-    marginBottom: 10,
+    marginBottom: 1,
   },
   profileInfoButtons: {
     flexDirection: 'column',
@@ -1230,27 +1257,57 @@ const styles = StyleSheet.create({
     backgroundColor: 'aliceblue', // Aliceblue background for better readability
     borderRadius: 10, // Medium rounded corners
     padding: 10,
-    marginBottom: 10,
+    marginBottom: 1,
   },
   profileButton: {
     backgroundColor: 'aliceblue',
     borderRadius: 10, 
     padding: 10,
-    margin: 10,
+    margin: 1,
     color: 'cornflowerblue',
     borderWidth: 1,
     borderColor: 'lightseagreen' 
   },
+  profileDestroyButton: {
+    backgroundColor: 'aliceblue',
+    borderRadius: 10, 
+    padding: 10,
+    margin: 1,
+    color: 'cornflowerblue',
+    borderWidth: 1,
+    borderColor: 'firebrick' 
+  },
   buttonText: {
     color: 'cornflowerblue',
     fontSize: 20,
-  },
+    },
   orText: {
     color: 'midnightblue',
     paddingHorizontal: 10,
     paddingVertical: 10,
-    marginVertical: 10,
+    marginVertical: 1,
     fontSize: 18,
+  },
+  input: {
+    backgroundColor: 'aliceblue', // Light background for input
+    borderColor: 'lightseagreen', // Border color
+    borderWidth: 1,
+    width: '100%',
+    borderRadius: 5, // Rounded corners
+    padding: 10, // Inner padding for text
+    marginBottom: 2, // Space between each input
+    color: 'midnightblue', // Text color
+    fontSize: 16, // Text size
+  },
+  secureInput: {
+    backgroundColor: 'silver', 
+    borderColor: 'midnightblue',
+    borderWidth: 1,
+    borderRadius: 5,
+    padding: 1,
+    marginBottom: 2,
+    color: 'midnightblue',
+    fontSize: 16,
   }
 
 });
