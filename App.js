@@ -9,7 +9,7 @@ import * as Location from 'expo-location';
 import MapView, { Marker } from 'react-native-maps';
 import * as FileSystem from 'expo-file-system';
 import Afc_NPP_2022 from './Afc_NPP_2022.pdf'
-import Clipboard from '@react-native-community/clipboard';
+import  * as Clipboard from '@react-native-community/clipboard';
 import { debounce } from 'lodash';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 
@@ -124,14 +124,15 @@ function ContactScreen({navigation}) {
   
   // business location is hardcoded. 
   
-  const businessAddress = '5812 Hollywood Blvd, Hollywood, FL 33021';
+  const businessAddress = "5812 Hollywood Blvd, Hollywood, FL 33021";
   
   const handleCopyToClipboard = () => {
+
     if (Clipboard && Clipboard.setString) {
         Clipboard.setString(businessAddress);
         Alert.alert('Success', 'Address copied to clipboard!');
     } else {
-        console.error('Clipboard is not available');
+        console.error('Clipboard is not available', error);
         Alert.alert('Error', 'Failed to copy address to clipboard');
     }
 };
