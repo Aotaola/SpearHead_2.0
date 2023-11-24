@@ -806,7 +806,7 @@ function App() {
     <View style={styles.container}>
       <View style={styles.logoContainer}>
        <Image source={SpearHealthLogoBW} style={styles.logo} />
-       <Text style={styles.mainHeading}>Spear Health</Text>
+       <Text style={styles.mainHeading}>SPEARHEAD</Text>
       </View>
       {/* <AuthContext.Provider value={{ user, setUser }}> */}
       
@@ -816,7 +816,7 @@ function App() {
             activeColor="midnightblue"
             inactiveColor="aliceblue"
             fontFamily="Helvetica"
-            barStyle={{ backgroundColor: '#20B2AA',
+            barStyle={{ backgroundColor: 'steelblue',
             height: 80,
             position: 'absolute',
             left: 7,
@@ -859,10 +859,10 @@ const styles = StyleSheet.create({
   },
   logoContainer: {
     //backgroundColor: 'mediumseagreen',
-    backgroundColor: 'lightseagreen',
+    //backgroundColor: 'lightseagreen',
     //backgroundColor: 'seagreen',
     //backgroundColor: 'darkseagreen',
-    //backgroundColor: 'cadetblue',
+    backgroundColor: 'steelblue',
     flexDirection: 'row', 
     paddingStart: 30,
     paddingEnd: 10,
@@ -888,13 +888,13 @@ const styles = StyleSheet.create({
   },
   profileMainText: {
     fontSize: 25,
-    color: 'lightseagreen',
+    color: 'cornflowerblue',
     marginBottom: 10,
 
   },
   profileText: {
     fontSize: 20,
-    color: 'lightseagreen',
+    color: 'midnightblue',
     marginBottom: 10,
   },
   invoiceContainer: {
@@ -946,16 +946,16 @@ const styles = StyleSheet.create({
   mainHeading: {
     display: 'flex',
     alignContent: 'center',
-    alignContent: 'center',
+    alignItems: 'center',
     justifyContent: 'center',
     fontFamily: 'Helvetica',
-    fontSize: 25,                
-    fontWeight: '300',           
-    color: 'aliceblue',               
-    letterSpacing: 1.5,          
+    fontSize: 20,                
+    fontWeight: '320',           
+    color: 'lavender',               
+    letterSpacing: 4,          
     position: 'absolute', 
     bottom: 20,
-    left: 110,
+    left: 120,
   },
   TouchableOpacityStyleStyle: {
     paddingHorizontal: 10,
