@@ -527,7 +527,7 @@ const handleUserChange = (newUser) => {
           Welcome, {user.first_name}!
         </Text>
         <Text style = {styles.profileText}>
-          here are your receipts from your most recent visits:
+          here are your lab results from your most recent visits:
         </Text>
         <View style = {styles.invoicesContainer}>
           {invoices.map(invoice => (
@@ -1291,7 +1291,7 @@ const styles = StyleSheet.create({
   },
   input: {
     backgroundColor: 'aliceblue', // Light background for input
-    borderColor: 'lightseagreen', // Border color
+    borderColor: 'cornflowerblue', // Border color
     borderWidth: 1,
     width: '100%',
     borderRadius: 5, // Rounded corners
@@ -1301,11 +1301,11 @@ const styles = StyleSheet.create({
     fontSize: 16, // Text size
   },
   secureInput: {
-    backgroundColor: 'silver', 
-    borderColor: 'midnightblue',
+    backgroundColor: 'aliceblue', 
+    borderColor: 'steelblue',
     borderWidth: 1,
     borderRadius: 5,
-    padding: 1,
+    padding: 10,
     marginBottom: 2,
     color: 'midnightblue',
     fontSize: 16,
