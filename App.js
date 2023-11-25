@@ -804,9 +804,23 @@ function App() {
   return (
     
     <View style={styles.container}>
+      <NavigationContainer>
+        <Tab.Navigator  tabBarPosition="bottom" 
+            initialRouteName="Home"
+            activeColor="midnightblue"
+            inactiveColor="aliceblue"
+            fontFamily="Helvetica"
+            barStyle={{ backgroundColor: 'steelblue',
+            overflow: 'hidden'
+            }}>
+          <Tab.Screen name="Profile" component={AccountStack} style={styles.navButton} options={{
+            tabBarIcon: 'account-heart'
+          }}/>
+        </Tab.Navigator>
+      </NavigationContainer>
       <View style={styles.logoContainer}>
-       <Image source={SpearHealthLogoBW} style={styles.logo} />
-       <Text style={styles.mainHeading}>SPEARHEAD</Text>
+      <Image source={SpearHealthLogoBW} style={styles.logo} />
+      <Text style={styles.mainHeading}>SPEARHEAD</Text>
       </View>
       {/* <AuthContext.Provider value={{ user, setUser }}> */}
       
@@ -835,9 +849,6 @@ function App() {
             <Tab.Screen name="Services" component={ServiceScreen} style={styles.navButton} options={{
               tabBarIcon: 'heart'
             }}/>
-            <Tab.Screen name="Profile" component={AccountStack} style={styles.navButton} options={{
-              tabBarIcon: 'account-heart'
-              }}/>
           </Tab.Navigator>
         </NavigationContainer>
       {/* </AuthContext.Provider> */}
@@ -850,6 +861,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: 'aliceblue',
+   // height: 100
   },
   pagerView: {
     flex: 1,
@@ -864,7 +876,7 @@ const styles = StyleSheet.create({
     //backgroundColor: 'darkseagreen',
     backgroundColor: 'steelblue',
     flexDirection: 'row', 
-    paddingStart: 30,
+    paddingStart: 20,
     paddingEnd: 10,
     paddingBottom: 10,
     paddingTop: 40,
