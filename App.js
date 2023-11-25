@@ -28,7 +28,6 @@ function HomeScreen({navigation}) {
   const [loading, setLoading] = useState(true);
   const itemsPerPage = 10;
   
-  
   useEffect(() => {
     fetch(`http://localhost:3000/api/v1/articles?page=${page}&per_page=${itemsPerPage}`)
     .then(response => response.json())
@@ -116,6 +115,57 @@ function HomeScreen({navigation}) {
     </ScrollView>
   );
 }
+
+const LocationScreen = () => {
+  const [searchQuery, setSearchQuery] = useState('');
+  const [mapRegion, setMapRegion] = useState({
+    latitude: 37.78825,
+    longitude: -122.4324,
+    latitudeDelta: 0.0922,
+    longitudeDelta: 0.0421,
+  });
+
+  const handleAddressSearch = async () => {
+    if (searchQuery.trim() === '') return;
+
+    const geocodeResult = await Location.geocodeAsync(searchQuery);
+    if (geocodeResult.length > 0) {
+      const { latitude, longitude } = geocodeResult[0];
+      setMapRegion({
+        ...mapRegion,
+        latitude: latitude,
+        longitude: longitude,
+      });
+    } else {
+      alert('No results found');
+    }
+  };
+
+  return (
+    <View style={styles.locationPickerContainer}>
+      <TextInput
+        style={styles.locationSearchBar}
+        placeholder="Enter address or location"
+        value={searchQuery}
+        onChangeText={setSearchQuery}
+        returnKeyType="search"
+        onSubmitEditing={handleAddressSearch}
+      />
+      <Button
+        title="Search Location"
+        onPress={handleAddressSearch}
+        color="#1a73e8"
+      />
+      <MapView
+        style={styles.locationMap}
+        region={mapRegion}
+        onRegionChangeComplete={setMapRegion}
+      >
+        <Marker coordinate={mapRegion} />
+      </MapView>
+    </View>
+  );
+};
 
 function ContactScreen({navigation}) {
   
@@ -544,6 +594,7 @@ const handleUserChange = (newUser) => {
     <View style = {styles.profileContainer}>
         {isCreatingAccount ? (
         <View style = {styles.profileInfoContainer}>
+          
           <TextInput
             style={styles.input}
             value={firstName}
@@ -793,31 +844,34 @@ function InitialStack() {
 function InformationalStack() {
   return (
     <Stack.Navigator>
+      <Stack.Screen name = "Location" component={LocationScreen} />
       <Stack.Screen name = "Contact" component={ContactScreen} />
       <Stack.Screen name="Info" component={InfoScreen}/>
     </Stack.Navigator>
   )
 }
 
-function App() {
+const ProfileButton = () => {
+  const navigation = useNavigation(); // This hook gets the navigation prop
+
+  return (
+    <TouchableOpacity 
+      style={styles.profileButton}
+      onPress={() => navigation.navigate('Profile')} // Use the navigation object here
+    >
+      <Text style={styles.profileButtonText}>Profile</Text>
+    </TouchableOpacity>
+  );
+};
+
+function App({navigation}) {
 
   return (
     
     <View style={styles.container}>
-      <NavigationContainer>
-        <Tab.Navigator  tabBarPosition="bottom" 
-            initialRouteName="Home"
-            activeColor="midnightblue"
-            inactiveColor="aliceblue"
-            fontFamily="Helvetica"
-            barStyle={{ backgroundColor: 'steelblue',
-            overflow: 'hidden'
-            }}>
           <Tab.Screen name="Profile" component={AccountStack} style={styles.navButton} options={{
             tabBarIcon: 'account-heart'
           }}/>
-        </Tab.Navigator>
-      </NavigationContainer>
       <View style={styles.logoContainer}>
       <Image source={SpearHealthLogoBW} style={styles.logo} />
       <Text style={styles.mainHeading}>SPEARHEAD</Text>
@@ -849,6 +903,9 @@ function App() {
             <Tab.Screen name="Services" component={ServiceScreen} style={styles.navButton} options={{
               tabBarIcon: 'heart'
             }}/>
+            <Tab.Screen name="Profile" component={AccountStack} style={styles.navButton} options={{
+            tabBarIcon: 'account-heart'
+          }}/>
           </Tab.Navigator>
         </NavigationContainer>
       {/* </AuthContext.Provider> */}
@@ -1019,6 +1076,24 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: '400',
     textAlign: 'center', // Centered text for a polished look
+  },
+  locationPickerContainer: {
+    flex: 1,
+    width: '100%',
+  },
+  locationSearchBar: {
+    width: '100%',
+    padding: 15,
+    fontSize: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: '#ccc',
+    backgroundColor: 'white',
+    marginTop: 10,
+    marginBottom: 10,
+  },
+  locationMap: {
+    width: '100%',
+    flex: 1,
   },
   informationButton: {
     alignItems: 'center',
