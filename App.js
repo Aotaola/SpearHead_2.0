@@ -185,7 +185,7 @@ const LocationScreen = () => {
     const result = await Location.geocodeAsync(searchQuery);
     if (result.length > 0) {
       const { latitude, longitude } = result[0];
-      setLocations({
+      setSelectedClinic({
         latitude,
         longitude,
         latitudeDelta: 1.1922,
@@ -203,12 +203,6 @@ const LocationScreen = () => {
         placeholder="Search for a location"
       />
       <Button title = 'Find Location'onPress={handleSearch} style={styles.findLocationBtn}/>
-        {/* <Text style={styles.findLocationText}>Find Locations</Text> */}
-        {/* </TouchableOpacity> */}
-    {/* </View> */}
-      {/* <TouchableOpacity onPress={handleUseCurrentLocation} style={styles.currentLocationBtn}>
-        <Text style={styles.currentLocationText}>Use current location</Text>
-      </TouchableOpacity> */}
 
       <MapView
         style={styles.locationMap}
