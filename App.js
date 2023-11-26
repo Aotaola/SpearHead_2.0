@@ -6,7 +6,7 @@ import { Button, Text, View, Image, StyleSheet, ActivityIndicator, ScrollView, T
 import {useEffect, useState} from 'react';
 import SpearHealthLogoBW from './assets/SpearHealthLogoBW.png';
 import * as Location from 'expo-location';
-import MapView, { Marker } from 'react-native-maps';
+import MapView, { Marker, Callout } from 'react-native-maps';
 import * as FileSystem from 'expo-file-system';
 import Afc_NPP_2022 from './Afc_NPP_2022.pdf'
 import  * as Clipboard from '@react-native-community/clipboard';
@@ -116,53 +116,123 @@ function HomeScreen({navigation}) {
   );
 }
 
+
 const LocationScreen = () => {
   const [searchQuery, setSearchQuery] = useState('');
-  const [mapRegion, setMapRegion] = useState({
-    latitude: 37.78825,
-    longitude: -122.4324,
-    latitudeDelta: 0.0922,
-    longitudeDelta: 0.0421,
+ // const [userLocation, setUserLocation] = useState(null);
+  const [detailsVisible, setDetailsVisible] = useState(false);
+  const [selectedClinic, setSelectedClinic] = useState(null);
+  const [locations, setLocations] = useState([
+    {
+      id: 'hollywood',
+      title: 'Hollywood',
+      coordinates: {
+        latitude: 26.011201,
+        longitude: -80.149490,
+      },
+      address: '5812 Hollywood Blvd Hollywood, FL, 33021',
+    },
+    {
+      id: 'clearwater',
+      title: 'Clearwater',
+      coordinates: {
+        latitude: 27.976914,
+        longitude: -82.710480,
+      },
+      address: '1500 McMullen Booth Rd. Ste. A1-A2 Clearwater, FL, 33759',
+    },
+    {
+      id: 'largo',
+      title: 'Largo',
+      coordinates: {
+        latitude: 27.892392,
+        longitude: -82.783243,
+      },
+      address: '9040 Ulmerton Rd, Suite 200 Largo, FL, 33771',
+    },
+    
+  ]);
+
+  const centerLatitude = (locations[0].coordinates.latitude + locations[1].coordinates.latitude + locations[2].coordinates.latitude) / 3;
+  const centerLongitude = (locations[0].coordinates.longitude + locations[1].coordinates.longitude + locations[2].coordinates.longitude) / 3;
+
+  // Set your map's initial region to this center
+  const [region, setRegion] = useState({
+    latitude: centerLatitude,
+    longitude: centerLongitude,
+    latitudeDelta: 2, // Adjust as necessary to include all markers
+    longitudeDelta: 2, // Adjust as necessary to include all markers
   });
 
-  const handleAddressSearch = async () => {
-    if (searchQuery.trim() === '') return;
+  // const handleUseCurrentLocation = async () => {
+  //   let { status } = await Location.requestForegroundPermissionsAsync();
+  //   if (status !== 'granted') {
+  //     alert('Permission to access location was denied');
+  //     return;
+  //   }
 
-    const geocodeResult = await Location.geocodeAsync(searchQuery);
-    if (geocodeResult.length > 0) {
-      const { latitude, longitude } = geocodeResult[0];
-      setMapRegion({
-        ...mapRegion,
-        latitude: latitude,
-        longitude: longitude,
+  //   let location = await Location.getCurrentPositionAsync({});
+  //   setMapRegion({
+  //     latitude: location.coords.latitude,
+  //     longitude: location.coords.longitude,
+  //     latitudeDelta: 0.0922,
+  //     longitudeDelta: 0.0421,
+  //   });
+  // };
+  
+  const handleSearch = async () => {
+    if (!searchQuery.trim()) return;
+    const result = await Location.geocodeAsync(searchQuery);
+    if (result.length > 0) {
+      const { latitude, longitude } = result[0];
+      setLocations({
+        latitude,
+        longitude,
+        latitudeDelta: 1.1922,
+        longitudeDelta: 1.1421,
       });
     } else {
-      alert('No results found');
+      alert('No locations found');
     }
   };
 
   return (
     <View style={styles.locationPickerContainer}>
       <TextInput
-        style={styles.locationSearchBar}
-        placeholder="Enter address or location"
-        value={searchQuery}
-        onChangeText={setSearchQuery}
-        returnKeyType="search"
-        onSubmitEditing={handleAddressSearch}
+        style={styles.searchBar}
+        placeholder="Search for a location"
       />
-      <Button
-        title="Search Location"
-        onPress={handleAddressSearch}
-        color="#1a73e8"
-      />
+      <Button title = 'Find Location'onPress={handleSearch} style={styles.findLocationBtn}/>
+        {/* <Text style={styles.findLocationText}>Find Locations</Text> */}
+        {/* </TouchableOpacity> */}
+    {/* </View> */}
+      {/* <TouchableOpacity onPress={handleUseCurrentLocation} style={styles.currentLocationBtn}>
+        <Text style={styles.currentLocationText}>Use current location</Text>
+      </TouchableOpacity> */}
+
       <MapView
         style={styles.locationMap}
-        region={mapRegion}
-        onRegionChangeComplete={setMapRegion}
+        region={region}
+        onRegionChangeComplete={setRegion}
       >
-        <Marker coordinate={mapRegion} />
+        {locations.map((location) => (
+          <Marker
+            key={location.id}
+            coordinate={location.coordinates}
+            title={location.title}
+            description={location.address}
+          />
+        ))}
       </MapView>
+
+      {detailsVisible && selectedClinic && (
+        <View style={styles.clinicDetailsCard}>
+          <Text>{selectedClinic.title}</Text>
+          {/* ... other clinic details */}
+          <Button title="View Clinic" onPress={() => { /* ... */ }} />
+          <Button title="Save Your Spot" onPress={() => { /* ... */ }} />
+        </View>
+      )}
     </View>
   );
 };
@@ -824,17 +894,26 @@ const Stack = createStackNavigator();
 
 function AccountStack(){
   return (
-    <Stack.Navigator>
+    <Stack.Navigator
+    screenOptions={{
+      headerStyle: {
+        height: 0,
+      },
+    }}>
       <Stack.Screen name = "Profile" component={ProfileScreen} />
       <Stack.Screen name="Setting" component={SettingScreen} />
     </Stack.Navigator>
   );
-
 }
 
 function InitialStack() {
   return (
-    <Stack.Navigator>
+    <Stack.Navigator
+    screenOptions={{
+      headerStyle: {
+        height: 0,
+      },
+    }}>
       <Stack.Screen name = "Home" component={HomeScreen} />
       <Stack.Screen name="Update" component={UpdateScreen} />
     </Stack.Navigator>
@@ -843,7 +922,12 @@ function InitialStack() {
 
 function InformationalStack() {
   return (
-    <Stack.Navigator>
+    <Stack.Navigator
+    screenOptions={{
+      headerStyle: {
+        height: 0,
+      },
+    }}>
       <Stack.Screen name = "Location" component={LocationScreen} />
       <Stack.Screen name = "Contact" component={ContactScreen} />
       <Stack.Screen name="Info" component={InfoScreen}/>
@@ -851,27 +935,11 @@ function InformationalStack() {
   )
 }
 
-const ProfileButton = () => {
-  const navigation = useNavigation(); // This hook gets the navigation prop
-
-  return (
-    <TouchableOpacity 
-      style={styles.profileButton}
-      onPress={() => navigation.navigate('Profile')} // Use the navigation object here
-    >
-      <Text style={styles.profileButtonText}>Profile</Text>
-    </TouchableOpacity>
-  );
-};
-
 function App({navigation}) {
 
   return (
     
     <View style={styles.container}>
-          <Tab.Screen name="Profile" component={AccountStack} style={styles.navButton} options={{
-            tabBarIcon: 'account-heart'
-          }}/>
       <View style={styles.logoContainer}>
       <Image source={SpearHealthLogoBW} style={styles.logo} />
       <Text style={styles.mainHeading}>SPEARHEAD</Text>
@@ -882,7 +950,8 @@ function App({navigation}) {
           <Tab.Navigator tabBarPosition="bottom" 
             initialRouteName="Home"
             activeColor="midnightblue"
-            inactiveColor="aliceblue"
+            activeBackgroundColor="red"
+            inactiveColor="lavender"
             fontFamily="Helvetica"
             barStyle={{ backgroundColor: 'steelblue',
             height: 80,
@@ -908,7 +977,6 @@ function App({navigation}) {
           }}/>
           </Tab.Navigator>
         </NavigationContainer>
-      {/* </AuthContext.Provider> */}
   </View> 
   );
 }
@@ -927,10 +995,6 @@ const styles = StyleSheet.create({
     backgroundColor: 'aliceblue'
   },
   logoContainer: {
-    //backgroundColor: 'mediumseagreen',
-    //backgroundColor: 'lightseagreen',
-    //backgroundColor: 'seagreen',
-    //backgroundColor: 'darkseagreen',
     backgroundColor: 'steelblue',
     flexDirection: 'row', 
     paddingStart: 20,
@@ -953,13 +1017,11 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: 'aliceblue',
     padding: 20,
-    
   },
   profileMainText: {
     fontSize: 25,
     color: 'cornflowerblue',
     marginBottom: 10,
-
   },
   profileText: {
     fontSize: 20,
@@ -967,16 +1029,23 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   invoiceContainer: {
-    backgroundColor: 'aliceblue', // Aliceblue background for better readability
-    borderRadius: 10, // Medium rounded corners
+    backgroundColor: 'aliceblue', 
+    borderRadius: 10, 
     padding: 10,
     marginBottom: 10,
     borderWidth: 1,
-    borderColor: 'lightseagreen', // Lightseagreen border for a touch of color
+    borderColor: 'lightseagreen', 
+  },
+  clinicDetailsCard: {
+    position: 'absolute',
+    bottom: 0,
+    backgroundColor: 'white',
+    width: '100%',
+    padding: 20,
   },
   invoiceText: {
-    fontSize: 18, // Slightly larger text for better readability
-    color: 'cornflowerblue', // Cornflowerblue text for readability and color consistency
+    fontSize: 18, 
+    color: 'cornflowerblue',
   },
   serviceContainer:{
     display: 'flex',
@@ -1061,39 +1130,98 @@ const styles = StyleSheet.create({
     marginTop: 5,
   },
   contactButton: {
-    backgroundColor: 'aliceblue', // Lightseagreen background
+    backgroundColor: 'aliceblue', 
     borderRadius: 10,
     paddingHorizontal: 10,
-    paddingVertical: 10, // Added vertical padding for consistency
+    paddingVertical: 10, 
     borderWidth: 1,
-    borderColor: 'lightseagreen', // Cornflowerblue border for a touch of color
-    alignItems: 'center', // Center content horizontally
-    justifyContent: 'center', // Center content vertically
+    borderColor: 'lightseagreen', 
+    //alignItems: 'center', 
+    //justifyContent: 'center', 
   },
   contactButtonText: {
-    color: 'cornflowerblue', // Aliceblue text for readability and color consistency
+    color: 'cornflowerblue', 
     fontFamily: 'Helvetica',
     fontSize: 20,
     fontWeight: '400',
-    textAlign: 'center', // Centered text for a polished look
+    textAlign: 'center', 
   },
   locationPickerContainer: {
-    flex: 1,
+    display: 'flex',
+    backgroundColor: 'whitesmoke',
+    //alignContent: 'center',
+    //justifyContent: 'center',
+    alignItems: 'center',
+    paddingTop: 20,
+    paddingHorizontal: 0,
+    paddingBottom: 0, 
     width: '100%',
+    height: '60%',
+    flex: 1,
   },
   locationSearchBar: {
     width: '100%',
     padding: 15,
     fontSize: 16,
-    borderBottomWidth: 1,
-    borderBottomColor: '#ccc',
-    backgroundColor: 'white',
+    borderBottomWidth: 6,
+    borderRadius: 4,
+    borderBottomColor: 'red',
+    backgroundColor: 'red',
     marginTop: 10,
     marginBottom: 10,
   },
   locationMap: {
+    width: '95%',
+    height: '60%',
+    borderWidth: 1,
+    borderColor: 'silver',
+    borderRadius: 10,
+  },
+  findLocationBtn: {
+    backgroundColor: 'crimson',
+    padding: 10,
+    borderRadius: 5,
+    fontSize: 20,
+    marginTop: 10,
+    marginBottom: 10,
+    color: 'red',
+    borderBottomWidth: 1,
+    borderTopWidth: 1,
+    borderRightWidth: 6,
+    borderLeftWidth: 6,
+  },
+  findLocationText: {
+    color: 'white', // Example text color
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
+  currentLocationBtn: {
+    // Styles for the 'Use current location' button
+    padding: 10,
+    borderRadius: 5,
+    //alignItems: 'center',
+    //justifyContent: 'center',
+    marginTop: 10,
+  },
+  currentLocationText: {
+    // Styles for the text inside the 'Use current location' button
+    fontSize: 16,
+    color: '#1a73e8', // This can be any color you choose
+  },
+  searchBar: {
+    height: 40,
+    backgroundColor: 'lightgrey',
+    borderRadius: 10,
+    padding: 10,
+    width: '80%',
+    marginBottom: 2,
+  },
+  clinicDetailsCard: {
+    position: 'absolute',
+    bottom: 0,
+    backgroundColor: 'red',
     width: '100%',
-    flex: 1,
+    padding: 20,
   },
   informationButton: {
     alignItems: 'center',
@@ -1320,7 +1448,7 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     padding: 20,
     marginBottom: 10,
-    color: 'midnightblue', // Text color
+    color: 'midnightblue', 
   },
   profileButtonText: {
     color: 'cornflowerblue', 
@@ -1342,8 +1470,8 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     marginVertical: 20,
-    backgroundColor: 'aliceblue', // Aliceblue background for better readability
-    borderRadius: 10, // Medium rounded corners
+    backgroundColor: 'aliceblue',
+    borderRadius: 10,
     padding: 10,
     marginBottom: 1,
   },
