@@ -117,7 +117,7 @@ function HomeScreen({navigation}) {
 }
 
 
-const LocationScreen = () => {
+function LocationScreen ({navigation}){
   const [searchQuery, setSearchQuery] = useState('');
  // const [userLocation, setUserLocation] = useState(null);
   const [detailsVisible, setDetailsVisible] = useState(false);
@@ -201,6 +201,11 @@ const LocationScreen = () => {
     }
   };
 
+  const visitClinic = (clinic) => {
+    navigation.navigate('Contact')
+  };
+  
+
   return (
     <View style={styles.locationScrollview}>
 
@@ -212,6 +217,11 @@ const LocationScreen = () => {
         onChangeText={setSearchQuery}
         />
       <Button title = 'Find Location'onPress={handleSearch} style={styles.findLocationBtn}/>
+      {selectedClinic && (
+      <TouchableOpacity onPress={() => visitClinic(selectedClinic)} style={styles.button}>
+        <Text style={styles.buttonText}>Visit Clinic</Text>
+      </TouchableOpacity>
+    )}
       <MapView
         style={styles.locationMap}
         region={region}
@@ -225,21 +235,25 @@ const LocationScreen = () => {
           description={location.address}
           onPress={() => handleSelectClinic(location)}
           >
-             <View style={styles.customMarker}>
-             <Ionicons name="location" size={40} color="crimson" />
-             </View>
+            <View style={styles.customMarker}>
+              <Ionicons name="location" size={40} color="crimson" />
+            </View>
+            <Callout  style={styles.customCallout}>
+              <View style={styles.calloutView}>
+                <Text style={styles.calloutTitle}>{location.title}</Text>
+                <Text style={styles.calloutDescription}>{location.address}</Text>
+                  <TouchableOpacity
+                    onPress={() => navigation.navigate('Contact', { clinic: location })}
+                    style={styles.calloutButton}
+                  >
+                    <Text style={styles.calloutButtonText}>View Clinic</Text>
+                  </TouchableOpacity>
+              </View>
+            </Callout>
           </Marker>
         ))}
       </MapView>
 
-
-      {detailsVisible && selectedClinic && (
-        <View style={styles.clinicDetailsCard}>
-          <Text>{selectedClinic.clinicTitle}</Text>
-          <Button title="View Clinic" onPress={() => { /* ... */ }} />
-          <Button title="Save Your Spot" onPress={() => { /* ... */ }} />
-      </View>
-          )}
       </View>
           
     </View>
@@ -934,7 +948,12 @@ function InformationalStack() {
     <Stack.Navigator
     screenOptions={{
       headerStyle: {
-        height: 0,
+        backgroundColor: 'steelblue',
+        borderBottomEndRadius: 20,
+        borderBottomStartRadius: 20,
+        borderColor: 'steelblue',
+        marginTop: 10,
+        
       },
     }}>
       <Stack.Screen name = "Location" component={LocationScreen} />
@@ -959,16 +978,18 @@ function App({navigation}) {
           <Tab.Navigator tabBarPosition="bottom" 
             initialRouteName="Home"
             activeColor="crimson"
-            inactiveColor="silver"
+            inactiveColor="grey"
             borderColor = "silver"
             fontFamily="Helvetica"
-            barStyle={{ backgroundColor: 'aliceblue',
+            barStyle={{ backgroundColor: 'whitesmoke',
+            borderWidth: 1,
+            borderColor: 'silver',
             height: 90,
             position: 'absolute',
             left: 0,
             right: 0,
             bottom: 0,
-            borderRadius: 20,
+            borderRadius: 0,
             overflow: 'hidden'
             }}>
             <Tab.Screen name="Home" component={InitialStack} style={styles.navButton} options={{
@@ -994,7 +1015,7 @@ const styles = StyleSheet.create({
  
   container: {
     flex: 1,
-    backgroundColor: 'aliceblue',
+    backgroundColor: 'red',
    // height: 100
   },
   pagerView: {
@@ -1006,11 +1027,11 @@ const styles = StyleSheet.create({
   logoContainer: {
     backgroundColor: 'steelblue',
     flexDirection: 'row', 
-    borderRadius: 30,
+   // borderRadius: 30,
     paddingStart: 20,
     paddingEnd: 10,
-    paddingBottom: 20,
-    paddingTop: 50,
+    paddingBottom: 0,
+    paddingTop: 40,
     justifyContent: 'flex-start',
     alignContent: 'space between',
     borderBottomWidth: 1,
@@ -1047,21 +1068,50 @@ const styles = StyleSheet.create({
     borderColor: 'lightseagreen', 
   },
   clinicDetailsCard: {
-      padding: 0,
-      marginVertical: 20,
-      marginHorizontal: 30,
-      width: '20%',
-      backgroundColor: 'gainsboro',
-      borderRadius: 10,
-      shadowColor: '#000',
-      shadowOffset: {
-        width: 0,
-        height: 2,
-      },
-      shadowOpacity: 0.25,
-      shadowRadius: 3.84,
-      elevation: 0,
+    backgroundColor: 'gainsboro',
+    borderRadius: 10,
+    padding: 20,
+    marginVertical: 10,
+    marginHorizontal: 20,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 5,
+    // Remove width: '20%' to allow the card to expand based on content
   },
+  clinicDetailsText: {
+    fontFamily: 'Helvetica Neue',
+    fontSize: 16,
+    color: '#333', // A darker color for better readability
+    marginBottom: 5, // Spacing between text elements
+  },
+  customCallout: {
+    borderRadius: 10,
+    zIndex: 10,
+    flex: 1,
+  },
+  calloutView: {
+    backgroundColor: 'white',
+    borderRadius: 10,
+    padding: 10,
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    minWidth: 160, // Set a minimum width for the callout bubble
+    maxWidth: 300, // Set a maximum width so it doesn't stretch too wide
+  },
+  calloutTitle: {
+    fontWeight: 'bold',
+    marginBottom: 5,
+  },
+  calloutDescription: {
+    fontSize: 14,
+  },
+
   invoiceText: {
     fontSize: 18, 
     color: 'cornflowerblue',
@@ -1176,7 +1226,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
     paddingVertical: 10,
     width: '100%',
-    height: '60%',
+    height: '100%',
   },
   locationSearchBar: {
     width: '100%',
@@ -1241,16 +1291,22 @@ const styles = StyleSheet.create({
     marginBottom: 2,
   },
   clinicDetailsCard: {
-    display: 'flex',
-    justifyContent: 'space-around',
-    backgroundColor: 'whitesmoke',
-    borderWidth: 1,
-    borderRadius: 10,
-    marginHorizontal: 10,
-    paddingHorizontal: 10,
-    paddingTop: 1,
-    borderColor: 'crimson',
-    padding: 2,
+    backgroundColor: '#f9f9f9', // Soft background color for the details card
+    borderRadius: 8,
+    padding: 15,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 2,
+    elevation: 4,
+    marginTop: 10,
+  },
+  clinicDetailsText: {
+    display: 'inline-block',
+    fontSize: 16,
+    lineWeight: 'bold',
+    color: 'crimson',
+    marginBottom: 3,
   },
   informationButton: {
     alignItems: 'center',
@@ -1553,7 +1609,21 @@ const styles = StyleSheet.create({
     marginBottom: 2,
     color: 'midnightblue',
     fontSize: 16,
-  }
+  },
+  calloutButton: {
+    backgroundColor: '#2196F3',
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+    marginVertical: 5,
+    borderRadius: 5,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  calloutButtonText: {
+    color: 'white',
+    textAlign: 'center',
+  },
+
 
 });
 
