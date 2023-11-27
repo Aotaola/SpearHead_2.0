@@ -11,7 +11,7 @@ import * as FileSystem from 'expo-file-system';
 import Afc_NPP_2022 from './Afc_NPP_2022.pdf'
 import  * as Clipboard from '@react-native-community/clipboard';
 import { debounce } from 'lodash';
-import { MaterialCommunityIcons, Ionicons} from '@expo/vector-icons';
+import { MaterialCommunityIcons, Ionicons, Octicons} from '@expo/vector-icons';
 
 
 
@@ -211,18 +211,20 @@ function LocationScreen ({navigation}){
 
       <View style={styles.locationPickerContainer}>
       <View style={styles.locationSearchBar}>
-      <TextInput
-        style={styles.searchBar}
-        placeholder="Search for a location"
-        value={searchQuery}
-        onChangeText={setSearchQuery}
-        />
-        <TouchableOpacity onPress={handleSearch} style={styles.findLocationBtn}/>
+        <TextInput
+          style={styles.searchBar}
+          placeholder="Search for a clinic"
+          value={searchQuery}
+          onChangeText={setSearchQuery}
+          />
+          <TouchableOpacity onPress={handleSearch} style={styles.findLocationBtn}>
+            <Octicons name="search" size={20} color="black"/>
+          </TouchableOpacity>
       </View>
-      <View>
+      <View style= {styles.visitClinicCont}>
         {selectedClinic && (
-          <TouchableOpacity onPress={() => visitClinic(selectedClinic)} style={styles.button}>
-            <Text style={styles.buttonText}>Visit Clinic</Text>
+          <TouchableOpacity onPress={() => visitClinic(selectedClinic)} style={styles.visitClinicBtn}>
+            <Text style={styles.clinicButtonText}> Visit Clinic +</Text>
           </TouchableOpacity>
         )}
       </View>
@@ -1046,7 +1048,7 @@ const styles = StyleSheet.create({
  
   container: {
     flex: 1,
-    backgroundColor: 'red',
+    backgroundColor: 'transparent',
    // height: 100
   },
   pagerView: {
@@ -1192,7 +1194,7 @@ const styles = StyleSheet.create({
     color: 'lavender',               
     letterSpacing: 4,          
     position: 'absolute', 
-    bottom: 20,
+    bottom: 5,
     left: 120,
   },
   TouchableOpacityStyleStyle: {
@@ -1250,12 +1252,37 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: 'aliceblue',
   },
+  visitClinicCont: {
+    height: 40,
+    width: '100%',
+    backgroundColor: 'aliceblue',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  visitClinicBtn: {
+    height: '100%',
+    width: '40%',
+    backgroundColor: 'aliceblue',
+    borderWidth: 1,
+    borderColor: 'crimson',
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderRadius: 10, // Added rounded corners
+    boxShadow: '0px 4px 8px rgba(0, 0, 0, 0.1)', // Added subtle shadow
+  },
+  clinicButtonText: {
+    color: 'cornflowerblue',
+    fontFamily: 'Helvetica',
+    fontSize: 18,
+    fontWeight: 'bold',
+    letterSpacing: 0.5, // Added letter spacing for better readability
+  },
   locationPickerContainer: {
     justifyContent: 'space-between',
     backgroundColor: 'aliceblue',
     alignItems: 'center',
     paddingHorizontal: 10,
-    paddingVertical: 10,
+    paddingTop: 10,
     width: '100%',
     height: '100%',
   },
@@ -1264,10 +1291,10 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'center',
     width: '100%',
-    paddingVertical: 10,
+    padding: 0,
     fontSize: 20,
-    backgroundColor: 'transparent',
-  },
+    backgroundColor: 'aliceblue',
+    },
   mapContainer: {
     height: 200, 
     width: '100%'
@@ -1280,14 +1307,17 @@ const styles = StyleSheet.create({
     borderRadius: 10,
   },
   findLocationBtn: {
-    backgroundColor: 'darkgrey',
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'grey',
     borderBottomRightRadius: 30, 
-    width: '20%',
+    borderTopRightRadius: 30, 
+    width: '18%',
     borderWidth: 1,
     borderColor: 'gainsboro'
   },
   findLocationText: {
-    color: 'white', // Example text color
+    color: 'red', // Example text color
     fontSize: 16,
     fontWeight: 'bold',
   },
@@ -1310,9 +1340,12 @@ const styles = StyleSheet.create({
     borderTopLeftRadius: 30,
     borderWidth: 0,
     borderColor: 'silver',
-    padding: 10,
+    padding: 0,
     width: '60%',
-    marginBottom: 2,
+    marginBottom: 0,
+    paddingLeft: 20,
+    fontSize: 16,
+    fontColor: 'black',
   },
   clinicDetailsCard: {
     backgroundColor: '#f9f9f9', // Soft background color for the details card
@@ -1508,9 +1541,9 @@ const styles = StyleSheet.create({
     color: 'white'
   },
   logo: {
-    padding: 20,
-    width: 60,
-    height: 60,
+    padding: 0,
+    width: 65,
+    height: 65,
   },
   footer: {
     position: 'absolute',
