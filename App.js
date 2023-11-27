@@ -11,7 +11,7 @@ import * as FileSystem from 'expo-file-system';
 import Afc_NPP_2022 from './Afc_NPP_2022.pdf'
 import  * as Clipboard from '@react-native-community/clipboard';
 import { debounce } from 'lodash';
-import { MaterialCommunityIcons } from '@expo/vector-icons';
+import { MaterialCommunityIcons, Ionicons} from '@expo/vector-icons';
 
 
 
@@ -180,12 +180,17 @@ const LocationScreen = () => {
   //   });
   // };
   
+  const handleSelectClinic = (clinic) => {
+    setSelectedClinic(clinic);
+    setDetailsVisible(true);
+  };
+
   const handleSearch = async () => {
     if (!searchQuery.trim()) return;
     const result = await Location.geocodeAsync(searchQuery);
     if (result.length > 0) {
       const { latitude, longitude } = result[0];
-      setSelectedClinic({
+      setRegion({
         latitude,
         longitude,
         latitudeDelta: 1.1922,
@@ -197,37 +202,48 @@ const LocationScreen = () => {
   };
 
   return (
-    <View style={styles.locationPickerContainer}>
+    <ScrollView style={styles.locationScrollview}>
+
+      <View style={styles.locationPickerContainer}>
       <TextInput
         style={styles.searchBar}
         placeholder="Search for a location"
-      />
+        value={searchQuery}
+        onChangeText={setSearchQuery}
+        />
       <Button title = 'Find Location'onPress={handleSearch} style={styles.findLocationBtn}/>
 
       <MapView
         style={styles.locationMap}
         region={region}
         onRegionChangeComplete={setRegion}
-      >
+        >
         {locations.map((location) => (
           <Marker
-            key={location.id}
-            coordinate={location.coordinates}
-            title={location.title}
-            description={location.address}
-          />
+          key={location.id}
+          coordinate={location.coordinates}
+          title={location.title}
+          description={location.address}
+          onPress={() => handleSelectClinic(location)}
+          >
+             <View style={styles.customMarker}>
+             <Ionicons name="location" size={40} color="crimson" />
+             </View>
+          </Marker>
         ))}
       </MapView>
 
+      </View>
+
       {detailsVisible && selectedClinic && (
         <View style={styles.clinicDetailsCard}>
-          <Text>{selectedClinic.title}</Text>
+          <Text>{selectedClinic.clinicTitle}</Text>
           {/* ... other clinic details */}
           <Button title="View Clinic" onPress={() => { /* ... */ }} />
           <Button title="Save Your Spot" onPress={() => { /* ... */ }} />
         </View>
       )}
-    </View>
+    </ScrollView>
   );
 };
 
@@ -948,11 +964,11 @@ function App({navigation}) {
             inactiveColor="lavender"
             fontFamily="Helvetica"
             barStyle={{ backgroundColor: 'steelblue',
-            height: 80,
+            height: 90,
             position: 'absolute',
-            left: 7,
-            right: 7,
-            bottom: 30,
+            left: 0,
+            right: 0,
+            bottom: 0,
             borderRadius: 20,
             overflow: 'hidden'
             }}>
@@ -1031,11 +1047,18 @@ const styles = StyleSheet.create({
     borderColor: 'lightseagreen', 
   },
   clinicDetailsCard: {
-    position: 'absolute',
-    bottom: 0,
-    backgroundColor: 'white',
-    width: '100%',
-    padding: 20,
+      padding: 20,
+      marginTop: 20,
+      backgroundColor: 'white',
+      borderRadius: 10,
+      shadowColor: '#000',
+      shadowOffset: {
+        width: 0,
+        height: 2,
+      },
+      shadowOpacity: 0.25,
+      shadowRadius: 3.84,
+      elevation: 0,
   },
   invoiceText: {
     fontSize: 18, 
@@ -1140,18 +1163,20 @@ const styles = StyleSheet.create({
     fontWeight: '400',
     textAlign: 'center', 
   },
+  locationScrollview: {
+    flex: 1,
+    backgroundColor: 'red'
+  },
   locationPickerContainer: {
-    display: 'flex',
-    backgroundColor: 'whitesmoke',
-    //alignContent: 'center',
-    //justifyContent: 'center',
+    
+    justifyContent: 'space-between',
+    backgroundColor: 'aliceblue',
     alignItems: 'center',
     paddingTop: 20,
-    paddingHorizontal: 0,
-    paddingBottom: 0, 
+    paddingHorizontal: 10,
+    
     width: '100%',
-    height: '60%',
-    flex: 1,
+    height: 300,
   },
   locationSearchBar: {
     width: '100%',
@@ -1165,8 +1190,8 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   locationMap: {
-    width: '95%',
-    height: '60%',
+    width: '100%',
+    height: '100%',
     borderWidth: 1,
     borderColor: 'silver',
     borderRadius: 10,
@@ -1213,7 +1238,13 @@ const styles = StyleSheet.create({
   clinicDetailsCard: {
     position: 'absolute',
     bottom: 0,
-    backgroundColor: 'red',
+    backgroundColor: 'whitesmoke',
+    borderWidth: 1,
+    borderRadius: 10,
+    marginHorizontal: 10,
+    //paddingHorizontal: 10,
+    paddingTop: 10,
+    borderColor: 'crimson',
     width: '100%',
     padding: 20,
   },
