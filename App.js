@@ -202,7 +202,7 @@ const LocationScreen = () => {
   };
 
   return (
-    <ScrollView style={styles.locationScrollview}>
+    <View style={styles.locationScrollview}>
 
       <View style={styles.locationPickerContainer}>
       <TextInput
@@ -212,7 +212,6 @@ const LocationScreen = () => {
         onChangeText={setSearchQuery}
         />
       <Button title = 'Find Location'onPress={handleSearch} style={styles.findLocationBtn}/>
-
       <MapView
         style={styles.locationMap}
         region={region}
@@ -233,17 +232,17 @@ const LocationScreen = () => {
         ))}
       </MapView>
 
-      </View>
 
       {detailsVisible && selectedClinic && (
         <View style={styles.clinicDetailsCard}>
           <Text>{selectedClinic.clinicTitle}</Text>
-          {/* ... other clinic details */}
           <Button title="View Clinic" onPress={() => { /* ... */ }} />
           <Button title="Save Your Spot" onPress={() => { /* ... */ }} />
-        </View>
-      )}
-    </ScrollView>
+      </View>
+          )}
+      </View>
+          
+    </View>
   );
 };
 
@@ -959,11 +958,11 @@ function App({navigation}) {
         <NavigationContainer>
           <Tab.Navigator tabBarPosition="bottom" 
             initialRouteName="Home"
-            activeColor="midnightblue"
-            activeBackgroundColor="red"
-            inactiveColor="lavender"
+            activeColor="crimson"
+            inactiveColor="silver"
+            borderColor = "silver"
             fontFamily="Helvetica"
-            barStyle={{ backgroundColor: 'steelblue',
+            barStyle={{ backgroundColor: 'aliceblue',
             height: 90,
             position: 'absolute',
             left: 0,
@@ -1007,10 +1006,11 @@ const styles = StyleSheet.create({
   logoContainer: {
     backgroundColor: 'steelblue',
     flexDirection: 'row', 
+    borderRadius: 30,
     paddingStart: 20,
     paddingEnd: 10,
-    paddingBottom: 10,
-    paddingTop: 40,
+    paddingBottom: 20,
+    paddingTop: 50,
     justifyContent: 'flex-start',
     alignContent: 'space between',
     borderBottomWidth: 1,
@@ -1047,9 +1047,11 @@ const styles = StyleSheet.create({
     borderColor: 'lightseagreen', 
   },
   clinicDetailsCard: {
-      padding: 20,
-      marginTop: 20,
-      backgroundColor: 'white',
+      padding: 0,
+      marginVertical: 20,
+      marginHorizontal: 30,
+      width: '20%',
+      backgroundColor: 'gainsboro',
       borderRadius: 10,
       shadowColor: '#000',
       shadowOffset: {
@@ -1165,29 +1167,30 @@ const styles = StyleSheet.create({
   },
   locationScrollview: {
     flex: 1,
-    backgroundColor: 'red'
+    backgroundColor: 'aliceblue',
   },
   locationPickerContainer: {
-    
     justifyContent: 'space-between',
     backgroundColor: 'aliceblue',
     alignItems: 'center',
-    paddingTop: 20,
     paddingHorizontal: 10,
-    
+    paddingVertical: 10,
     width: '100%',
-    height: 300,
+    height: '60%',
   },
   locationSearchBar: {
     width: '100%',
     padding: 15,
     fontSize: 16,
-    borderBottomWidth: 6,
-    borderRadius: 4,
+    borderRadius: 1,
     borderBottomColor: 'red',
     backgroundColor: 'red',
     marginTop: 10,
     marginBottom: 10,
+  },
+  mapContainer: {
+    height: 200, 
+    width: '100%'
   },
   locationMap: {
     width: '100%',
@@ -1230,23 +1233,24 @@ const styles = StyleSheet.create({
   searchBar: {
     height: 40,
     backgroundColor: 'lightgrey',
-    borderRadius: 10,
+    borderRadius: 18,
+    borderWidth: 1,
+    borderColor: 'silver',
     padding: 10,
     width: '80%',
     marginBottom: 2,
   },
   clinicDetailsCard: {
-    position: 'absolute',
-    bottom: 0,
+    display: 'flex',
+    justifyContent: 'space-around',
     backgroundColor: 'whitesmoke',
     borderWidth: 1,
     borderRadius: 10,
     marginHorizontal: 10,
-    //paddingHorizontal: 10,
-    paddingTop: 10,
+    paddingHorizontal: 10,
+    paddingTop: 1,
     borderColor: 'crimson',
-    width: '100%',
-    padding: 20,
+    padding: 2,
   },
   informationButton: {
     alignItems: 'center',
