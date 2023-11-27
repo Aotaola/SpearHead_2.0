@@ -210,18 +210,22 @@ function LocationScreen ({navigation}){
     <View style={styles.locationScrollview}>
 
       <View style={styles.locationPickerContainer}>
+      <View style={styles.locationSearchBar}>
       <TextInput
         style={styles.searchBar}
         placeholder="Search for a location"
         value={searchQuery}
         onChangeText={setSearchQuery}
         />
-      <Button title = 'Find Location'onPress={handleSearch} style={styles.findLocationBtn}/>
-      {selectedClinic && (
-      <TouchableOpacity onPress={() => visitClinic(selectedClinic)} style={styles.button}>
-        <Text style={styles.buttonText}>Visit Clinic</Text>
-      </TouchableOpacity>
-    )}
+        <TouchableOpacity onPress={handleSearch} style={styles.findLocationBtn}/>
+      </View>
+      <View>
+        {selectedClinic && (
+          <TouchableOpacity onPress={() => visitClinic(selectedClinic)} style={styles.button}>
+            <Text style={styles.buttonText}>Visit Clinic</Text>
+          </TouchableOpacity>
+        )}
+      </View>
       <MapView
         style={styles.locationMap}
         region={region}
@@ -242,20 +246,12 @@ function LocationScreen ({navigation}){
               <View style={styles.calloutView}>
                 <Text style={styles.calloutTitle}>{location.title}</Text>
                 <Text style={styles.calloutDescription}>{location.address}</Text>
-                  <TouchableOpacity
-                    onPress={() => navigation.navigate('Contact', { clinic: location })}
-                    style={styles.calloutButton}
-                  >
-                    <Text style={styles.calloutButtonText}>View Clinic</Text>
-                  </TouchableOpacity>
               </View>
             </Callout>
           </Marker>
         ))}
-      </MapView>
-
+      </MapView>          
       </View>
-          
     </View>
   );
 };
@@ -920,8 +916,21 @@ function AccountStack(){
     <Stack.Navigator
     screenOptions={{
       headerStyle: {
-        height: 0,
+        backgroundColor: 'steelblue', // Color of the header bar
+        borderBottomEndRadius: 20,    // Rounded corners on the bottom end
+        borderBottomStartRadius: 20,  // Rounded corners on the bottom start
+        shadowOpacity: 0.5,           // Shadow for iOS
+        shadowOffset: { height: 5 },  // Shadow offset for iOS
+        shadowRadius: 5,              // Shadow blur radius for iOS
+        height: 40,                  // Height of the header bar
       },
+      headerTintColor: 'lightsteelblue',        // Color of the back button and title
+      headerTitleStyle: {
+        color: 'transparent',              // Font size for the title
+      },
+      headerTitleAlign: 'center',     // Align the title to the center
+      headerBackTitleVisible: true,  
+      headerShadowVisible: true,
     }}>
       <Stack.Screen name = "Profile" component={ProfileScreen} />
       <Stack.Screen name="Setting" component={SettingScreen} />
@@ -934,8 +943,21 @@ function InitialStack() {
     <Stack.Navigator
     screenOptions={{
       headerStyle: {
-        height: 0,
+        backgroundColor: 'steelblue', // Color of the header bar
+        borderBottomEndRadius: 20,    // Rounded corners on the bottom end
+        borderBottomStartRadius: 20,  // Rounded corners on the bottom start
+        shadowOpacity: 0.5,           // Shadow for iOS
+        shadowOffset: { height: 5 },  // Shadow offset for iOS
+        shadowRadius: 5,              // Shadow blur radius for iOS
+        height: 40,                  // Height of the header bar
       },
+      headerTintColor: 'lightsteelblue',        // Color of the back button and title
+      headerTitleStyle: {
+        color: 'transparent',              // Font size for the title
+      },
+      headerTitleAlign: 'center',     // Align the title to the center
+      headerBackTitleVisible: true,  
+      headerShadowVisible: true,
     }}>
       <Stack.Screen name = "Home" component={HomeScreen} />
       <Stack.Screen name="Update" component={UpdateScreen} />
@@ -948,13 +970,22 @@ function InformationalStack() {
     <Stack.Navigator
     screenOptions={{
       headerStyle: {
-        backgroundColor: 'steelblue',
-        borderBottomEndRadius: 20,
-        borderBottomStartRadius: 20,
-        borderColor: 'steelblue',
-        marginTop: 10,
-        
+        backgroundColor: 'steelblue', // Color of the header bar
+        borderBottomEndRadius: 20,    // Rounded corners on the bottom end
+        borderBottomStartRadius: 20,  // Rounded corners on the bottom start
+        shadowOpacity: 0.5,           // Shadow for iOS
+        shadowOffset: { height: 5 },  // Shadow offset for iOS
+        shadowRadius: 5,              // Shadow blur radius for iOS
+        height: 40,                  // Height of the header bar
       },
+      headerTintColor: 'lightsteelblue', 
+      headerFontSize: 20,       // Color of the back button and title
+      headerTitleStyle: {
+        color: 'transparent',  
+      },
+      headerTitleAlign: 'center',     // Align the title to the center
+      headerBackTitleVisible: true,  
+      headerShadowVisible: true,
     }}>
       <Stack.Screen name = "Location" component={LocationScreen} />
       <Stack.Screen name = "Contact" component={ContactScreen} />
@@ -1035,7 +1066,7 @@ const styles = StyleSheet.create({
     justifyContent: 'flex-start',
     alignContent: 'space between',
     borderBottomWidth: 1,
-    borderBottomColor: 'lightsteelblue',
+    borderBottomColor: 'steelblue',
   },
   profileContainer: {
     flex: 1,
@@ -1229,14 +1260,13 @@ const styles = StyleSheet.create({
     height: '100%',
   },
   locationSearchBar: {
+    display: 'flex',
+    flexDirection: 'row',
+    justifyContent: 'center',
     width: '100%',
-    padding: 15,
-    fontSize: 16,
-    borderRadius: 1,
-    borderBottomColor: 'red',
-    backgroundColor: 'red',
-    marginTop: 10,
-    marginBottom: 10,
+    paddingVertical: 10,
+    fontSize: 20,
+    backgroundColor: 'transparent',
   },
   mapContainer: {
     height: 200, 
@@ -1250,17 +1280,11 @@ const styles = StyleSheet.create({
     borderRadius: 10,
   },
   findLocationBtn: {
-    backgroundColor: 'crimson',
-    padding: 10,
-    borderRadius: 5,
-    fontSize: 20,
-    marginTop: 10,
-    marginBottom: 10,
-    color: 'red',
-    borderBottomWidth: 1,
-    borderTopWidth: 1,
-    borderRightWidth: 6,
-    borderLeftWidth: 6,
+    backgroundColor: 'darkgrey',
+    borderBottomRightRadius: 30, 
+    width: '20%',
+    borderWidth: 1,
+    borderColor: 'gainsboro'
   },
   findLocationText: {
     color: 'white', // Example text color
@@ -1283,11 +1307,11 @@ const styles = StyleSheet.create({
   searchBar: {
     height: 40,
     backgroundColor: 'lightgrey',
-    borderRadius: 18,
-    borderWidth: 1,
+    borderTopLeftRadius: 30,
+    borderWidth: 0,
     borderColor: 'silver',
     padding: 10,
-    width: '80%',
+    width: '60%',
     marginBottom: 2,
   },
   clinicDetailsCard: {
