@@ -164,22 +164,6 @@ function LocationScreen ({navigation}){
     longitudeDelta: 2, // Adjust as necessary to include all markers
   });
 
-  // const handleUseCurrentLocation = async () => {
-  //   let { status } = await Location.requestForegroundPermissionsAsync();
-  //   if (status !== 'granted') {
-  //     alert('Permission to access location was denied');
-  //     return;
-  //   }
-
-  //   let location = await Location.getCurrentPositionAsync({});
-  //   setMapRegion({
-  //     latitude: location.coords.latitude,
-  //     longitude: location.coords.longitude,
-  //     latitudeDelta: 0.0922,
-  //     longitudeDelta: 0.0421,
-  //   });
-  // };
-  
   const handleSelectClinic = (clinic) => {
     setSelectedClinic(clinic);
     setDetailsVisible(true);
@@ -202,7 +186,9 @@ function LocationScreen ({navigation}){
   };
 
   const visitClinic = (clinic) => {
-    navigation.navigate('Contact')
+    navigation.navigate('Contact'
+    , {clinic: clinic}
+    )
   };
   
 
@@ -258,10 +244,13 @@ function LocationScreen ({navigation}){
   );
 };
 
-function ContactScreen({navigation}) {
+function ContactScreen({route, navigation}) {
   
   const [userLocation, setUserLocation] = useState(null);
+  const clinic = route.params.clinic
   const [errorMsg, setErrorMsg] = useState(null);
+
+  console.log(clinic)
   
   // business location is hardcoded. 
   
@@ -306,26 +295,6 @@ function ContactScreen({navigation}) {
   
   const businessLocation = {latitude:  26.0089697, longitude: -80.2038731}
   console.log('business location: ', businessLocation)
-  
-  
-  //when multiple locations are required, the below code will help set up business location services
-  //const GOOGLE_API_KEY = 'AIzaSyBGAPK3-L4ipbDv7LZN6VmK1TqalvOGfmg';
-  // async function getBusinessCoordinates() {
-    //   const address = "5812 Hollywood Blvd, Hollywood, FL 33021";
-    //   const response = await fetch(`https://maps.googleapis.com/maps/api/geocode/json?address=5812%20Hollywood%20Blvd%2C%20Hollywood%2C%20FL%2033021&key=AIzaSyBGAPK3-L4ipbDv7LZN6VmK1TqalvOGfmg`);
-    //   const articles = await response.json();
-    
-    //   if (articles.results && articles.results.length > 0) {
-      //     const location = articles.results[0].geometry.location;
-      //     console.log("Extracted Location:", location);
-      //     console.log(location.lat, location.lng);
-      //     return { latitude: location.lat, longitude: location.lng };
-      //   }
-      //   //console.log('Geocode API response:', location);
-      
-      //   print ("no results found"); 
-      
-      // }
       
       
       useEffect(() => {
@@ -365,6 +334,7 @@ function ContactScreen({navigation}) {
       //  
       return (
         <ScrollView style = {{backgroundColor: 'aliceblue'}}> 
+        {/* <Text>{clinic.address}</Text> */}
         {userLocation  && businessLocation  ? 
         (
           <MapView 
@@ -408,6 +378,7 @@ function ContactScreen({navigation}) {
         <Text style={styles.contactButtonText}>
           Call: +1(954) 866-7435
         </Text>
+        <Text>{clinic.address}</Text>
       </TouchableOpacity>
     </View>
     <View  style = {styles.contactButtonContainer}>
@@ -1345,8 +1316,8 @@ const styles = StyleSheet.create({
     marginBottom: 0,
     paddingLeft: 20,
     fontSize: 16,
-    fontColor: 'black',
-  },
+    placeholderTextColor: 'red',
+    },
   clinicDetailsCard: {
     backgroundColor: '#f9f9f9', // Soft background color for the details card
     borderRadius: 8,
