@@ -11,7 +11,7 @@ import * as FileSystem from 'expo-file-system';
 import Afc_NPP_2022 from './Afc_NPP_2022.pdf'
 import  * as Clipboard from '@react-native-community/clipboard';
 import { debounce } from 'lodash';
-import { MaterialCommunityIcons, Ionicons, Octicons} from '@expo/vector-icons';
+import { MaterialCommunityIcons, Ionicons, Octicons, Feather} from '@expo/vector-icons';
 
 
 
@@ -140,6 +140,8 @@ function LocationScreen ({navigation}){
         longitude: -82.710480,
       },
       address: '1500 McMullen Booth Rd. Ste. A1-A2 Clearwater, FL, 33759',
+      phoneNumber: '(727) 266-1266',
+      walkIns: true, 
     },
     {
       id: 'largo',
@@ -247,8 +249,9 @@ function LocationScreen ({navigation}){
 function ContactScreen({route, navigation}) {
   
   const [userLocation, setUserLocation] = useState(null);
-  const clinic = route.params.clinic
   const [errorMsg, setErrorMsg] = useState(null);
+  const clinic = route.params.clinic
+  const clinicCords = clinic.coordinates
 
   console.log(clinic)
   
@@ -259,7 +262,7 @@ function ContactScreen({route, navigation}) {
   const handleCopyToClipboard = () => {
 
     if (Clipboard && Clipboard.setString) {
-        Clipboard.setString(businessAddress);
+        Clipboard.setString(clinic.address);
         Alert.alert('Success', 'Address copied to clipboard!');
     } else {
         console.error('Clipboard is not available', error);
@@ -335,29 +338,33 @@ function ContactScreen({route, navigation}) {
       return (
         <ScrollView style = {{backgroundColor: 'aliceblue'}}> 
         {/* <Text>{clinic.address}</Text> */}
-        {userLocation  && businessLocation  ? 
+        {userLocation  && clinicCords  ? 
         (
           <MapView 
           style={{  width: '100%', height: 350}} 
           region={{
-            latitude: businessLocation.latitude,
-            longitude: businessLocation.longitude,
-            latitudeDelta: 0.0522,
-            longitudeDelta: 0.0421
+            latitude: clinicCords.latitude,
+            longitude: clinicCords.longitude,
+            latitudeDelta: 0.0922,
+            longitudeDelta: 0.0921
           }}>
             <Marker 
              coordinate={{
-               latitude: 26.0089697, 
-               longitude: -80.2038731
+               latitude: clinicCords.latitude, 
+               longitude: clinicCords.longitude
               }}
-              title="American Family Care, Hollywood, Fl."
-              />
+              title= {clinic.title}
+              >
+              <View style={styles.customMarker}>
+              <Ionicons name= "location" size={40} color="crimson" />
+              </View>
+            </Marker>
             <Marker  
               coordinate={{
-                latitude: userLocation.coords.latitude,
-                longitude: userLocation.coords.longitude
+                latitude: userLocation.latitude,
+                longitude: userLocation.longitude
               }}
-              title="your location"
+              title="you!"
               pinColor='crimson'
               />
           </MapView>
@@ -367,18 +374,13 @@ function ContactScreen({route, navigation}) {
 
     <View style={styles.contactButtonContainer}>
       <TouchableOpacity onPress={handleCopyToClipboard} style={styles.contactButton}>
-        <Text style={styles.contactButtonText}>
-          {businessAddress}
-        </Text>
+      <Feather name = "copy" size={30} color="crimson"/>
       </TouchableOpacity>
     </View>
 
     <View style={styles.contactButtonContainer}>
       <TouchableOpacity onPress={handleCallBusiness} style={styles.contactButton}>
-        <Text style={styles.contactButtonText}>
-          Call: +1(954) 866-7435
-        </Text>
-        <Text>{clinic.address}</Text>
+        <Feather name = "phone-call" size={30} color="crimson"/>
       </TouchableOpacity>
     </View>
     <View  style = {styles.contactButtonContainer}>
