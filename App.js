@@ -1271,7 +1271,7 @@ const styles = StyleSheet.create({
     flex: 1,
     flexDirection: 'column',
     justifyContent: 'space-between',
-    backgroundColor: 'lavender',
+    backgroundColor: 'aliceblue',
     paddingHorizontal: 15,
     paddingTop: 5
   },
@@ -1282,7 +1282,7 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     padding: 10,
     marginBottom: 10,
-    borderWidth: 1,
+    borderBottomWidth: 1,
     borderColor: 'lightseagreen', // Cornflowerblue border for a touch of color
   },
   serviceText: {
@@ -1317,11 +1317,10 @@ const styles = StyleSheet.create({
   TouchableOpacityStyleStyle: {
     paddingHorizontal: 10,
     paddingVertical: 2,
-    borderWidth: .3,
-    borderColor: 'lavender',
+    borderBottomWidth: 1,
+    borderRadius: 30,
     backgroundColor: 'aliceblue',
-    borderBottomColor: 'midnightblue',
-    difuseColor: 'steelblue',
+    borderBottomColor: 'lightseagreen',
   },
   contactMainText: {
     color: 'crimson',
@@ -1418,25 +1417,26 @@ const styles = StyleSheet.create({
     backgroundColor: 'aliceblue',
   },
   visitClinicCont: {
-    height: 40,
+    height: 55,
     width: '100%',
     backgroundColor: 'aliceblue',
     justifyContent: 'center',
     alignItems: 'center',
   },
   visitClinicBtn: {
-    height: '100%',
+    height: '60%',
     width: '40%',
     backgroundColor: 'aliceblue',
-    borderWidth: 1,
-    borderColor: 'crimson',
+    borderBottomWidth: 1,
+    borderColor: 'cornflowerblue',
     justifyContent: 'center',
+    marginBottom: 10,
     alignItems: 'center',
     borderRadius: 10, // Added rounded corners
     boxShadow: '0px 4px 8px rgba(0, 0, 0, 0.1)', // Added subtle shadow
   },
   clinicButtonText: {
-    color: 'cornflowerblue',
+    color: 'steelblue',
     fontFamily: 'Helvetica',
     fontSize: 18,
     fontWeight: 'bold',
@@ -1915,12 +1915,12 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   faqQuestionContainer: {
-    marginBottom: 10,
-    padding: 15,
-    backgroundColor: 'lightgray', // Feel free to choose any color that fits your design
-    borderRadius: 5,
-    borderWidth: 1,
-    borderColor: '#ddd', // Light grey border color
+    marginBottom: 20,
+    padding: 10,
+    backgroundColor: 'aliceblue', // Feel free to choose any color that fits your design
+    borderRadius: 20,
+    borderBottomWidth: 1,
+    borderColor: 'silver', // Light grey border color
   },
   faqQuestion: {
     fontSize: 18,
