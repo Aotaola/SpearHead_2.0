@@ -355,15 +355,7 @@ function ContactScreen({route, navigation}) {
         text = errorMsg;
       } else if (userLocation) {
         text = JSON.stringify(userLocation);
-      }
-      
-      {/* bellow is to open the privacy policy for this location */}
-      const openAfcNPP = () => {
-        const fileUri = FileSystem.documentDirectory + Afc_NPP_2022;
-        Linking.openURL(fileUri);
-        console.log('fileURI:' + fileUri)
-      }
-      //  
+      }  
       return (
         <ScrollView style = {{backgroundColor: 'aliceblue', display: 'flex', flexDirection: 'column'}} > 
           {/* <Text>{clinic.address}</Text> */}
@@ -502,36 +494,49 @@ function AppointmentScreen({route}){
 }
 
 function InfoScreen({route}) {
+
+  const [selectedFaqIndex, setSelectedFaqIndex] = useState(null);
+
+  const faqs = [
+    { question: "Can you do sports and camp physicals?", answer: "Yes, we can. No appointment is needed. Just come in on a walk-in basis, and we’ll perform the physical. The price is low, (unless there are special requirements). If there’s a required form, please bring that with you." },
+    { question: "Do I have to make an appointment?", answer: "No, you can walk-in during our normal business hours and be seen by a physician without a long wait."},
+    { question: "Do you do physicals?", answer: "We can do camp, and school physicals. We also do pre-employment and DOT physicals."},
+    { question: "Do you provide seasonal flu vaccinations?", answer: "Yes, we do." }
+  ];
+
+  const toggleFaq = (index) => {
+    setSelectedFaqIndex(index === selectedFaqIndex ? null : index);
+  };
+  
   const openAfcNPP = () => {
     const fileUri = FileSystem.documentDirectory + Afc_NPP_2022;
     Linking.openURL(fileUri);
     console.log('fileURI:' + fileUri)
   }
-  
+
   return (
     <ScrollView style={styles.infoContainer}> 
-          <Text style={styles.infoBody}>
-            If you’re in need of medical care for an illness or injury that’s not life-threatening, 
-            look no further than American Family Care®. We offer urgent care in the Hollywood area for patients of all ages. 
-            Our medical team is staffed with medical professionals that are dedicated to ensuring your health and overall well-being.
-          </Text>
           <Text style={styles.infoMainText}>
-            Our Mission
+            Frequently Asked Questions
           </Text>
-          <Text style={styles.infoBody}>
-            Our mission is to provide the best healthcare possible in a kind and caring environment, 
-            in an economical manner,
-            while respecting the rights of all of our patients,
-            at times and locations convenient to the patient.
-          </Text>
+          <FlatList
+            data={faqs}
+            keyExtractor={(item, index) => index.toString()}
+            renderItem={({ item, index }) => (
+            <View>
+              <TouchableOpacity onPress={() => toggleFaq(index)} style={styles.faqQuestionContainer}>
+                <Text style={styles.faqQuestion}>{item.question}</Text>
+              </TouchableOpacity>
+                {selectedFaqIndex === index && (
+              <Text style={styles.faqAnswer}>{item.answer}</Text>
+                )}
+            </View>
+            )}
+          />
         <View style={styles.buttonContainer}>
           <Button title="Privacy Policy" onPress={openAfcNPP} style={styles.privacyBtn}/>
         </View>
-        <Text style={styles.infoMainText}>Hours of Operation</Text>
-        <Text style={styles.infoBody}>
-        Monday - Friday: 8:00 AM - 8:00 PM {`\n`}
-        Saturday - Sunday: 8:00 AM - 5:00 PM
-        </Text>
+        
     </ScrollView>
   );
 };
@@ -1546,6 +1551,7 @@ const styles = StyleSheet.create({
     flex: 1,
     height: '100%',
     backgroundColor: 'aliceblue',
+    padding: 10,
   },
   infoMainText: {
     display: 'flex',
@@ -1558,7 +1564,8 @@ const styles = StyleSheet.create({
     fontFamily: 'Helvetica',
     letterSpacing: 0.7,  
     fontSize: 25, 
-    textAlign: 'center'
+    textAlign: 'center',
+    color: 'steelblue'
   },
   infoBody: {
     backgroundColor: 'aliceblue',
@@ -1895,6 +1902,47 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: 'bold',
   },
+  faqInfoContainer: {
+    // Replace with your specific styles
+    flex: 1,
+    padding: 10,
+    backgroundColor: 'aliceblue', // Feel free to choose any color that fits your design
+  },
+  faqInfoMainText: {
+    fontSize: 22,
+    fontWeight: 'bold',
+    color: 'navy', // Feel free to choose any color that fits your design
+    marginBottom: 20,
+  },
+  faqQuestionContainer: {
+    marginBottom: 10,
+    padding: 15,
+    backgroundColor: 'lightgray', // Feel free to choose any color that fits your design
+    borderRadius: 5,
+    borderWidth: 1,
+    borderColor: '#ddd', // Light grey border color
+  },
+  faqQuestion: {
+    fontSize: 18,
+    color: 'black', // Feel free to choose any color that fits your design
+  },
+  faqAnswer: {
+    fontSize: 16,
+    color: 'darkslategray', // Feel free to choose any color that fits your design
+    padding: 10,
+    backgroundColor: 'whitesmoke', // Light grey background for the answer
+    borderBottomLeftRadius: 5,
+    borderBottomRightRadius: 5,
+  },
+  faqButtonContainer: {
+    marginTop: 30,
+    paddingHorizontal: 10,
+  },
+  faqPrivacyBtn: {
+    fontSize: 16,
+    color: 'white', // Assuming the button text is white
+  },
+
 
 
 });
