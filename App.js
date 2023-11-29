@@ -276,8 +276,7 @@ function LocationScreen ({navigation}){
   );
 };
 
-function ContactScreen({route, navigation}) {
-  
+function ContactScreen({route, navigation}) {  
   const [userLocation, setUserLocation] = useState(null);
   const [errorMsg, setErrorMsg] = useState(null);
   const clinic = route.params.clinic
@@ -367,9 +366,9 @@ function ContactScreen({route, navigation}) {
       //  
       return (
         <ScrollView style = {{backgroundColor: 'aliceblue', display: 'flex', flexDirection: 'column'}} > 
-        {/* <Text>{clinic.address}</Text> */}
-        {userLocation  && clinicCords  ? 
-        (
+          {/* <Text>{clinic.address}</Text> */}
+          {userLocation  && clinicCords  ? 
+          (
           <MapView 
           style={{  width: '100%', height: 230}} 
           region={{
@@ -377,7 +376,7 @@ function ContactScreen({route, navigation}) {
             longitude: clinicCords.longitude,
             latitudeDelta: 0.009,
             longitudeDelta: 0.009
-          }}>
+            }}>
             <Marker 
              coordinate={{
                latitude: clinicCords.latitude, 
@@ -386,64 +385,119 @@ function ContactScreen({route, navigation}) {
               title= {clinic.title}
               >
               <View style={styles.customMarker}>
-              <Ionicons name= "location" size={40} color="crimson" />
+                <Ionicons name= "location" size={40} color="crimson" />
               </View>
             </Marker>
             
-          </MapView>
-        ) : ( <Text style={styles.paragraph}> no location found </Text>
-        )
-      }
-    <View style={styles.contactClickContainer}>
-      <View style={styles.contactButtonContainer}>
-        <TouchableOpacity onPress={handleCopyToClipboard} style={styles.contactButton}>
-        <Feather name = "copy" size={30} color="crimson"/>
-        </TouchableOpacity>
-      </View>
+            </MapView>
+                ) : ( <Text style={styles.paragraph}> no location found </Text>
+                )
+              }
+            <View style={styles.contactClickContainer}>
+              <View style={styles.contactButtonContainer}>
+                <TouchableOpacity onPress={handleCopyToClipboard} style={styles.contactButton}>
+                <Feather name = "copy" size={30} color="crimson"/>
+                </TouchableOpacity>
+              </View>
 
-      <View style={styles.contactButtonContainer}>
-        <TouchableOpacity onPress={handleCallBusiness} style={styles.contactButton}>
-          <Feather name = "phone-call" size={30} color="crimson"/>
-        </TouchableOpacity>
-      </View>
-        {walkIn ?
-      <View style={styles.contactWalking}>
-         <Text style={styles.contactWalkInText}>Walk-ins are Welcomed</Text> 
-      </View>
-         : false}
-    </View>
-    <View  style = {styles.contactButtonContainer}>
-      <TouchableOpacity 
-        onPress={navigation.navigate("Appointment")}
-      // onPress={handleMakeAppointment} 
-      style={styles.contactButton}>
-        <Text style={styles.contactButtonText}>
-          Make an Appointment
-        </Text>
-      </TouchableOpacity>
-    </View>
+              <View style={styles.contactButtonContainer}>
+                <TouchableOpacity onPress={handleCallBusiness} style={styles.contactButton}>
+                  <Feather name = "phone-call" size={30} color="crimson"/>
+                </TouchableOpacity>
+              </View>
+                {walkIn ?
+              <View style={styles.contactWalking}>
+                <Text style={styles.contactWalkInText}>Walk-ins are Welcomed</Text> 
+              </View>
+              : false}
+            </View>
+            <View  style = {styles.contactButtonContainer}>
+              <TouchableOpacity 
+                onPress={() => navigation.navigate("Appointment", {clinic: clinic})}
+              // onPress={handleMakeAppointment} 
+              style={styles.contactButton}>
+                <Text style={styles.contactButtonText}>
+                  Make an Appointment
+                </Text> 
+              </TouchableOpacity>
+            </View>
 
-    <View style={styles.scheduleContainer}>
-    {Object.entries(workHours).map(([day, hours]) => (
-      <Text key={day} style={styles.scheduleDay}>{`${day}: ${hours}`}</Text>
-    ))}
-    </View>
-
-    <View style={styles.informationButton} >
-      <TouchableOpacity 
-      onPress={() => navigation.navigate('Info')} >
-      <Text style={styles.InfobuttonText}>more information +</Text>
-      </TouchableOpacity>
-    </View>
-
-    
+            <View style={styles.scheduleContainer}>
+            {Object.entries(workHours).map(([day, hours]) => (
+              <Text key={day} style={styles.scheduleDay}>{`${day}: ${hours}`}</Text>
+            ))}
+            </View>
         </ScrollView>
   );
 }
 
-function AppointmentScreen(){
+function AppointmentScreen({route}){
+
+  const clinic = route.params.clinic
+
   return(
-    <Text>this is an appointment screen</Text>
+    <View style={styles.appointmentContainer}>
+      <View style={styles.appointmentHeader}>
+        
+      </View>
+
+      <View style={styles.appointmentForm}>
+        <View style={styles.appointmentInputRow}>
+          <TextInput
+            style={styles.appointmentInput}
+            placeholder="Patient First Name"
+            placeholderTextColor="grey"
+            // onChangeText={...}
+          />
+          <TextInput
+            style={styles.appointmentInput}
+            placeholder="Patient Last Name"
+            placeholderTextColor="grey"
+
+            // onChangeText={...}
+          />
+        </View>
+        <TextInput
+          style={styles.inputFull}
+          placeholder="Date of Birth (MM / DD / YYYY)"
+          placeholderTextColor="grey"
+
+          // onChangeText={...}
+        />
+        
+        <TextInput
+          style={styles.inputFull}
+          placeholder="Patient Birth Sex"
+          placeholderTextColor="grey"
+
+          // onChangeText={...}
+        />
+        
+        <TextInput
+          style={styles.inputFull}
+          placeholder="Cell Phone Number"
+          keyboardType="phone-pad"
+          placeholderTextColor="grey"
+
+          // onChangeText={...}
+        />
+        
+        <TextInput
+          style={styles.inputFull}
+          placeholder="Email"
+          keyboardType="email-address"
+          placeholderTextColor="grey"
+
+          // onChangeText={...}
+        />
+        {/* <Text style={styles.notificationText}>
+          We'll send you a text message when it's time to show up.
+        </Text> */}
+      <TouchableOpacity style={styles.appointmentButton}>
+        <Text style={styles.appointmentButtonText}>Save your Spot</Text>
+      </TouchableOpacity>
+      </View>
+    </View>
   )
 }
 
@@ -482,7 +536,7 @@ function InfoScreen({route}) {
   );
 };
 
-function ServiceScreen(){
+function ServiceScreen({navigation}){
   const [hasMoreItems, setHasMoreItems] = useState(true);
   const [services, setServices] = useState([])
   const [page, setPage] = useState(1)
@@ -552,6 +606,12 @@ function ServiceScreen(){
   
   return (
     <View style={styles.serviceContainer} >
+      <View style={styles.informationButton} >
+            <TouchableOpacity 
+            onPress={() => navigation.navigate('Info')} >
+            <Text style={styles.InfobuttonText}>more information +</Text>
+            </TouchableOpacity>
+          </View>
       <FlatList
       data={services}
       renderItem={renderUpdate}
@@ -708,36 +768,42 @@ const handleUserChange = (newUser) => {
             value={firstName}
             onChangeText={setFirstName}
             placeholder="First Name"
+            placeholderTextColor="grey"
             />
           <TextInput
             style={styles.input}
             value={lastName}
             onChangeText={setLastName}
             placeholder="Last Name"
+            placeholderTextColor="grey"
             />
           <TextInput
             style={styles.input}
             value={insurance}
             onChangeText={setInsurance}
             placeholder="Insurance"
+            placeholderTextColor="grey"
             />
           <TextInput
             style={styles.input}
             value={email}
             onChangeText={setEmail}
             placeholder="Email"
+            placeholderTextColor="grey"
             />
           <TextInput
             style={styles.input}
             value={phoneNumber}
             onChangeText={setPhoneNumber}
             placeholder="Phone Number"
+            placeholderTextColor="grey"
             />
           <TextInput
             style={styles.input}
             value={password}
             onChangeText={setPassword}
             placeholder="Password"
+            placeholderTextColor="grey"
             secureTextEntry
             />
           <View style={styles.profileInfoButtons}>
@@ -984,7 +1050,7 @@ function InitialStack() {
   );
 }
 
-function InformationalStack() {
+function ClinicStack() {
   return (
     <Stack.Navigator
     screenOptions={{
@@ -1008,11 +1074,40 @@ function InformationalStack() {
     }}>
       <Stack.Screen name = "Location" component={LocationScreen} />
       <Stack.Screen name = "Contact" component={ContactScreen} />
-      <Stack.Screen name="Info" component={InfoScreen}/>
       <Stack.Screen name = "Appointment" component={AppointmentScreen} />
     </Stack.Navigator>
   )
 }
+
+function InformationalStack() {
+  return (
+    <Stack.Navigator
+    screenOptions={{
+      headerStyle: {
+        backgroundColor: 'steelblue', // Color of the header bar
+        borderBottomEndRadius: 20,    // Rounded corners on the bottom end
+        borderBottomStartRadius: 20,  // Rounded corners on the bottom start
+        shadowOpacity: 0.5,           // Shadow for iOS
+        shadowOffset: { height: 5 },  // Shadow offset for iOS
+        shadowRadius: 5,              // Shadow blur radius for iOS
+        height: 40,                  // Height of the header bar
+      },
+      headerTintColor: 'lightsteelblue', 
+      headerFontSize: 20,       // Color of the back button and title
+      headerTitleStyle: {
+        color: 'transparent',  
+      },
+      headerTitleAlign: 'center',     // Align the title to the center
+      headerBackTitleVisible: true,  
+      headerShadowVisible: true,
+    }}>
+      <Stack.Screen name="Services" component={ServiceScreen} />
+      <Stack.Screen name="Info" component={InfoScreen}/>
+    </Stack.Navigator>
+
+  )
+}
+
 
 function App({navigation}) {
 
@@ -1047,10 +1142,10 @@ function App({navigation}) {
               tabBarIcon: 'home-circle-outline', 
 
             }}/>
-            <Tab.Screen name="Contact" component={InformationalStack} style={styles.navButton} options={{
+            <Tab.Screen name="Contact" component={ClinicStack} style={styles.navButton} options={{
               tabBarIcon: 'map-marker-plus-outline'}}/>
       
-            <Tab.Screen name="Services" component={ServiceScreen} style={styles.navButton} options={{
+            <Tab.Screen name="Services" component={InformationalStack} style={styles.navButton} options={{
               tabBarIcon: 'heart'
             }}/>
             <Tab.Screen name="Profile" component={AccountStack} style={styles.navButton} options={{
@@ -1744,6 +1839,61 @@ const styles = StyleSheet.create({
   calloutButtonText: {
     color: 'white',
     textAlign: 'center',
+  },
+  appointmentContainer: {
+    flex: 1,
+    padding: 10,
+    backgroundColor: 'aliceblue',
+  },
+  appointmentHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: 20,
+  },
+  appointmentHeaderText: {
+    fontSize: 18,
+  },
+  appointmentForm: {
+    flex: 1,
+  },
+  appointmentInputRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+  },
+  appointmentInput: {
+    flex: 1,
+    backgroundColor: 'gainsboro',
+    borderColor: 'lightseagreen',
+    fontFamily: 'Times New Roman',
+    fontSize: 18,
+    borderWidth: 1,
+    padding: 10,
+    margin: 8,
+    },
+  inputFull: {
+    borderColor: 'gray',
+    backgroundColor: 'gainsboro',
+    fontFamily: 'Times New Roman',
+    fontSize: 20,
+    borderWidth: 1,
+    padding: 10,
+    margin: 8,
+  },
+  appointmentNotificationText: {
+    margin: 8,
+  },
+  appointmentButton: {
+    backgroundColor: 'lightseagreen',
+    padding: 15,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderRadius: 5,
+    margin: 8,
+  },
+  appointmentButtonText: {
+    color: 'aliceblue',
+    fontSize: 16,
+    fontWeight: 'bold',
   },
 
 
