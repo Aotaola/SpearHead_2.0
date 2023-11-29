@@ -375,8 +375,8 @@ function ContactScreen({route, navigation}) {
           region={{
             latitude: clinicCords.latitude,
             longitude: clinicCords.longitude,
-            latitudeDelta: 0.0922,
-            longitudeDelta: 0.0921
+            latitudeDelta: 0.009,
+            longitudeDelta: 0.009
           }}>
             <Marker 
              coordinate={{
@@ -389,14 +389,7 @@ function ContactScreen({route, navigation}) {
               <Ionicons name= "location" size={40} color="crimson" />
               </View>
             </Marker>
-            {/* <Marker  
-              coordinate={{
-                latitude: userLocation.latitude,
-                longitude: userLocation.longitude
-              }}
-              title="you!"
-              pinColor='crimson'
-              /> */}
+            
           </MapView>
         ) : ( <Text style={styles.paragraph}> no location found </Text>
         )
@@ -425,7 +418,12 @@ function ContactScreen({route, navigation}) {
           Make an Appointment
         </Text>
       </TouchableOpacity>
-      
+    </View>
+
+    <View style={styles.scheduleContainer}>
+    {Object.entries(workHours).map(([day, hours]) => (
+      <Text key={day} style={styles.scheduleDay}>{`${day}: ${hours}`}</Text>
+    ))}
     </View>
 
     <View style={styles.informationButton} >
@@ -1058,14 +1056,14 @@ const styles = StyleSheet.create({
  
   container: {
     flex: 1,
-    backgroundColor: 'transparent',
+    backgroundColor: 'aliceblue',
    // height: 100
   },
   pagerView: {
     flex: 1,
   },
   scrollView: {
-    backgroundColor: 'aliceblue'
+    backgroundColor: 'transparent'
   },
   logoContainer: {
     backgroundColor: 'steelblue',
@@ -1154,7 +1152,6 @@ const styles = StyleSheet.create({
   calloutDescription: {
     fontSize: 14,
   },
-
   invoiceText: {
     fontSize: 18, 
     color: 'cornflowerblue',
@@ -1287,6 +1284,24 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: '400',
     textAlign: 'center', 
+  },
+  scheduleContainer: {
+    display: 'flex',
+    alignItems: 'center',
+    backgroundColor: 'tranparent', // keeping a light, neutral background
+    padding: 15,
+    borderRadius: 8, // subtle rounded corners
+    marginTop: 10, // space from the preceding element
+    borderWidth: 1, // adding a thin border for a refined look
+    borderColor: 'lightgrey', // a soft border color
+  },
+  scheduleDay: {
+    color: 'steelblue', // maintaining the color for contrast
+    fontSize: 16, // a comfortable reading size
+    fontWeight: '400', // normal weight for a clean look
+    letterSpacing: 2, 
+    marginBottom: 6, // slightly reduced space between days for compactness
+    textAlign: 'left', // left-aligned text for a traditional layout
   },
   locationScrollview: {
     flex: 1,
