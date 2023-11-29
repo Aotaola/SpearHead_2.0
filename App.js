@@ -131,6 +131,17 @@ function LocationScreen ({navigation}){
         longitude: -80.149490,
       },
       address: '5812 Hollywood Blvd Hollywood, FL, 33021',
+      phoneNumber: '(954) 981-9111',
+      walkIns: true,
+      schedule: {
+        Monday: '8:00 AM - 8:00 PM',
+        Tuesday: '8:00 AM - 8:00 PM',
+        Wednesday: '8:00 AM - 8:00 PM',
+        Thursday: '8:00 AM - 8:00 PM',
+        Friday: '8:00 AM - 8:00 PM',
+        Saturday: '8:00 AM - 5:00 PM',
+        Sunday: '8:00 AM - 5:00 PM'
+      }
     },
     {
       id: 'clearwater',
@@ -142,6 +153,15 @@ function LocationScreen ({navigation}){
       address: '1500 McMullen Booth Rd. Ste. A1-A2 Clearwater, FL, 33759',
       phoneNumber: '(727) 266-1266',
       walkIns: true, 
+      schedule: {
+        Monday: '8:00 AM - 8:00 PM',
+        Tuesday: '8:00 AM - 8:00 PM',
+        Wednesday: '8:00 AM - 8:00 PM',
+        Thursday: '8:00 AM - 8:00 PM',
+        Friday: '8:00 AM - 8:00 PM',
+        Saturday: '9:00 AM - 6:00 PM',
+        Sunday: '9:00 AM - 6:00 PM'
+      }
     },
     {
       id: 'largo',
@@ -151,8 +171,18 @@ function LocationScreen ({navigation}){
         longitude: -82.783243,
       },
       address: '9040 Ulmerton Rd, Suite 200 Largo, FL, 33771',
-    },
-    
+      phoneNumber: '(727) 371-0660',
+      walkIns: false,
+      schedule: {
+        Monday: '8:00 AM - 8:00 PM',
+        Tuesday: '8:00 AM - 8:00 PM',
+        Wednesday: '8:00 AM - 8:00 PM',
+        Thursday: '8:00 AM - 8:00 PM',
+        Friday: '8:00 AM - 8:00 PM',
+        Saturday: '8:00 AM - 5:00 PM',
+        Sunday: '8:00 AM - 5:00 PM'
+      }
+    }
   ]);
 
   const centerLatitude = (locations[0].coordinates.latitude + locations[1].coordinates.latitude + locations[2].coordinates.latitude) / 3;
@@ -252,8 +282,11 @@ function ContactScreen({route, navigation}) {
   const [errorMsg, setErrorMsg] = useState(null);
   const clinic = route.params.clinic
   const clinicCords = clinic.coordinates
+  const walkIn = clinic.walkIns
+  const workHours = clinic.schedule
 
   console.log(clinic)
+  console.log('walkin', walkIn)
   
   // business location is hardcoded. 
   
@@ -295,9 +328,6 @@ function ContactScreen({route, navigation}) {
     })
     .catch(err => console.error('An error occurred', err));
   };
-  
-  const businessLocation = {latitude:  26.0089697, longitude: -80.2038731}
-  console.log('business location: ', businessLocation)
       
       
       useEffect(() => {
@@ -336,12 +366,12 @@ function ContactScreen({route, navigation}) {
       }
       //  
       return (
-        <ScrollView style = {{backgroundColor: 'aliceblue'}}> 
+        <ScrollView style = {{backgroundColor: 'aliceblue', display: 'flex', flexDirection: 'column'}} > 
         {/* <Text>{clinic.address}</Text> */}
         {userLocation  && clinicCords  ? 
         (
           <MapView 
-          style={{  width: '100%', height: 350}} 
+          style={{  width: '100%', height: 230}} 
           region={{
             latitude: clinicCords.latitude,
             longitude: clinicCords.longitude,
@@ -359,29 +389,35 @@ function ContactScreen({route, navigation}) {
               <Ionicons name= "location" size={40} color="crimson" />
               </View>
             </Marker>
-            <Marker  
+            {/* <Marker  
               coordinate={{
                 latitude: userLocation.latitude,
                 longitude: userLocation.longitude
               }}
               title="you!"
               pinColor='crimson'
-              />
+              /> */}
           </MapView>
         ) : ( <Text style={styles.paragraph}> no location found </Text>
         )
       }
+    <View style={styles.contactClickContainer}>
+      <View style={styles.contactButtonContainer}>
+        <TouchableOpacity onPress={handleCopyToClipboard} style={styles.contactButton}>
+        <Feather name = "copy" size={30} color="crimson"/>
+        </TouchableOpacity>
+      </View>
 
-    <View style={styles.contactButtonContainer}>
-      <TouchableOpacity onPress={handleCopyToClipboard} style={styles.contactButton}>
-      <Feather name = "copy" size={30} color="crimson"/>
-      </TouchableOpacity>
-    </View>
-
-    <View style={styles.contactButtonContainer}>
-      <TouchableOpacity onPress={handleCallBusiness} style={styles.contactButton}>
-        <Feather name = "phone-call" size={30} color="crimson"/>
-      </TouchableOpacity>
+      <View style={styles.contactButtonContainer}>
+        <TouchableOpacity onPress={handleCallBusiness} style={styles.contactButton}>
+          <Feather name = "phone-call" size={30} color="crimson"/>
+        </TouchableOpacity>
+      </View>
+        {walkIn ?
+      <View style={styles.contactWalking}>
+         <Text style={styles.contactWalkInText}>Walk-ins are Welcomed</Text> 
+      </View>
+         : false}
     </View>
     <View  style = {styles.contactButtonContainer}>
       <TouchableOpacity onPress={handleMakeAppointment} style={styles.contactButton}>
@@ -389,6 +425,7 @@ function ContactScreen({route, navigation}) {
           Make an Appointment
         </Text>
       </TouchableOpacity>
+      
     </View>
 
     <View style={styles.informationButton} >
@@ -399,7 +436,7 @@ function ContactScreen({route, navigation}) {
     </View>
 
     
-  </ScrollView>
+        </ScrollView>
   );
 }
 
@@ -1200,11 +1237,33 @@ const styles = StyleSheet.create({
     fontSize: 17, 
     textAlign: 'center'
   },
+  contactClickContainer: {
+    backgroundColor: 'transparent',
+    display: 'flex',
+    flexDirection: 'row',
+    marginHorizontal: 5,
+    alignContent: 'center',
+    alignItems: 'center',
+    justifyContent: 'flex-start',
+  },
   contactButtonContainer: {
-    marginHorizontal: 10,
-    marginTop: 5,
+    display: 'flex',
+    justifyContent: 'space-around',
+    alignItems: 'center',
+    width: 'auto',
+    paddingHorizontal: 10,
+    paddingVertical: 10,
+  },
+  contactWalking: {
+    backgroundColor: 'steelblue', 
+    borderRadius: 10,
+    paddingHorizontal: 10,
+    paddingVertical: 10, 
+    borderWidth: 1,
+    borderColor: 'crimson', 
   },
   contactButton: {
+    width: '100%',
     backgroundColor: 'aliceblue', 
     borderRadius: 10,
     paddingHorizontal: 10,
@@ -1213,6 +1272,14 @@ const styles = StyleSheet.create({
     borderColor: 'lightseagreen', 
     //alignItems: 'center', 
     //justifyContent: 'center', 
+  },
+  contactWalkInText: {
+    backgroundColor: 'steelblue', 
+    color: 'aliceblue', 
+    fontFamily: 'Helvetica',
+    fontSize: 20,
+    fontWeight: '400',
+    textAlign: 'center', 
   },
   contactButtonText: {
     color: 'cornflowerblue', 
