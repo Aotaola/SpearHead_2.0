@@ -357,7 +357,7 @@ function ContactScreen({route, navigation}) {
         text = JSON.stringify(userLocation);
       }  
       return (
-        <ScrollView style = {{backgroundColor: 'aliceblue', display: 'flex', flexDirection: 'column'}} > 
+        <View style = {{backgroundColor: 'aliceblue', display: 'flex', flexDirection: 'column'}} > 
           {/* <Text>{clinic.address}</Text> */}
           {userLocation  && clinicCords  ? 
           (
@@ -419,7 +419,7 @@ function ContactScreen({route, navigation}) {
               <Text key={day} style={styles.scheduleDay}>{`${day}: ${hours}`}</Text>
             ))}
             </View>
-        </ScrollView>
+        </View>
   );
 }
 
@@ -600,7 +600,7 @@ function ServiceScreen({navigation}){
   
   const renderFooter = () => {
     if (loading) {
-      return <ActivityIndicator size="large" color="#0000ff" />;
+      return <ActivityIndicator size="large" color="lavender" />;
     }
     
     if (!hasMoreItems) {
@@ -1361,7 +1361,7 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
   },
   contactWalking: {
-    backgroundColor: 'steelblue', 
+    backgroundColor: 'aliceblue', 
     borderRadius: 10,
     paddingHorizontal: 10,
     paddingVertical: 10, 
@@ -1380,8 +1380,8 @@ const styles = StyleSheet.create({
     //justifyContent: 'center', 
   },
   contactWalkInText: {
-    backgroundColor: 'steelblue', 
-    color: 'aliceblue', 
+    backgroundColor: 'aliceblue', 
+    color: 'darkgrey', 
     fontFamily: 'Helvetica',
     fontSize: 20,
     fontWeight: '400',
@@ -1590,7 +1590,7 @@ const styles = StyleSheet.create({
   },
   privacyBtn:{
     borderWidth: 1,
-    borderColor: 'crimson',
+    borderColor: 'silver',
     backgroundColor: 'aliceblue',
     color: 'white',
   },
@@ -1626,7 +1626,7 @@ const styles = StyleSheet.create({
     paddingRight: 10,
     fontSize: 22,
     fontFamily: 'Helvetica',
-    color: 'midnightblue',
+    color: 'steelblue',
     backgroundColor: 'aliceblue',
     fontWeight: '400', 
     letterSpacing: 0.7,
@@ -1639,7 +1639,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontFamily: 'Helvetica',
     fontStyle: 'italic',
-    color: 'steelblue',
+    color: 'lightseagreen',
     backgroundColor: 'aliceblue',
     fontWeight: '200', 
     letterSpacing: 0.7,
