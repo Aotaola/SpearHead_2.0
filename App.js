@@ -413,7 +413,10 @@ function ContactScreen({route, navigation}) {
          : false}
     </View>
     <View  style = {styles.contactButtonContainer}>
-      <TouchableOpacity onPress={handleMakeAppointment} style={styles.contactButton}>
+      <TouchableOpacity 
+        onPress={navigation.navigate("Appointment")}
+      // onPress={handleMakeAppointment} 
+      style={styles.contactButton}>
         <Text style={styles.contactButtonText}>
           Make an Appointment
         </Text>
@@ -436,6 +439,12 @@ function ContactScreen({route, navigation}) {
     
         </ScrollView>
   );
+}
+
+function AppointmentScreen(){
+  return(
+    <Text>this is an appointment screen</Text>
+  )
 }
 
 function InfoScreen({route}) {
@@ -1000,6 +1009,7 @@ function InformationalStack() {
       <Stack.Screen name = "Location" component={LocationScreen} />
       <Stack.Screen name = "Contact" component={ContactScreen} />
       <Stack.Screen name="Info" component={InfoScreen}/>
+      <Stack.Screen name = "Appointment" component={AppointmentScreen} />
     </Stack.Navigator>
   )
 }
