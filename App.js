@@ -482,9 +482,9 @@ function AppointmentScreen({route}){
 
           // onChangeText={...}
         />
-        {/* <Text style={styles.notificationText}>
+        <Text style={styles.notificationText}>
           We'll send you a text message when it's time to show up.
-        </Text> */}
+        </Text>
       <TouchableOpacity style={styles.appointmentButton}>
         <Text style={styles.appointmentButtonText}>Save your Spot</Text>
       </TouchableOpacity>
@@ -1886,7 +1886,12 @@ const styles = StyleSheet.create({
     padding: 10,
     margin: 8,
   },
-  appointmentNotificationText: {
+  notificationText: {
+    fontFamily: 'Times New Roman',
+    fontStyle: 'bold',
+    fontSize: 18,
+    color: 'lightseagreen',
+    padding: 10,
     margin: 8,
   },
   appointmentButton: {
