@@ -13,8 +13,6 @@ import  * as Clipboard from '@react-native-community/clipboard';
 import { debounce } from 'lodash';
 import { MaterialCommunityIcons, Ionicons, Octicons, Feather} from '@expo/vector-icons';
 
-
-
 function truncate(str, maxLength, continuation = "...") {
   if (str.length <= maxLength) return str;
   return str.slice(0, maxLength - continuation.length) + continuation;
@@ -58,10 +56,19 @@ function HomeScreen({navigation}) {
   
   const renderUpdate = ({ item }) => {
     console.log('item ID', item.id)
+
     return (
       <TouchableOpacity 
       style={styles.TouchableOpacityStyleStyle}
-      onPress={() => navigation.navigate('Update', { item })}
+      onPress={() => { fetch(`http://127.0.0.1:5000/track_click`, { method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({title: item.title}) 
+    })
+    .catch((error) => console.error('Error tracking click', error)); navigation.navigate('Update', { item });
+    console.log(`click on ${item.title}`)
+      }}
       >
         <Text style={styles.newsTitle}>{item.title}</Text>
         <Text style={styles.newsSubTitle}>{truncate(item.description, 85)}</Text>
@@ -493,7 +500,7 @@ function AppointmentScreen({route}){
   )
 }
 
-function InfoScreen({route}) {
+function InformationScreen({route}) {
 
   const [selectedFaqIndex, setSelectedFaqIndex] = useState(null);
 
@@ -515,7 +522,7 @@ function InfoScreen({route}) {
   }
 
   return (
-    <ScrollView style={styles.infoContainer}> 
+    <View style={styles.infoContainer}> 
           <Text style={styles.infoMainText}>
             Frequently Asked Questions
           </Text>
@@ -537,7 +544,7 @@ function InfoScreen({route}) {
           <Button title="Privacy Policy" onPress={openAfcNPP} style={styles.privacyBtn}/>
         </View>
         
-    </ScrollView>
+    </View>
   );
 };
 
@@ -604,7 +611,7 @@ function ServiceScreen({navigation}){
     }
     
     if (!hasMoreItems) {
-      return <Text style={{ textAlign: 'center', padding: 10 }}>No more articles available</Text>;
+      return <Text style={{ textAlign: 'center', padding: 10 }}>youve reached the end of services</Text>;
     }
     return null;
   };
@@ -613,7 +620,7 @@ function ServiceScreen({navigation}){
     <View style={styles.serviceContainer} >
       <View style={styles.informationButton} >
             <TouchableOpacity 
-            onPress={() => navigation.navigate('Info')} >
+            onPress={() => navigation.navigate('Information')} >
             <Text style={styles.InfobuttonText}>more information +</Text>
             </TouchableOpacity>
           </View>
@@ -1107,7 +1114,7 @@ function InformationalStack() {
       headerShadowVisible: true,
     }}>
       <Stack.Screen name="Services" component={ServiceScreen} />
-      <Stack.Screen name="Info" component={InfoScreen}/>
+      <Stack.Screen name="Information" component={InformationScreen}/>
     </Stack.Navigator>
 
   )
@@ -1143,17 +1150,17 @@ function App({navigation}) {
             borderRadius: 0,
             overflow: 'hidden'
             }}>
-            <Tab.Screen name="Home" component={InitialStack} style={styles.navButton} options={{
+            <Tab.Screen name="Explore" component={InitialStack} style={styles.navButton} options={{
               tabBarIcon: 'home-circle-outline', 
 
             }}/>
-            <Tab.Screen name="Contact" component={ClinicStack} style={styles.navButton} options={{
+            <Tab.Screen name="Call" component={ClinicStack} style={styles.navButton} options={{
               tabBarIcon: 'map-marker-plus-outline'}}/>
       
-            <Tab.Screen name="Services" component={InformationalStack} style={styles.navButton} options={{
+            <Tab.Screen name="Info" component={InformationalStack} style={styles.navButton} options={{
               tabBarIcon: 'heart'
             }}/>
-            <Tab.Screen name="Profile" component={AccountStack} style={styles.navButton} options={{
+            <Tab.Screen name="Account" component={AccountStack} style={styles.navButton} options={{
             tabBarIcon: 'account-heart'
           }}/>
           </Tab.Navigator>
@@ -1307,7 +1314,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     fontFamily: 'Helvetica',
     fontSize: 20,                
-    fontWeight: '320',           
+    fontWeight: '400',           
     color: 'lavender',               
     letterSpacing: 4,          
     position: 'absolute', 
@@ -1510,7 +1517,7 @@ const styles = StyleSheet.create({
     marginBottom: 0,
     paddingLeft: 20,
     fontSize: 16,
-    placeholderTextColor: 'red',
+    //placeholderTextColor: 'red',
     },
   clinicDetailsCard: {
     backgroundColor: '#f9f9f9', // Soft background color for the details card
@@ -1888,7 +1895,7 @@ const styles = StyleSheet.create({
   },
   notificationText: {
     fontFamily: 'Times New Roman',
-    fontStyle: 'bold',
+    fontWeight: '400',
     fontSize: 18,
     color: 'lightseagreen',
     padding: 10,
