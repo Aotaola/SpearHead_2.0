@@ -107,9 +107,7 @@ function HomeScreen({navigation}) {
     if (!route.params) {
       return <Text style={styles.newsError}>Error loading data, please select an article from the homepage</Text> 
     }
-    const {item} = route.params;
-    console.log(item.admin)
-    
+    const {item} = route.params;    
     return(
       <ScrollView style={styles.newsContainer}>
         <Text style={styles.newsTitle}>{item.title}</Text>
