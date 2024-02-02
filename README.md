@@ -1,9 +1,9 @@
-# AFC Mobile App
+# Spearhead Mobile App
 
 ## Overview
-The AFC Mobile App, built using React Native and Expo for iOS, serves as a dedicated platform for an urgent care facility. Its main goal is to relay essential, educational, and sometimes critical information on healthcare topics to patients and interested readers. This initiative aims to strengthen the bond and improve communication between healthcare providers and their clientele.
+The Spearhead Mobile App, built using React Native and Expo for iOS, serves as a dedicated platform for an urgent care facility. Its main goal is to relay essential, educational, and sometimes critical information on healthcare topics to patients and interested readers. This initiative aims to strengthen the bond and improve communication between healthcare providers and their clientele.
 
-This application complements the AFC Mobile Admin.
+This application complements the Spearhead Admin Platform.
 
 ## Getting Started
 
